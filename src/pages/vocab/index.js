@@ -1,0 +1,1 @@
+export { Vocab } from './vocab';

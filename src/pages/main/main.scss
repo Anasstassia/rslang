@@ -1,0 +1,106 @@
+@use '../../scss/vars.scss';
+
+.start {
+  color: vars.$jet;
+  width: 100%;
+}
+
+.about {
+  margin-top: 1em;
+
+  &__app {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @media (max-width: vars.$mediumScreen) {
+      flex-direction: column;
+    }
+  }
+
+  &__description {
+    max-width: 600px;
+    margin-right: 1em;
+  }
+
+  &__video {
+    margin: 2em 0 0 0;
+  }
+
+  &__title {
+    font-size: 2em;
+    padding: 0 0 5px 0;
+    margin: 0;
+    border-bottom: 3px solid vars.$green;
+  }
+
+  .team {
+    &__list {
+      display: flex;
+      margin: 1em 0 1em 0;
+      padding: 0;
+      justify-content: space-between;
+      @media (max-width: vars.$smallScreen) {
+        flex-direction: column;
+      }
+    }
+
+    .member {
+      position: relative;
+      list-style: none;
+      display: flex;
+      border: 2px solid vars.$green;
+      border-radius: 1em;
+      width: 31%;
+      padding: 7px;
+      @media (max-width: vars.$mediumScreen) {
+        flex-direction: column;
+        font-size: 14px;
+        align-items: center;
+      }
+      @media (max-width: vars.$smallScreen) {
+        flex-direction: row;
+        width: 100%;
+        margin-bottom: 1em;
+      }
+
+      &__photo {
+        display: block;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 15px 0 0;
+      }
+
+      &__name {
+        font-size: 1.2em;
+        padding: 0 0 7px 0;
+        margin: 0;
+      }
+
+      &__role {
+        font-style: italic;
+        margin: 0 7px 0 0;
+      }
+
+      &__duties {
+        padding: 0 0 0 10px;
+        margin: 0;
+      }
+
+      .github {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        &__icon {
+          filter: vars.$filter-green;
+        }
+        &:hover .github__icon {
+          filter: vars.$filter-orange;
+        }
+        &:active .github__icon {
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}
