@@ -8,8 +8,9 @@ import { Header } from './core/components/header';
 import { Footer } from './core/components/footer';
 import { Menu } from './core/components/menu';
 
-import { Utils, urlRequest } from './core/utils/utils';
+import { Utils } from './core/utils/utils';
 // import Types
+import { content } from './core/components/types';
 
 export const header = new Header();
 export const footer = new Footer();
@@ -18,21 +19,16 @@ export const main = new Main();
 export const vocab = new Vocab();
 export const error404 = new Error404();
 
-interface content {
-  render: Function;
-  run: Function;
-}
-
-const routes: Record<string, any> = {
+const routes: Record<string, content> = {
   '/': main,
   '/vocab': vocab,
 };
 
 export const router = async () => {
-  let headerElem = document.querySelector('.header') as HTMLElement;
-  let mainElem = document.querySelector('.content') as HTMLElement;
-  let footerElem = document.querySelector('.footer') as HTMLElement;
-  let menuElem = document.querySelector('.menu') as HTMLElement;
+  const headerElem = document.querySelector('.header') as HTMLElement;
+  const mainElem = document.querySelector('.content') as HTMLElement;
+  const footerElem = document.querySelector('.footer') as HTMLElement;
+  const menuElem = document.querySelector('.menu') as HTMLElement;
 
   headerElem.innerHTML = await header.render();
   footerElem.innerHTML = await footer.render();
@@ -41,12 +37,11 @@ export const router = async () => {
   await menu.run();
   await footer.run();
 
-  const request: urlRequest = Utils.parseRequestURL();
-  const parsedURL: string = (request.main ? `/${request.main}` : '/') + (request.vocab ? `/${request.vocab}` : '');
+  const request = Utils.parseRequestURL();
+  const parsedURL = (request.main ? `/${request.main}` : '/') + (request.vocab ? `/${request.vocab}` : '');
 
-  const page: content = routes[parsedURL] ? routes[parsedURL] : error404;
+  const page = routes[parsedURL] ? routes[parsedURL] : error404;
   mainElem.innerHTML = await page.render();
-
   await page.run();
 };
 

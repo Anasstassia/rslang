@@ -5,7 +5,7 @@ export interface urlRequest {
 
 export const Utils = {
   parseRequestURL: () => {
-    const url: string = location.hash.slice(1).toLowerCase() || '/';
+    const url: string = window.location.hash.slice(1).toLowerCase() || '/';
 
     const r: string[] = url.split('/');
 
@@ -13,9 +13,9 @@ export const Utils = {
       main: '',
       vocab: '',
     };
-
-    request.main = r[1];
-    request.vocab = r[2];
+    const [main, vocab] = [r[1], r[2]];
+    request.main = main;
+    request.vocab = vocab;
 
     return request;
   },

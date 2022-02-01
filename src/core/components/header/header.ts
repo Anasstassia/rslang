@@ -1,12 +1,15 @@
+import { content } from '../types';
 import html from './header.html';
 import './header.scss';
 
-export class Header {
-  constructor() {}
+export class Header implements content {
+  // constructor() {}
 
   async render() {
     return html;
   }
 
-  async run() {}
+  async run() {
+    return undefined;
+  }
 }

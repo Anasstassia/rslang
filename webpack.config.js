@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 const devServer = (develop) =>
   !develop
@@ -17,11 +18,13 @@ const devServer = (develop) =>
         },
       };
 
-module.exports = ({ develop }) => ({
+module.exports = ({ develop, analyze }) => ({
   entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+    filename: '[name].[hash:8].js',
+    sourceMapFilename: '[name].[hash:8].map',
+    chunkFilename: '[id].[hash:8].js',
   },
   mode: develop ? 'development' : 'production',
   module: {
@@ -72,10 +75,13 @@ module.exports = ({ develop }) => ({
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'src/assets/'),
-          to: path.resolve(__dirname, 'dist/assets/'),
+          from: path.resolve(__dirname, './src/assets/'),
+          to: path.resolve(__dirname, './dist/assets/'),
         },
       ],
+    }),
+    new CompressionPlugin({
+      algorithm: 'brotliCompress',
     }),
   ],
   ...devServer(develop),
