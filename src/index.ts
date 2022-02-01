@@ -33,9 +33,9 @@ export const router = async () => {
   headerElem.innerHTML = await header.render();
   footerElem.innerHTML = await footer.render();
   menuElem.innerHTML = await menu.render();
-  // await header.run();
-  // await menu.run();
-  // await footer.run();
+  await header.run();
+  await menu.run();
+  await footer.run();
 
   const request = Utils.parseRequestURL();
   const parsedURL = (request.main ? `/${request.main}` : '/') + (request.vocab ? `/${request.vocab}` : '');
