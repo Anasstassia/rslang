@@ -1,0 +1,25 @@
+/* FOOTER */
+@use '../../../scss/vars.scss';
+
+.footer {
+  background-color: vars.$jet;
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .rss {
+    display: block;
+    margin: 10px;
+    filter: vars.$filter-snow;
+    transition: all 0.3s;
+    &:hover {
+      filter: vars.$filter-green;
+    }
+    &:active {
+      filter: vars.$filter-blue-green;
+    }
+  }
+}
