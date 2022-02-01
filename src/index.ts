@@ -19,7 +19,7 @@ export const main = new Main();
 export const vocab = new Vocab();
 export const error404 = new Error404();
 
-const routes: Record<string, any> = {
+const routes: Record<string, 2> = {
   '/': main,
   '/vocab': vocab,
 };
