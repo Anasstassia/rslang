@@ -8,8 +8,10 @@
     "build": "webpack build",
     "dev": "webpack serve --env develop",
     "lint": "eslint ./src",
-    "analyze": "webpack --profile",
-    "prepare": "husky install"
+    "analyze": "webpack --profile --json > stats.json && webpack-bundle-analyzer stats.json"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run lint"
   },
   "repository": {
     "type": "git",
@@ -36,10 +38,10 @@
     "eslint-plugin-prettier": "^4.0.0",
     "html-loader": "^3.1.0",
     "html-webpack-plugin": "^5.5.0",
-    "husky": "^7.0.4",
     "prettier": "2.5.1",
     "sass": "^1.49.0",
     "sass-loader": "^12.4.0",
+    "simple-git-hooks": "^2.7.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",

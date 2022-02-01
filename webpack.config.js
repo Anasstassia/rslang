@@ -3,7 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const devServer = (develop) =>
   !develop
@@ -19,7 +18,7 @@ const devServer = (develop) =>
         },
       };
 
-module.exports = ({ develop }) => ({
+module.exports = ({ develop, analyze }) => ({
   entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
@@ -81,7 +80,6 @@ module.exports = ({ develop }) => ({
         },
       ],
     }),
-    new BundleAnalyzerPlugin(),
     new CompressionPlugin({
       algorithm: 'brotliCompress',
     }),
