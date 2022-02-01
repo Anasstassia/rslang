@@ -6,7 +6,10 @@
   "scripts": {
     "start": "webpack serve",
     "build": "webpack build",
-    "dev": "webpack serve --env develop"
+    "dev": "webpack serve --env develop",
+    "lint": "eslint ./src",
+    "analyze": "webpack --profile",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -22,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "clean-webpack-plugin": "^4.0.0",
+    "compression-webpack-plugin": "^9.2.0",
     "copy-webpack-plugin": "^10.2.4",
     "css-loader": "^6.5.1",
     "eslint": "^8.8.0",
@@ -32,6 +36,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "html-loader": "^3.1.0",
     "html-webpack-plugin": "^5.5.0",
+    "husky": "^7.0.4",
     "prettier": "2.5.1",
     "sass": "^1.49.0",
     "sass-loader": "^12.4.0",
@@ -39,6 +44,7 @@
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",
     "webpack": "^5.68.0",
+    "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.3"
   },
