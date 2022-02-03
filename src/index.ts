@@ -11,6 +11,7 @@ import { Menu } from './core/components/menu';
 import { Utils } from './core/utils/utils';
 // import Types
 import { content } from './core/components/types';
+import { createUser, loginUser } from './core/client/users';
 
 export const header = new Header();
 export const footer = new Footer();
@@ -43,15 +44,9 @@ export const router = async () => {
   const page = routes[parsedURL] ? routes[parsedURL] : error404;
   mainElem.innerHTML = await page.render();
   await page.run();
+  createUser({ email: 'test-user@google.com', password: '12345678' });
+  loginUser({ email: 'test-user@google.com', password: '12345678' });
 };
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);
-
-/*
-console.log(`
-Самооценка: 
-165	баллов
-	
-`)
-*/
