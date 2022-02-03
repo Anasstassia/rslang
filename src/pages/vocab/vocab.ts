@@ -6,8 +6,10 @@ import { Word } from '../../core/components/word';
 
 export class Vocab implements content {
   page: number;
+
   group: number | string;
-  vocabList: any;
+
+  vocabList?: HTMLElement;
 
   constructor() {
     this.page = 0;
@@ -64,11 +66,12 @@ export class Vocab implements content {
   };
 
   renderWords = async () => {
+    if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
-    let items = await this.getWords();
+    const items = await this.getWords();
     items.forEach(async (item: iWord) => {
       const word = await new Word(item).render();
-      this.vocabList.append(word);
+      this.vocabList?.append(word);
     });
   };
 }
