@@ -1,0 +1,118 @@
+@use "../../../scss/vars.scss";
+
+.sprint {
+  color: #fff;
+	background: linear-gradient(-45deg, #ee7752, vars.$red, #23a6d5, vars.$blue-green);
+  height: 100% !important;
+  padding-top: 25px;
+  position: relative;
+	background-size: 300% 300%;
+	animation: gradient 20s ease infinite;
+
+  .container {
+    padding: 0 60px 0 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .buttons {
+      cursor: pointer;
+      filter: vars.$filter-snow;
+
+      display: flex;
+      align-items: center;
+      column-gap: 40px;
+
+      transform: scale(1);
+      img {
+        transition: transform .07s linear;
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+
+      &__volume-img {
+        width: 40px;
+        height: 40px;
+      }
+      &__fullScreen-img {
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+    .diff {
+      display: block;
+      text-decoration: none;
+      border: 1px solid transparent;
+      border-radius: 30px;
+      outline: none;
+      background: transparent !important;
+      cursor: pointer;
+      color: #fff;
+      font-size: 18px;
+
+      padding: 10px;
+
+      transition: border .2s linear;
+
+      &:hover {
+        border: 1px solid rgb(255, 255, 255);
+      }
+
+      &__option {
+        background: rgb(199, 152, 152);
+      }
+    }
+
+  }
+
+
+  &__content {
+    width: 600px;
+    margin: 0 auto;
+    margin-top: 15%;
+    padding: 20px;
+    border: 1px solid #fff;
+    text-align: center;
+
+    &__title {
+      font-size: 27px;
+    }
+    &__subtitle {
+      font-size: 23px;
+    }
+
+    &__start-btn {
+      background: transparent;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      border: 1px solid #ffffff;
+      border-radius: 20px;
+      padding: 10px 20px;
+      
+      transition: all .3s linear;
+
+      &:hover {
+        color: vars.$jet;
+        background-color: #fff;
+      }
+    }
+  }
+}
+
+@keyframes gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
