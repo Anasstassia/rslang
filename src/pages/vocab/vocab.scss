@@ -1,0 +1,108 @@
+@use '../../scss/vars.scss';
+
+@mixin colorLvl($color) {
+  .vocab__level-name::before{
+    background-color: $color;
+  }
+}
+
+.vocab {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__difficult {
+    font-size: 1.1em;
+    padding: 3px 10px;
+    margin-right: 2em;
+  }
+
+
+  &_a1 {
+    @include colorLvl(vars.$a1);
+  }
+
+  &_a2 {
+    @include colorLvl(vars.$a2);
+  }
+
+  &_b1 {
+    @include colorLvl(vars.$b1);
+  }
+
+  &_b2 {
+    @include colorLvl(vars.$b2);
+  }
+
+  &_c1 {
+    @include colorLvl(vars.$c1);
+  }
+
+  &_c2 {
+    @include colorLvl(vars.$c2);
+  }
+
+
+  &__level-name {
+    position: relative;
+    font-size: 2em;
+    height: 1.5em;
+    border-radius: 1em;
+    overflow: hidden;
+    padding: 0 0 0 2em;
+    margin: 1em 0 0 0;
+    border: 2px solid vars.$jet;
+    &::before {
+      content: '';
+      display: block;
+      position:absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+      width: 30px;
+      height: 100%;
+    }
+  }
+}
+
+.level {
+  font-size: 1.1em;
+  width: 250px;
+  margin-right: 2em;
+}
+
+.btn_arrow {
+  background-image: url("../../assets/icons/arrow.svg");
+  filter: vars.$filter-jet;
+}
+
+.pagination {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  
+
+  .btn_prev {
+    transform: rotate(-90deg)
+  }
+
+  .btn_next {
+    transform: rotate(90deg)
+  }
+
+  .btn_page {
+    font-size: 1.1em;
+    width: 2em;
+    height: 2em;
+  }
+}
+
+.vocab__page {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1em;
+  margin: 1em 0 0 0;
+  padding: 0;
+  
+}

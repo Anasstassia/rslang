@@ -2,7 +2,7 @@ import { client } from '.';
 
 const state = {} as State;
 
-type State = { currentUser: AuthUserResponse };
+type State = { currentUser: AuthUserResponse | null };
 
 type UserRequest = {
   email: string;
@@ -43,7 +43,7 @@ export const refreshToken = async () => {
   const oldRefreshToken = localStorage.getItem('refreshToken');
 
   const { token, refreshToken: rtoken } = await client.get<unknown, { token: string; refreshToken: string }>(
-    `/users/${state.currentUser.userId}/tokens`,
+    `/users/${state.currentUser?.userId}/tokens`,
     {
       headers: {
         Authorization: `Bearer ${oldRefreshToken}`,
@@ -51,4 +51,10 @@ export const refreshToken = async () => {
     }
   );
   return { token, refreshToken: rtoken };
+};
+
+export const logOut = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  state.currentUser = null;
 };
