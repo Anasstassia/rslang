@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://some-domain.com/api/',
+  baseURL: 'https://rs-lang-irina-mokh.herokuapp.com/',
   timeout: 1000,
   headers: {
     Accept: 'application/json',

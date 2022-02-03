@@ -1,0 +1,132 @@
+@use '../../../scss/vars.scss';
+
+.word {
+  max-width: 500px;
+  display: grid;
+  grid-template-columns: 8fr 7fr 1fr;
+  gap: 8px;
+  grid-template-areas:
+        "img wordEn audio"
+        "img transcript done"
+        "img wordRu difficult"
+        "meaning meaningRu right"
+        "example exampleRu wrong";
+        padding: 7px;
+  border: 2px solid vars.$jet;
+  border-radius: 10px;
+  font-size: 14px;
+
+  & > * {
+    padding: 0;
+    margin: 0;
+  }
+
+  &__img {
+    grid-area: img;
+    img {
+      width: 100%;    
+    }
+  }
+
+  &__en {
+    grid-area: wordEn;
+    font-weight: 800;
+    font-size: 2em;
+  }
+
+  &__ru {
+    grid-area: wordRu;
+    font-size: 1.5em;
+  }
+
+  &__transcript {
+    grid-area: transcript;
+    font-size: 1.2em;
+  }
+
+  &__meaning,
+  &__meaning_ru,
+  &__example,
+  &__example_ru {
+    font-style: italic;
+  }
+  &__meaning {
+    grid-area: meaning;
+  }
+
+  &__meaning_ru {
+    grid-area: meaningRu;
+  }
+
+  &__example {
+    grid-area: example;
+  }
+
+  &__example_ru {
+    grid-area: exampleRu;
+  }
+
+  .checkbox {
+    display: none;
+    &:checked + * {
+      filter: vars.$filter-green;
+    }
+  }
+
+  &__btn {
+    filter: vars.$filter-jet;
+    background-size: 90%;
+    &:hover {
+      filter: vars.$filter-green;
+    }
+    &:active {
+      filter: vars.$filter-blue-green;
+    }
+  }
+
+  .btn_audio {
+    grid-area: audio;
+    background-image: url("../../../assets/icons/volume.svg");
+  }
+
+  .btn_done {
+    grid-area: done;
+    background-image: url("../../../assets/icons/check.svg");
+  }
+
+  .btn_difficult {
+    grid-area: difficult;
+    background-image: url("../../../assets/icons/lightbulb_outline.svg"); 
+  }
+
+  &__result {
+    text-align: center;
+    vertical-align: center;
+    padding: 4px 0 0 0;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    color: #ffffff;
+  }
+
+  &__right-ans {
+    grid-area: right;
+    background-color: vars.$green;
+  }
+
+  &__wrong-ans {
+    grid-area: wrong;
+    background-color: vars.$red;
+  }
+
+  &_done {
+    color: #b8b3b3;
+    .word__img {
+      filter: grayscale(1);
+    }
+  }
+  &_difficult {
+    border-color: vars.$green;
+  }
+
+}
