@@ -10,6 +10,12 @@ export class Header implements content {
   }
 
   async run() {
-    return undefined;
+    this.runListeners();
+  }
+
+  runListeners() {
+    document.querySelector('.btn_auth')?.addEventListener('click', () => {
+      document.querySelector('.popup')?.classList.add('active');
+    });
   }
 }
