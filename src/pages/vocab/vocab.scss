@@ -1,8 +1,12 @@
 @use '../../scss/vars.scss';
 
 @mixin colorLvl($color) {
-  .vocab__level-name::before{
+  .vocab__level-name{
     background-color: $color;
+    border-color: $color;
+  }
+  .word {
+    border-color: $color;
   }
 }
 
@@ -92,17 +96,17 @@
   }
 
   .btn_page {
-    font-size: 1.1em;
-    width: 2em;
+    font-size: 16px;
+    width: 3em;
     height: 2em;
   }
 }
 
 .vocab__page {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1em;
-  margin: 1em 0 0 0;
+  margin: 1em 0 1em 0;
   padding: 0;
   
 }

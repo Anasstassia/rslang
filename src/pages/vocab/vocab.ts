@@ -40,7 +40,11 @@ export class Vocab implements content {
 
     levelSelect.addEventListener('change', () => {
       this.group = Number(levelSelect.value);
-      vocab.classList.add(`vocab_${this.group}`);
+      const levlClass = levels[this.group].slice(0, 2);
+
+      vocab.className = 'vocab section container';
+
+      vocab.classList.add(`vocab_${levlClass.toLowerCase()}`);
       lvlHeader.innerHTML = levels[this.group];
       this.page = 0;
       this.renderWords();
@@ -52,7 +56,7 @@ export class Vocab implements content {
     for (let i = 2; i <= PAGES; i += 1) {
       const item = pageId.cloneNode() as HTMLInputElement;
       item.innerHTML = String(i);
-      item.value = String(i-1);
+      item.value = String(i - 1);
       pagesEl.append(item);
     }
 
