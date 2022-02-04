@@ -7,7 +7,7 @@ import { Word } from '../../core/components/word';
 export class Vocab implements content {
   page: number;
 
-  group: number | string;
+  group: number;
 
   vocabList?: HTMLElement;
 
@@ -39,21 +39,42 @@ export class Vocab implements content {
     // change group
 
     levelSelect.addEventListener('change', () => {
-      this.group = levelSelect.value;
+      this.group = Number(levelSelect.value);
       vocab.classList.add(`vocab_${this.group}`);
       lvlHeader.innerHTML = levels[this.group];
+      this.page = 0;
       this.renderWords();
     });
 
     // render pages list
-    const pagesEl = document.querySelector('.btn_page') as HTMLElement;
+    const pagesEl = document.querySelector('.btn_page') as HTMLSelectElement;
     const pageId = pagesEl.querySelector('option') as HTMLElement;
     for (let i = 2; i <= PAGES; i += 1) {
       const item = pageId.cloneNode() as HTMLInputElement;
       item.innerHTML = String(i);
-      item.value = String(i);
+      item.value = String(i-1);
       pagesEl.append(item);
     }
+
+    // render words by page
+    pagesEl.addEventListener('change', () => {
+      this.page = Number(pagesEl.value);
+      this.renderWords();
+    });
+
+    const pagePrev = document.querySelector('.btn_prev') as HTMLElement;
+    const pageNext = document.querySelector('.btn_next') as HTMLElement;
+    pagePrev.addEventListener('click', () => {
+      this.page -= 1;
+      pagesEl.value = String(this.page);
+      this.renderWords();
+    });
+
+    pageNext.addEventListener('click', () => {
+      this.page += 1;
+      pagesEl.value = String(this.page);
+      this.renderWords();
+    });
 
     this.renderWords();
     return undefined;
