@@ -68,6 +68,16 @@ export class Word {
     setData('.word__meaning_ru', this.textMeaningTranslate);
     setData('.word__example_ru', this.textExampleTranslate);
 
+    function setAttrBySelector(selector: string, attr: string, data: string) {
+      const item = card.querySelector(`${selector}`) as HTMLElement;
+      item.setAttribute(attr, data);
+    }
+
+    setAttrBySelector('.checkbox_done', 'id', `done${this.id}`);
+    setAttrBySelector('.checkbox_done ~ label', 'for', `done${this.id}`);
+    setAttrBySelector('.checkbox_difficult', 'id', `difficult${this.id}`);
+    setAttrBySelector('.checkbox_difficult ~ label', 'for', `difficult${this.id}`);
+
     return card;
   }
 }
