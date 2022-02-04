@@ -2,6 +2,7 @@ import './scss/style.scss';
 
 import { Main } from './pages/main';
 import { Vocab } from './pages/vocab';
+import { SprintGame } from './pages/games/sprint';
 import { Error404 } from './pages/error404';
 import { Popup } from './core/components/popup';
 
@@ -19,12 +20,14 @@ export const footer = new Footer();
 export const menu = new Menu();
 export const main = new Main();
 export const vocab = new Vocab();
+export const sprint = new SprintGame();
 export const error404 = new Error404();
 export const popup = new Popup();
 
 const routes: Record<string, content> = {
   '/': main,
   '/vocab': vocab,
+  '/sprint': sprint,
 };
 
 export const router = async () => {
@@ -43,7 +46,10 @@ export const router = async () => {
   await popup.run();
 
   const request = Utils.parseRequestURL();
-  const parsedURL = (request.main ? `/${request.main}` : '/') + (request.vocab ? `/${request.vocab}` : '');
+  const parsedURL =
+    (request.main ? `/${request.main}` : '/') +
+    (request.vocab ? `/${request.vocab}` : '') +
+    (request.sprint ? `/${request.sprint}` : '');
 
   const page = routes[parsedURL] ? routes[parsedURL] : error404;
   mainElem.innerHTML = await page.render();
