@@ -46,6 +46,7 @@ export class Vocab implements content {
 
       vocab.classList.add(`vocab_${levlClass.toLowerCase()}`);
       lvlHeader.innerHTML = levels[this.group];
+      pagesEl.value = String(0);
       this.page = 0;
       this.renderWords();
     });
@@ -69,13 +70,21 @@ export class Vocab implements content {
     const pagePrev = document.querySelector('.btn_prev') as HTMLElement;
     const pageNext = document.querySelector('.btn_next') as HTMLElement;
     pagePrev.addEventListener('click', () => {
-      this.page -= 1;
+      if (this.page === 0) {
+        this.page = 29;
+      } else {
+        this.page -= 1;
+      }
       pagesEl.value = String(this.page);
       this.renderWords();
     });
 
     pageNext.addEventListener('click', () => {
-      this.page += 1;
+      if (this.page === 29) {
+        this.page = 0;
+      } else {
+        this.page += 1;
+      }
       pagesEl.value = String(this.page);
       this.renderWords();
     });
