@@ -84,6 +84,18 @@ export class Word {
       this.audio.play();
     });
 
+    // learnt (done) words
+    const doneBtn = card.querySelector('.btn_done') as HTMLElement;
+    doneBtn.addEventListener('click', () => {
+      card.classList.toggle('word_done');
+    });
+
+    // difficult words
+    const difficultBtn = card.querySelector('.btn_difficult') as HTMLElement;
+    difficultBtn.addEventListener('click', () => {
+      card.classList.toggle('word_difficult');
+    });
+
     return card;
   }
 }

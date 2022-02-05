@@ -55,7 +55,6 @@
   &__transcript {
     grid-area: transcript;
     font-size: 1.4em;
-    color: vars.$jet;
   }
 
   &__meaning,
@@ -66,7 +65,6 @@
   &__example,
   &__example_ru {
     font-style: italic;
-    color: vars.$jet;
   }
   &__meaning {
     grid-area: meaning;
@@ -87,7 +85,7 @@
   .checkbox {
     display: none;
     &:checked + * {
-      filter: vars.$filter-green;
+      filter: vars.$filter-orange;
     }
   }
 
@@ -142,12 +140,13 @@
 
   &_done {
     color: #b8b3b3;
+    background-color: #eeeeee;
     .word__img {
       filter: grayscale(1);
     }
   }
   &_difficult {
-    border-color: vars.$green;
+    box-shadow: 0px 0px 10px 8px rgba(44, 44, 44, 0.4);
   }
 
 }
