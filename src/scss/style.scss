@@ -88,7 +88,9 @@
   }
 
   &_auth {
-    background-image: url('../assets/icons/login.svg');
+    border: none;
+    background-size: cover;
+    background-image: url('../assets/icons/user-login.svg');
   }
   &_user {
     background-image: url('../assets/icons/user.svg');
