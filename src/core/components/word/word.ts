@@ -13,7 +13,7 @@ export class Word {
 
   image: string;
 
-  audio: string;
+  audio: HTMLAudioElement;
 
   audioMeaning: string;
 
@@ -37,7 +37,7 @@ export class Word {
     this.page = word.page;
     this.word = word.word;
     this.image = word.image;
-    this.audio = word.audio;
+    this.audio = new Audio(`https://rs-lang-irina-mokh.herokuapp.com/${word.audio}`);
     this.audioMeaning = word.audioMeaning;
     this.audioExample = word.audioExample;
     this.textMeaning = word.textMeaning;
@@ -77,6 +77,12 @@ export class Word {
     setAttrBySelector('.checkbox_done ~ label', 'for', `done${this.id}`);
     setAttrBySelector('.checkbox_difficult', 'id', `difficult${this.id}`);
     setAttrBySelector('.checkbox_difficult ~ label', 'for', `difficult${this.id}`);
+
+    const audioBtn = card.querySelector('.btn_audio') as HTMLElement;
+
+    audioBtn.addEventListener('click', () => {
+      this.audio.play();
+    });
 
     return card;
   }
