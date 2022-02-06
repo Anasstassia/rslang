@@ -8,6 +8,8 @@ export class SprintGame implements content {
 
   timeLeft = 60;
 
+  isGameOver = false;
+
   async render() {
     return html;
   }
@@ -57,7 +59,41 @@ export class SprintGame implements content {
   }
 
   startTimer(time: HTMLElement, line: HTMLElement) {
-    console.log(time, line);
+    setTimeout(() => {
+      let width = line.clientWidth;
+      line.style.width = `${width}px`;
+
+      const interval = setInterval(() => {
+        this.timeLeft -= 1;
+        time.innerHTML = this.timeLeft.toString();
+
+        width -= 10;
+        line.style.width = `${width}px`;
+
+        if (this.timeLeft === 5) {
+          time.style.color = '#ffe600';
+          line.style.backgroundColor = '#ffe600';
+        }
+
+        if (this.timeLeft === 3) {
+          time.style.color = '#bd0404';
+          line.style.backgroundColor = '#bd0404';
+        }
+
+        if (this.timeLeft === 0) {
+          this.gameOver();
+          clearInterval(interval);
+
+          this.timeLeft = 60;
+          time.style.color = '';
+          line.style.backgroundColor = '';
+        }
+      }, 1000);
+    }, 3000);
+  }
+
+  gameOver() {
+    console.log('Game over!');
   }
 
   generateWord(word: HTMLElement, translatedWord: HTMLElement) {
