@@ -127,8 +127,8 @@
 
       &__mark {
         height: 30px;
-        &.hide {
-          display: none;
+        &.hidden {
+          opacity: 0;
         }
       }
 
