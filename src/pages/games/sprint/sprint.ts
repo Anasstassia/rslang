@@ -71,6 +71,11 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
+        if (this.isSoundOn) {
+          const sound = new Audio('../../../assets/sounds/correct.mp3');
+          sound.play();
+        }
+
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
@@ -80,6 +85,11 @@ export class SprintGame implements content {
 
         mark.src = '../../../assets/icons/cross.svg';
         mark.classList.remove('hidden');
+
+        if (this.isSoundOn) {
+          const sound = new Audio('../../../assets/sounds/wrong.mp3');
+          sound.play();
+        }
 
         setTimeout(() => {
           mark.classList.add('hidden');
@@ -93,6 +103,11 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
+        if (this.isSoundOn) {
+          const sound = new Audio('../../../assets/sounds/correct.mp3');
+          sound.play();
+        }
+
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
@@ -102,6 +117,11 @@ export class SprintGame implements content {
 
         mark.src = '../../../assets/icons/cross.svg';
         mark.classList.remove('hidden');
+
+        if (this.isSoundOn) {
+          const sound = new Audio('../../../assets/sounds/wrong.mp3');
+          sound.play();
+        }
 
         setTimeout(() => {
           mark.classList.add('hidden');
