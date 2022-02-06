@@ -1,7 +1,12 @@
 /* eslint-disable no-param-reassign */
-import { content } from '../../../core/components/types';
+import { content, iWord } from '../../../core/components/types';
 import html from './sprint.html';
 import './sprint.scss';
+
+type Word = {
+  word: string;
+  wordTranslate: string;
+};
 
 export class SprintGame implements content {
   isSoundOn = true;
@@ -9,6 +14,8 @@ export class SprintGame implements content {
   timeLeft = 60;
 
   isGameOver = false;
+
+  words: Array<Word> = [];
 
   async render() {
     return html;
@@ -50,10 +57,10 @@ export class SprintGame implements content {
   }
 
   startGame() {
-    const { time, line } = this.generateTimerUI();
-    const { word, translatedWord /* wrongBtn, correctBtn, mark */ } = this.generateContentUI();
+    this.generateWords();
 
-    this.generateWord(word, translatedWord);
+    const { time, line } = this.generateTimerUI();
+    /* const { word, translatedWord wrongBtn, correctBtn, mark } = */ this.generateContentUI();
 
     this.startTimer(time, line);
   }
@@ -96,8 +103,24 @@ export class SprintGame implements content {
     console.log('Game over!');
   }
 
-  generateWord(word: HTMLElement, translatedWord: HTMLElement) {
-    console.log(word, translatedWord);
+  generateWords() {
+    const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
+
+    this.getWords(group).then((el) => {
+      el.forEach((element: iWord) => {
+        const { word, wordTranslate } = element;
+        this.words.push({ word, wordTranslate });
+      });
+    });
+  }
+
+  async getWords(group: string | undefined) {
+    const randPage = Math.round(Math.random() * 30);
+
+    const response = await (
+      await fetch(`https://rs-lang-irina-mokh.herokuapp.com/words?group=${group}&page=${randPage}`)
+    ).json();
+    return response;
   }
 
   generateContentUI() {
