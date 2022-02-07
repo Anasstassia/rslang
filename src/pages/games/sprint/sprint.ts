@@ -66,14 +66,17 @@ export class SprintGame implements content {
     const { time, line } = this.generateTimerUI();
     const { word, translatedWord, wrongBtn, correctBtn, mark } = this.generateContentUI();
 
+    const correctSound = new Audio('../../../assets/sounds/correct.mp3');
+    correctSound.volume = 0.5;
+    const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
+
     correctBtn.addEventListener('click', () => {
       if (this.isCorrect) {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
         if (this.isSoundOn) {
-          const sound = new Audio('../../../assets/sounds/correct.mp3');
-          sound.play();
+          correctSound.play();
         }
 
         setTimeout(() => {
@@ -87,8 +90,7 @@ export class SprintGame implements content {
         mark.classList.remove('hidden');
 
         if (this.isSoundOn) {
-          const sound = new Audio('../../../assets/sounds/wrong.mp3');
-          sound.play();
+          wrongSound.play();
         }
 
         setTimeout(() => {
@@ -104,8 +106,7 @@ export class SprintGame implements content {
         mark.classList.remove('hidden');
 
         if (this.isSoundOn) {
-          const sound = new Audio('../../../assets/sounds/correct.mp3');
-          sound.play();
+          correctSound.play();
         }
 
         setTimeout(() => {
@@ -119,8 +120,7 @@ export class SprintGame implements content {
         mark.classList.remove('hidden');
 
         if (this.isSoundOn) {
-          const sound = new Audio('../../../assets/sounds/wrong.mp3');
-          sound.play();
+          wrongSound.play();
         }
 
         setTimeout(() => {
