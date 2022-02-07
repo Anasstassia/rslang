@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { content, iWord } from '../../../core/components/types';
+import { appearanceContent, changeContent, show } from '../animation';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -264,10 +265,10 @@ export class SprintGame implements content {
 
     const wrap = document.querySelector('.sprint__content') as HTMLElement;
 
-    this.animate(wrap, 'changeContent', '3s', 'ease-in-out');
-    this.animate(word, 'appearanceContent', '3.2s', 'ease-in-out');
-    this.animate(translatedWord, 'appearanceContent', '3.2s', 'ease-in-out');
-    this.animate(btnsWrap, 'appearanceContent', '3.2s', 'ease-in-out');
+    changeContent(wrap, 3000, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+    appearanceContent(word, 3200);
+    appearanceContent(translatedWord, 3200);
+    appearanceContent(btnsWrap, 3200);
 
     wrap.innerHTML = '';
     wrap.append(word, translatedWord, btnsWrap);
@@ -289,7 +290,7 @@ export class SprintGame implements content {
 
     const wrap = document.querySelector('.sprint .container') as HTMLElement;
 
-    this.animate(timerWrap, 'timerAppearance', '3s', 'ease-in-out');
+    show(timerWrap, 3000, 600, 0.7);
 
     wrap.appendChild(timerWrap);
 
@@ -298,12 +299,5 @@ export class SprintGame implements content {
 
   generateStatisticUI() {
     console.log('UI');
-  }
-
-  animate(element: HTMLElement, name: string, time: string, animationFunc: string) {
-    element.style.animationName = `${name}`;
-    element.style.animationDuration = `${time}`;
-    element.style.animationTimingFunction = `${animationFunc}`;
-    element.style.animationFillMode = 'forwards';
   }
 }
