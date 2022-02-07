@@ -46,6 +46,8 @@ export class Popup implements content {
     const loginButton = document.querySelector('#form-auth .popup__btn');
     const handlers = [createUser, loginUser];
     const ids = ['form-registr', 'form-auth'];
+    const emailRegExp = /[a-z0-9]+@[a-z]+.[a-z]{2,3}/;
+
     [registerButton, loginButton].forEach((button, i) =>
       button?.addEventListener(
         'click',
@@ -57,6 +59,12 @@ export class Popup implements content {
           const buttonTop = target?.offsetTop;
           const buttonLeft = target?.offsetLeft;
           const emailInputElement = document.getElementById(ids[i])?.querySelector<HTMLInputElement>('.input__email');
+          const passwordInputElement = document
+            .getElementById(ids[i])
+            ?.querySelector<HTMLInputElement>('.input__password');
+          const spanEmail = document.getElementById(ids[i])?.querySelector('.spanEmail');
+          const spanPass = document.getElementById(ids[i])?.querySelector('.spanPassword');
+
           const emailPasswordElement = document
             .getElementById(ids[i])
             ?.querySelector<HTMLInputElement>('.input__password');
@@ -66,9 +74,23 @@ export class Popup implements content {
           circle.classList.add('circle');
           circle.style.top = `${yInside}px`;
           circle.style.left = `${xInside}px`;
-
           button.appendChild(circle);
-          handlers[i]({ email: emailInputElement?.value || '', password: emailPasswordElement?.value || '' });
+          console.log(passwordInputElement?.value);
+          if (!emailInputElement || !spanEmail || !passwordInputElement || !spanPass) return;
+          if (!this.validate(emailRegExp, emailInputElement?.value)) {
+            this.notValid(emailInputElement, spanEmail, 'Проверка почты не пройдена, введите еще раз');
+          } else if (passwordInputElement?.value.length < 8) {
+            this.notValid(
+              passwordInputElement,
+              spanPass,
+              'Проверка пароля не пройдена, используйте минимум 8 символов'
+            );
+            this.valid(emailInputElement, spanEmail);
+          } else {
+            this.valid(emailInputElement, spanEmail);
+            this.valid(passwordInputElement, spanPass);
+            handlers[i]({ email: emailInputElement?.value || '', password: emailPasswordElement?.value || '' });
+          }
           setTimeout(() => circle.remove(), 500);
         })
       )
@@ -90,4 +112,18 @@ export class Popup implements content {
       display: 'block',
     });
   };
+
+  validate(regex: RegExp, value: string) {
+    return regex.test(value);
+  }
+
+  notValid(input: HTMLInputElement, elem: Element, mess: string) {
+    input.classList.add('is-invalid');
+    Object.assign(elem, { innerHTML: mess });
+  }
+
+  valid(input: HTMLInputElement, elem: Element) {
+    input.classList.remove('is-invalid');
+    Object.assign(elem, { innerHTML: '' });
+  }
 }
