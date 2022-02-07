@@ -13,7 +13,7 @@ import { Menu } from './core/components/menu';
 import { Utils } from './core/utils/utils';
 // import Types
 import { content } from './core/components/types';
-// import { loginUser } from './core/client/users';
+import { loginUser, state } from './core/client/users';
 
 export const header = new Header();
 export const footer = new Footer();
@@ -31,6 +31,7 @@ const routes: Record<string, content> = {
 };
 
 export const router = async () => {
+  loginUser({ email: 'test-user@google.com', password: '12345678' });
   const headerElem = document.querySelector('.header') as HTMLElement;
   const mainElem = document.querySelector('.content') as HTMLElement;
   const footerElem = document.querySelector('.footer') as HTMLElement;
@@ -54,6 +55,7 @@ export const router = async () => {
   const page = routes[parsedURL] ? routes[parsedURL] : error404;
   mainElem.innerHTML = await page.render();
   await page.run();
+  await renderAuthElements();
 
   /* Для логина можно использовать данный запрос:
    *
@@ -61,6 +63,15 @@ export const router = async () => {
    *
    */
 };
+
+async function renderAuthElements() {
+  if (!state.currentUser) {
+    const authOnlyElems = document.querySelectorAll('.auth') as NodeListOf<HTMLElement>;
+    authOnlyElems.forEach((elem: HTMLElement) => {
+      elem.style.display = 'none';
+    });
+  }
+}
 
 window.addEventListener('hashchange', router);
 window.addEventListener('load', router);

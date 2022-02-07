@@ -89,7 +89,7 @@ export class Vocab implements content {
       this.renderWords();
     });
 
-    this.renderWords();
+    await this.renderWords();
     return undefined;
   }
 

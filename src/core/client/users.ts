@@ -1,6 +1,6 @@
 import { client } from '.';
 
-const state = {} as State;
+export const state = {} as State;
 
 type State = { currentUser: AuthUserResponse | null };
 
