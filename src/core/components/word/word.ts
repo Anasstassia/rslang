@@ -15,9 +15,9 @@ export class Word {
 
   audio: HTMLAudioElement;
 
-  audioMeaning: string;
+  audioMeaning: HTMLAudioElement;
 
-  audioExample: string;
+  audioExample: HTMLAudioElement;
 
   textMeaning: string;
 
@@ -38,8 +38,8 @@ export class Word {
     this.word = word.word;
     this.image = word.image;
     this.audio = new Audio(`https://rs-lang-irina-mokh.herokuapp.com/${word.audio}`);
-    this.audioMeaning = word.audioMeaning;
-    this.audioExample = word.audioExample;
+    this.audioMeaning = new Audio(`https://rs-lang-irina-mokh.herokuapp.com/${word.audioMeaning}`);
+    this.audioExample = new Audio(`https://rs-lang-irina-mokh.herokuapp.com/${word.audioExample}`);
     this.textMeaning = word.textMeaning;
     this.textExample = word.textExample;
     this.transcription = word.transcription;
@@ -79,9 +79,36 @@ export class Word {
     setAttrBySelector('.checkbox_difficult ~ label', 'for', `difficult${this.id}`);
 
     const audioBtn = card.querySelector('.btn_audio') as HTMLElement;
+    let isPlaying = false;
 
-    audioBtn.addEventListener('click', () => {
-      this.audio.play();
+    const playList = [this.audio, this.audioMeaning, this.audioExample];
+    let i = 0;
+    function playNext() {
+      if (i < playList.length - 1) {
+        i += 1;
+        playList[i].play();
+      } else {
+        i = 0;
+        audioBtn.classList.remove('btn_pause');
+      }
+    }
+
+    for (let k = 0; k < playList.length; k += 1) {
+      playList[k].addEventListener('ended', () => {
+        playNext();
+      });
+    }
+
+    audioBtn.addEventListener('click', async () => {
+      if (!isPlaying) {
+        isPlaying = true;
+        audioBtn.classList.add('btn_pause');
+        playList[i].play();
+      } else {
+        isPlaying = false;
+        playList[i].pause();
+        audioBtn.classList.remove('btn_pause');
+      }
     });
 
     // learnt (done) words
