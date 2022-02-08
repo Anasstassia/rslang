@@ -114,18 +114,19 @@ export class Vocab implements content {
     if (request === 'basic') {
       if (state.currentUser?.userId) {
         response = await client.get(
-          `https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.userId}/aggregatedWords?group=${this.group}&page=${this.page}&wordsPerPage=20}`
+          `/users/${state.currentUser?.userId}/aggregatedWords?group=${this.group}&page=${this.page}&wordsPerPage=20}`
         );
-        data = await response.data[0].paginatedResults;
+        data = response.data[0].paginatedResults;
       } else {
         response = await client.get(`/words?group=${this.group}&page=${this.page}`);
-        data = await response.data;
+        data = response.data;
       }
     } else if (request === 'difficult') {
       /*
-      response = await client.get(`https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.userId}/aggregatedWords?&wordsPerPage=200&filter={"userWord.difficulty":"hard"`);
-      console.log(response.data);
-      data = await response.data[0].paginatedResults;
+      response = await client.get(
+        `/users/${state.currentUser?.userId}/aggregatedWords?&wordsPerPage=200&filter={"userWord.difficulty":"hard"`
+      );
+      data = response.data[0].paginatedResults;
       */
       response = await fetch(
         `https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.userId}/aggregatedWords?filter={"userWord.difficulty":"hard"}`,
@@ -140,6 +141,7 @@ export class Vocab implements content {
       );
       const json = await response.json();
       data = json[0].paginatedResults;
+
     }
     return data;
   };
