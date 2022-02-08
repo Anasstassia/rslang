@@ -141,7 +141,6 @@ export class Vocab implements content {
       );
       const json = await response.json();
       data = json[0].paginatedResults;
-
     }
     return data;
   };
