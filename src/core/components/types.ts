@@ -4,7 +4,7 @@ export interface content {
 }
 
 export interface iWord {
-  id: string;
+  _id: string;
   group: number;
   page: number;
   word: string;
@@ -18,4 +18,22 @@ export interface iWord {
   wordTranslate: string;
   textMeaningTranslate: string;
   textExampleTranslate: string;
+}
+
+export interface iUserWord extends iWord {
+  userWord?: {
+    difficulty: string;
+    optional: {
+      done: boolean;
+    };
+  };
+}
+
+export interface iUserWordCreator {
+  userId: string | undefined;
+  wordId: string;
+  word: {
+    difficulty: string;
+    optional: { done: boolean };
+  };
 }

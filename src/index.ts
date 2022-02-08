@@ -31,7 +31,7 @@ const routes: Record<string, content> = {
 };
 
 export const router = async () => {
-  loginUser({ email: 'test-user@google.com', password: '12345678' });
+  await loginUser({ email: 'test-user@google.com', password: '12345678' });
   const headerElem = document.querySelector('.header') as HTMLElement;
   const mainElem = document.querySelector('.content') as HTMLElement;
   const footerElem = document.querySelector('.footer') as HTMLElement;
@@ -63,7 +63,6 @@ export const router = async () => {
    *
    */
 };
-
 async function renderAuthElements() {
   if (!state.currentUser) {
     const authOnlyElems = document.querySelectorAll('.auth') as NodeListOf<HTMLElement>;

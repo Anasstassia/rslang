@@ -1,4 +1,5 @@
 import { client } from '.';
+import { iUserWordCreator } from '../components/types';
 
 export const state = {} as State;
 
@@ -33,8 +34,13 @@ export const loginUser = async (user: UserRequest) => {
   return response.data;
 };
 
-export const createUserWord = async ({ userId, wordId, word }: { [key: string]: string | Record<string, unknown> }) => {
+export const createUserWord = async ({ userId, wordId, word }: iUserWordCreator) => {
   const response = await client.post(`/users/${userId}/words/${wordId}`, word);
+  return response;
+};
+
+export const changeUserWord = async ({ userId, wordId, word }: iUserWordCreator) => {
+  const response = await client.put(`/users/${userId}/words/${wordId}`, word);
   return response;
 };
 

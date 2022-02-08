@@ -23,6 +23,9 @@
     margin-right: 2em;
   }
 
+  &_difficult {
+    @include colorLvl(vars.$green);
+  }
 
   &_a1 {
     @include colorLvl(vars.$a1);

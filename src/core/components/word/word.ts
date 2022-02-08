@@ -1,8 +1,11 @@
-import { iWord } from '../types';
+import { state, createUserWord, changeUserWord } from '../../client/users';
+import { iUserWord } from '../types';
 import html from './word.html';
 import './word.scss';
 
 export class Word {
+  card: HTMLElement;
+
   id: string;
 
   group: number;
@@ -31,8 +34,16 @@ export class Word {
 
   textExampleTranslate: string;
 
-  constructor(word: iWord) {
-    this.id = word.id;
+  userWord?: {
+    difficulty: string;
+    optional: { done: boolean };
+  };
+
+  difficult?: boolean;
+
+  constructor(word: iUserWord) {
+    this.card = document.createElement('li');
+    this.id = word._id;
     this.group = word.group;
     this.page = word.page;
     this.word = word.word;
@@ -46,13 +57,14 @@ export class Word {
     this.wordTranslate = word.wordTranslate;
     this.textMeaningTranslate = word.textMeaningTranslate;
     this.textExampleTranslate = word.textExampleTranslate;
+    this.userWord = word.userWord;
+    this.difficult = false;
   }
 
   async render() {
-    const card = document.createElement('li');
-    card.classList.add('word');
-    card.innerHTML = html;
-
+    this.card.classList.add('word');
+    this.card.innerHTML = html;
+    const card = this.card as HTMLElement;
     function setData(selector: string, data: string) {
       const item = card.querySelector(`${selector}`) as HTMLElement;
       item.innerHTML = data;
@@ -60,6 +72,9 @@ export class Word {
     const img = card.querySelector('img') as HTMLImageElement;
     img.src = `https://rs-lang-irina-mokh.herokuapp.com/${this.image}`;
 
+    if (this.userWord) {
+      this.difficult = this.userWord.difficulty === 'hard';
+    }
     setData('.word__en', this.word);
     setData('.word__ru', this.wordTranslate);
     setData('.word__transcript', this.transcription);
@@ -119,10 +134,41 @@ export class Word {
 
     // difficult words
     const difficultBtn = card.querySelector('.btn_difficult') as HTMLElement;
-    difficultBtn.addEventListener('click', () => {
-      card.classList.toggle('word_difficult');
-    });
+    difficultBtn.addEventListener('click', this.changeDifficult.bind(this));
 
-    return card;
+    // styling userWords
+    if (this.difficult) {
+      this.card.classList.add('word_difficult');
+      (this.card.querySelector('.checkbox_difficult') as HTMLInputElement).checked = true;
+    }
+    return this.card;
+  }
+
+  changeDifficult() {
+    if (this.difficult) {
+      this.removeFromDifficult();
+    } else {
+      this.addToDifficult();
+    }
+  }
+
+  async addToDifficult() {
+    this.card.classList.add('word_difficult');
+    const arg = {
+      userId: state.currentUser?.userId,
+      wordId: this.id,
+      word: { difficulty: 'hard', optional: { done: false } },
+    };
+    createUserWord(arg);
+  }
+
+  async removeFromDifficult() {
+    this.card.classList.remove('word_difficult');
+    const arg = {
+      userId: state.currentUser?.userId,
+      wordId: this.id,
+      word: { difficulty: 'basic', optional: { done: false } },
+    };
+    changeUserWord(arg);
   }
 }
