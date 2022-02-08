@@ -8,6 +8,40 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0;
+    margin: 0;
+    @media (max-width: vars.$smallScreen) {
+      flex-direction: column;
+    }
+  }
+
+  &__block {
+    list-style: none;
+    padding: 0;
+  }
+
+  &__team {
+    width: 50%;
+    @media (max-width: vars.$mediumScreen) {
+      width: 70%;
+      .github__text {
+        font-size: 14px;
+      }
+    }
+  }
+
+  &__members {
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    li {
+      list-style: none;
+    }
+
+    @media (max-width: vars.$smallScreen) {
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
   }
 
   .rss {
@@ -21,5 +55,10 @@
     &:active {
       filter: vars.$filter-blue-green;
     }
+  }
+
+  &__year {
+    color: vars.$snow;
+    margin: 0 0 0 1em;
   }
 }

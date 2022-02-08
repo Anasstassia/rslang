@@ -69,6 +69,10 @@
         height: 150px;
         border-radius: 50%;
         margin: 0 15px 0 0;
+        @media (max-width: vars.$mediumScreen) {
+          width: 100px;
+          height: 100px;
+        }
       }
 
       &__name {
