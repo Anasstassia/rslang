@@ -85,7 +85,7 @@ export const show = (element: HTMLElement, time: number, width: number, offset: 
         easing: 'ease-in-out',
       },
     ],
-    time
+    { duration: time, fill: 'forwards' }
   );
 };
 
@@ -106,6 +106,6 @@ export const hide = (element: HTMLElement, time: number, width: number, offset: 
         easing: 'ease-in-out',
       },
     ],
-    time
+    { duration: time, fill: 'forwards' }
   );
 };

@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { content, iWord } from '../../../core/components/types';
-import { appearanceContent, changeContent, show } from '../animation';
+import { appearanceContent, changeContent, hide, show } from '../animation';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -17,6 +17,8 @@ export class SprintGame implements content {
   timeLeft = 60;
 
   isCorrect = false;
+
+  isGameOver = false;
 
   words: Array<Word> = [];
 
@@ -160,10 +162,11 @@ export class SprintGame implements content {
           line.style.backgroundColor = '#bd0404';
         }
 
-        if (this.timeLeft === 0) {
+        if (this.timeLeft === 0 || this.isGameOver) {
           this.gameOver();
           clearInterval(interval);
 
+          this.isGameOver = true;
           this.timeLeft = 60;
           time.style.color = '';
           line.style.backgroundColor = '';
@@ -174,7 +177,7 @@ export class SprintGame implements content {
 
   renderContent(wordWrap: HTMLElement | null, translatedWordWrap: HTMLElement | null) {
     const id = this.chooseWord();
-    if (id) {
+    if (id !== false) {
       this.currId = id;
       if (wordWrap !== null && translatedWordWrap !== null) {
         wordWrap.innerHTML = this.words[id].word;
@@ -183,6 +186,7 @@ export class SprintGame implements content {
           this.words[this.isCorrectTranslate() ? id : this.getRandomNum(0, 19)].wordTranslate;
       }
     } else {
+      this.isGameOver = true;
       this.gameOver();
     }
   }
@@ -323,6 +327,9 @@ export class SprintGame implements content {
 
     changeContent(sprintContent, 3000, 600, 300, 500, 300, 20, [0.05, 0.5, 0.7, 0.9]);
     appearanceContent(wrap, 3200);
+
+    const timer = document.querySelector('.timer') as HTMLElement;
+    hide(timer, 1500, 600, 0);
 
     sprintContent.innerHTML = '';
     sprintContent.appendChild(wrap);
