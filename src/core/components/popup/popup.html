@@ -4,13 +4,17 @@
     <label class="tab" title="Вкл2" data-form="form-auth">Авторизация</label>
   </div>
   <form id="form-registr" class="popup__form">
-    <input type="email" placeholder="Введите e-mail" />
-    <input type="password" placeholder="Введите пароль" />
-    <a href="#" class="popup__btn">Зарегистрироваться</a>
+    <input class="input__email" type="email" name="custemail" autocomplete="email" placeholder="Введите e-mail" />
+    <span class="spanEmail"></span>
+    <input class="input__password" type="password" placeholder="Введите пароль" />
+    <span class="spanPassword"></span>
+    <button class="popup__btn" type="submit">Зарегистрироваться</button>
   </form>
   <form id="form-auth" class="popup__form" style="display: none">
-    <input type="email" placeholder="Введите e-mail" />
-    <input type="password" placeholder="Введите пароль" />
-    <a href="#" class="popup__btn">Войти</a>
+    <input class="input__email" type="email" placeholder="Введите e-mail" autocomplete="email" />
+    <span class="spanEmail"></span>
+    <input class="input__password" type="password" placeholder="Введите пароль" />
+    <span class="spanPassword"></span>
+    <button class="popup__btn" type="submit">Войти</button>
   </form>
 </div>

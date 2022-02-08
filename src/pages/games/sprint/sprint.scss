@@ -2,11 +2,11 @@
 
 .sprint {
   color: #fff;
-	background: linear-gradient(-45deg, #ee7752, vars.$red, #23a6d5, vars.$blue-green);
+	background: linear-gradient(-45deg, #f73e3e, #ee7752 , #236ad5, #9708aa);
   height: 100% !important;
   padding-top: 25px;
   position: relative;
-	background-size: 300% 300%;
+	background-size: 200% 200%;
 	animation: gradient 20s ease infinite;
 
   &__header {
@@ -68,21 +68,30 @@
 
 
   &__content {
-    width: 600px;
+    animation: appearanceWrap 2.5s ease-in-out;
+    animation-fill-mode: forwards;
+    overflow: hidden;
+    width: 2px;
+    height: 2px;
     margin: 0 auto;
-    margin-top: 15%;
-    padding: 20px;
+    margin-top: 15vh;
     border: 1px solid #fff;
     text-align: center;
 
     &__title {
+      animation: appearanceContent 2.7s ease-in-out;
+      animation-fill-mode: forwards;
       font-size: 27px;
     }
     &__subtitle {
+      animation: appearanceContent 2.7s ease-in-out;
+      animation-fill-mode: forwards;
       font-size: 23px;
     }
 
     &__start-btn {
+      animation: appearanceContent 2.7s ease-in-out;
+      animation-fill-mode: forwards;
       background: transparent;
       color: #fff;
       font-size: 20px;
@@ -98,6 +107,64 @@
         background-color: #fff;
       }
     }
+
+    // 
+    // 
+    //
+    &__word {
+      font-size: 35px;
+    }
+    &__translate {
+      font-size: 30px;
+    }
+
+    .answer-btns {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 400px;
+      margin: 40px auto auto auto;
+
+      &__mark {
+        height: 30px;
+        &.hidden {
+          opacity: 0;
+        }
+      }
+
+      button {
+        font-size: 20px;
+        background: transparent;
+        border: 1px solid #fff;
+        border-radius: 30px;
+        color: #fff;
+        padding: 10px 20px;
+        width: 130px;
+        cursor: pointer;
+        
+        transition: all .2s linear;
+        &:hover {
+          background-color: #fff;
+          color: #000;
+        }
+      }
+    }
+  }
+
+  .timer {
+    text-align: center;
+    overflow: hidden;
+    margin-top: 50px;
+    width: 600px;
+    margin: 70px auto auto auto;
+    span {
+      font-size: 40px;
+    }
+    .line {
+      background-color: #fff;
+      height: 2px;
+      margin: 10px auto auto auto; 
+    }
   }
 }
 
@@ -111,4 +178,78 @@
 	100% {
 		background-position: 0% 50%;
 	}
+}
+
+@keyframes appearanceWrap {
+  0% {
+    padding: 0;
+    width: 2px;
+    height: 2px;
+  }
+  50% {
+    width: 2px;
+    height: 300px;
+  }
+  55% {
+    padding: 20px 0;
+  }
+  90% {
+    padding: 20px 0;
+  }
+  100% {
+    width: 600px;
+    height: 300px;
+    padding: 20px;
+  }
+}
+@keyframes appearanceContent {
+  0% {
+    opacity: 0;
+  }
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes changeContent {
+  0% {
+    width: 600px;
+    height: 300px;
+    padding: 20px;
+  }
+  5% {
+    padding: 20px 0;
+  }
+  50% {
+    width: 2px;
+  }
+  70% {
+    width: 2px;
+  }
+  90% {
+    padding: 20px 0;
+  }
+  100% {
+    width: 600px;
+    height: 300px;
+    padding: 20px;
+  }
+}
+
+@keyframes timerAppearance {
+  0% {
+    width: 0;
+  }
+  50% {
+    width: 0;
+  }
+  70% {
+    width: 0;
+  }
+  100% {
+    width: 600px;
+  }
 }

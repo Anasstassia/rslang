@@ -27,7 +27,9 @@
     "no-use-before-define": "off",
     "no-undef": 0,
     "no-param-reassign": 0,
-    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   },
   "ignorePatterns": ["webpack.config.js"],
   "settings": {
