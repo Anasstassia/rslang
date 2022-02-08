@@ -103,7 +103,12 @@
   .btn_audio {
     grid-area: audio;
     background-image: url("../../../assets/icons/volume.svg");
+    &.btn_pause {
+      background-image: url("../../../assets/icons/pause.svg");
+    }
   }
+
+  
 
   .btn_done {
     grid-area: done;
