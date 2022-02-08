@@ -1,16 +1,18 @@
 export const changeContent = (
   element: HTMLElement,
   time: number,
-  width: number,
-  height: number,
+  startWidth: number,
+  startHeight: number,
+  endWidth: number,
+  endHeight: number,
   padding: number,
   offset: Array<number>
 ) => {
   element.animate(
     [
       {
-        width: `${width}px`,
-        height: `${height}px`,
+        width: `${startWidth}px`,
+        height: `${startHeight}px`,
         padding: `${padding}px`,
         easing: 'ease-in-out',
       },
@@ -35,13 +37,13 @@ export const changeContent = (
         easing: 'ease-in-out',
       },
       {
-        width: `${width}px`,
-        height: `${height}px`,
+        width: `${endWidth}px`,
+        height: `${endHeight}px`,
         padding: `${padding}px`,
         easing: 'ease-in-out',
       },
     ],
-    time
+    { duration: time, fill: 'forwards' }
   );
 };
 

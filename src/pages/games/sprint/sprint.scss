@@ -166,6 +166,59 @@
       margin: 10px auto auto auto; 
     }
   }
+
+  .statistics {
+    display: flex;
+    flex-direction: column;
+    row-gap: 30px;
+    text-align: left;
+
+    p {
+      margin: 0;
+    }
+
+    &__progress {
+      font-size: 32px;
+    }
+
+    &__correct-num {
+      font-size: 25px;
+    }
+
+    &__mistakes, &__correctly  {
+      display: flex;
+      flex-direction: column;
+      row-gap: 10px;
+      p {
+        font-size: 25px;
+      }
+    }
+
+    &__word {
+      display: flex;
+      div {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+        margin-right: auto;
+      }
+      p {
+      font-size: 20px !important;
+      }
+      .transcription {
+        width: 150px;
+      }
+      .translate {
+        width: 220px;
+        text-align: right;
+        word-wrap:  break-word;
+      }
+      &__audio {
+        filter: invert(90%) sepia(4%) saturate(263%) hue-rotate(303deg) brightness(106%) contrast(105%);
+        height: 25px;
+      }
+    }
+  }
 }
 
 @keyframes gradient {

@@ -6,7 +6,9 @@ import './sprint.scss';
 
 type Word = {
   word: string;
+  transcription: string;
   wordTranslate: string;
+  audio: string;
 };
 
 export class SprintGame implements content {
@@ -196,9 +198,7 @@ export class SprintGame implements content {
   }
 
   gameOver() {
-    this.generateStatisticUI();
-    console.log('Game over!');
-    console.log(this.wrongWords);
+    /* const { progress, correctNums, wrongWords, correctWords } = */ this.generateStatisticsUI();
   }
 
   generateWords() {
@@ -206,8 +206,8 @@ export class SprintGame implements content {
 
     this.getWords(group).then((el) => {
       el.forEach((element: iWord) => {
-        const { word, wordTranslate } = element;
-        this.words.push({ word, wordTranslate });
+        const { word, transcription, wordTranslate, audio } = element;
+        this.words.push({ word, transcription, wordTranslate, audio });
       });
       this.renderContent(
         document.querySelector<HTMLElement>('.sprint__content__word'),
@@ -265,7 +265,7 @@ export class SprintGame implements content {
 
     const wrap = document.querySelector('.sprint__content') as HTMLElement;
 
-    changeContent(wrap, 3000, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+    changeContent(wrap, 3000, 600, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
     appearanceContent(word, 3200);
     appearanceContent(translatedWord, 3200);
     appearanceContent(btnsWrap, 3200);
@@ -297,7 +297,73 @@ export class SprintGame implements content {
     return { time, line };
   }
 
-  generateStatisticUI() {
-    console.log('UI');
+  generateStatisticsUI() {
+    const wrap = document.createElement('div');
+    wrap.classList.add('statistics');
+
+    const progress = document.createElement('p');
+    progress.classList.add('statistics__progress');
+    progress.innerHTML = 'Успешность: <b> 85%</b>'; // TODO: Remove
+
+    const correctNums = document.createElement('p');
+    correctNums.classList.add('statistics__correct-num');
+    correctNums.innerHTML = 'Правильных ответов: <b>15 / 20</b>'; // TODO: Remove
+
+    const wrongWords = document.createElement('div');
+    wrongWords.classList.add('statistics__mistakes');
+    wrongWords.innerHTML = '<p>Не угадано:</p>';
+
+    const correctWords = document.createElement('div');
+    correctWords.classList.add('statistics__correctly');
+    correctWords.innerHTML = '<p>Угадано:</p>';
+
+    wrap.append(progress, correctNums, wrongWords, correctWords);
+
+    const sprintContent = document.querySelector('.sprint__content') as HTMLElement;
+
+    changeContent(sprintContent, 3000, 600, 300, 500, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+    appearanceContent(wrap, 3200);
+
+    sprintContent.innerHTML = '';
+    sprintContent.appendChild(wrap);
+
+    setTimeout(() => {
+      sprintContent.style.overflowY = 'scroll';
+    }, 3000);
+
+    return { progress, correctNums, wrongWords, correctWords };
+  }
+
+  createWord(el: Word) {
+    const word = document.createElement('div');
+    word.classList.add('statistics__word');
+
+    const div = document.createElement('div');
+
+    const img = document.createElement('img');
+    img.classList.add('statistics__word__audio');
+    img.src = '../../../assets/icons/soundOn.svg';
+    img.alt = 'Sound';
+
+    img.addEventListener('click', () => {
+      const audio = new Audio(`https://rs-lang-irina-mokh.herokuapp.com/${el.audio}`);
+      audio.play();
+    });
+
+    const p1 = document.createElement('p');
+    p1.innerHTML = el.word;
+
+    const p2 = document.createElement('p');
+    p2.classList.add('transcription');
+    p2.innerHTML = el.transcription;
+
+    const p3 = document.createElement('p');
+    p3.classList.add('translate');
+    p3.innerHTML = el.wordTranslate;
+
+    div.append(img, p1);
+    word.append(div, p2, p3);
+
+    return word;
   }
 }
