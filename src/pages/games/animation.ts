@@ -89,7 +89,9 @@ export const show = (element: HTMLElement, time: number, width: number, offset: 
   );
 };
 
-export const hide = (element: HTMLElement, time: number, width: number, offset: number) => {
+export const hide = (element: HTMLElement, time: number, width: number, height: number, offset: number) => {
+  console.log(element);
+
   element.animate(
     [
       {
@@ -102,7 +104,12 @@ export const hide = (element: HTMLElement, time: number, width: number, offset: 
         easing: 'ease-in-out',
       },
       {
+        height,
+        offset: 0.95,
+      },
+      {
         width: 0,
+        height: 0,
         easing: 'ease-in-out',
       },
     ],

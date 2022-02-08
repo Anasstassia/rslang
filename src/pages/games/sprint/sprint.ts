@@ -91,7 +91,7 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
-        }, 700);
+        }, 500);
       } else {
         this.wrongWords.push(this.words[this.currId]);
 
@@ -105,7 +105,7 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
-        }, 700);
+        }, 500);
       }
     });
 
@@ -213,7 +213,7 @@ export class SprintGame implements content {
     }
     const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
 
-    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(1)}%</b>`;
+    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
     correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
 
     this.wrongWords.forEach((el) => {
@@ -222,6 +222,21 @@ export class SprintGame implements content {
     this.correctWords.forEach((el) => {
       correctWords.appendChild(this.createWord(el));
     });
+  }
+
+  restart() {
+    document.querySelector('.timer')?.remove();
+    const wrap = document.querySelector('.sprint__content') as HTMLElement;
+    wrap.style.overflow = 'clip';
+    wrap.innerHTML = '';
+    changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+
+    this.startGame();
+
+    this.isGameOver = false;
+    this.correctWords = [];
+    this.wrongWords = [];
+    this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
   }
 
   generateWords() {
@@ -346,13 +361,18 @@ export class SprintGame implements content {
     appearanceContent(wrap, 3200);
 
     const timer = document.querySelector('.timer') as HTMLElement;
-    hide(timer, 1500, 600, 0);
+    hide(timer, 1500, 600, 64, 0);
+
+    setTimeout(() => {
+      timer.style.margin = '0';
+    }, 1450);
 
     sprintContent.innerHTML = '';
     sprintContent.appendChild(wrap);
 
     setTimeout(() => {
       sprintContent.style.overflowY = 'scroll';
+      this.createEndBtns();
     }, 3000);
 
     return { progress, correctNums, wrongWords, correctWords };
@@ -389,5 +409,35 @@ export class SprintGame implements content {
     word.append(div, p2, p3);
 
     return word;
+  }
+
+  createEndBtns() {
+    const btnsWrap = document.createElement('div');
+    btnsWrap.classList.add('btns-wrap');
+
+    const restart = document.createElement('button');
+    restart.classList.add('restart');
+    restart.innerHTML = 'Играть заново';
+
+    restart.addEventListener('click', () => {
+      this.restart();
+      hide(btnsWrap, 1500, 500, 45, 0);
+      setTimeout(() => {
+        btnsWrap.remove();
+      }, 1550);
+    });
+
+    const mainPage = document.createElement('button');
+    mainPage.classList.add('main-page-btn');
+    mainPage.innerHTML = 'Главная страница';
+
+    mainPage.addEventListener('click', () => {
+      window.location.href = '../';
+    });
+
+    btnsWrap.append(restart, mainPage);
+
+    const wrap = document.querySelector('.sprint .container');
+    wrap?.append(btnsWrap);
   }
 }
