@@ -24,6 +24,8 @@ export class SprintGame implements content {
 
   wrongWords: Array<Word> = [];
 
+  correctWords: Array<Word> = [];
+
   ids: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
   currId = 0;
@@ -77,6 +79,8 @@ export class SprintGame implements content {
 
     correctBtn.addEventListener('click', () => {
       if (this.isCorrect) {
+        this.correctWords.push(this.words[this.currId]);
+
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
@@ -107,6 +111,8 @@ export class SprintGame implements content {
 
     wrongBtn.addEventListener('click', () => {
       if (!this.isCorrect) {
+        this.correctWords.push(this.words[this.currId]);
+
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
@@ -186,8 +192,8 @@ export class SprintGame implements content {
           this.words[this.isCorrectTranslate() ? id : this.getRandomNum(0, 19)].wordTranslate;
       }
     } else {
-      this.isGameOver = true;
       this.gameOver();
+      this.isGameOver = true;
     }
   }
 
@@ -202,7 +208,20 @@ export class SprintGame implements content {
   }
 
   gameOver() {
-    /* const { progress, correctNums, wrongWords, correctWords } = */ this.generateStatisticsUI();
+    if (this.isGameOver) {
+      return;
+    }
+    const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
+
+    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(1)}%</b>`;
+    correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
+
+    this.wrongWords.forEach((el) => {
+      wrongWords.appendChild(this.createWord(el));
+    });
+    this.correctWords.forEach((el) => {
+      correctWords.appendChild(this.createWord(el));
+    });
   }
 
   generateWords() {
@@ -307,11 +326,9 @@ export class SprintGame implements content {
 
     const progress = document.createElement('p');
     progress.classList.add('statistics__progress');
-    progress.innerHTML = 'Успешность: <b> 85%</b>'; // TODO: Remove
 
     const correctNums = document.createElement('p');
     correctNums.classList.add('statistics__correct-num');
-    correctNums.innerHTML = 'Правильных ответов: <b>15 / 20</b>'; // TODO: Remove
 
     const wrongWords = document.createElement('div');
     wrongWords.classList.add('statistics__mistakes');

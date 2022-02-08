@@ -206,12 +206,12 @@
       font-size: 20px !important;
       }
       .transcription {
-        width: 150px;
+        width: 100px;
       }
       .translate {
-        width: 220px;
+        width: 150px;
         text-align: right;
-        word-wrap:  break-word;
+        word-wrap: normal;
       }
       &__audio {
         filter: invert(90%) sepia(4%) saturate(263%) hue-rotate(303deg) brightness(106%) contrast(105%);
