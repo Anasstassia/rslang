@@ -9,6 +9,23 @@
 	background-size: 200% 200%;
 	animation: gradient 20s ease infinite;
 
+  button {
+    background: transparent;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    border: 1px solid #ffffff;
+    border-radius: 20px;
+    padding: 10px 20px;
+    transition: all 0.3s linear;
+
+    &:hover {
+      color: vars.$jet;
+      background-color: #fff;
+    }
+
+  }
+
   &__header {
     display: flex;
     align-items: center;
@@ -92,20 +109,6 @@
     &__start-btn {
       animation: appearanceContent 2.7s ease-in-out;
       animation-fill-mode: forwards;
-      background: transparent;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      border: 1px solid #ffffff;
-      border-radius: 20px;
-      padding: 10px 20px;
-      
-      transition: all .3s linear;
-
-      &:hover {
-        color: vars.$jet;
-        background-color: #fff;
-      }
     }
 
     // 
@@ -131,23 +134,6 @@
           opacity: 0;
         }
       }
-
-      button {
-        font-size: 20px;
-        background: transparent;
-        border: 1px solid #fff;
-        border-radius: 30px;
-        color: #fff;
-        padding: 10px 20px;
-        width: 130px;
-        cursor: pointer;
-        
-        transition: all .2s linear;
-        &:hover {
-          background-color: #fff;
-          color: #000;
-        }
-      }
     }
   }
 
@@ -165,6 +151,68 @@
       height: 2px;
       margin: 10px auto auto auto; 
     }
+  }
+
+  .statistics {
+    display: flex;
+    flex-direction: column;
+    row-gap: 30px;
+    text-align: left;
+
+    p {
+      margin: 0;
+    }
+
+    &__progress {
+      font-size: 32px;
+    }
+
+    &__correct-num {
+      font-size: 25px;
+    }
+
+    &__mistakes, &__correctly  {
+      display: flex;
+      flex-direction: column;
+      row-gap: 10px;
+      p {
+        font-size: 25px;
+      }
+    }
+
+    &__word {
+      display: flex;
+      div {
+        display: flex;
+        align-items: center;
+        column-gap: 10px;
+        margin-right: auto;
+      }
+      p {
+      font-size: 20px !important;
+      }
+      .transcription {
+        width: 100px;
+      }
+      .translate {
+        width: 150px;
+        text-align: right;
+        word-wrap: normal;
+      }
+      &__audio {
+        filter: invert(90%) sepia(4%) saturate(263%) hue-rotate(303deg) brightness(106%) contrast(105%);
+        height: 25px;
+      }
+    }
+  }
+
+  .btns-wrap {
+    overflow: hidden;
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-evenly;
   }
 }
 
@@ -211,45 +259,5 @@
   }
   100% {
     opacity: 1;
-  }
-}
-
-@keyframes changeContent {
-  0% {
-    width: 600px;
-    height: 300px;
-    padding: 20px;
-  }
-  5% {
-    padding: 20px 0;
-  }
-  50% {
-    width: 2px;
-  }
-  70% {
-    width: 2px;
-  }
-  90% {
-    padding: 20px 0;
-  }
-  100% {
-    width: 600px;
-    height: 300px;
-    padding: 20px;
-  }
-}
-
-@keyframes timerAppearance {
-  0% {
-    width: 0;
-  }
-  50% {
-    width: 0;
-  }
-  70% {
-    width: 0;
-  }
-  100% {
-    width: 600px;
   }
 }
