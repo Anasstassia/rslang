@@ -98,6 +98,7 @@ export class Vocab implements content {
     // difficult words
     const difficultWords = document.querySelector('.vocab__difficult') as HTMLElement;
     difficultWords.addEventListener('click', () => {
+      this.group = 7; // difficult words
       this.requestType = 'difficult';
       this.renderWords();
       levelSelect.classList.add('level_not-active');
@@ -117,7 +118,7 @@ export class Vocab implements content {
     if (request === 'basic') {
       if (state.currentUser?.userId) {
         response = await client.get(
-          `/users/${state.currentUser?.userId}/aggregatedWords?group=${this.group}&page=${this.page}&wordsPerPage=20}`
+          `/users/${state.currentUser?.userId}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
         );
         data = response.data[0].paginatedResults;
       } else {
@@ -152,8 +153,9 @@ export class Vocab implements content {
     if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
     const items = await this.getWords(this.requestType);
+    console.log(items);
     items.forEach(async (item: iUserWord) => {
-      const word = await new Word(item).render();
+      const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
     });
   };
