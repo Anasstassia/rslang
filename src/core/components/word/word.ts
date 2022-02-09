@@ -1,4 +1,4 @@
-import { state, createUserWord, changeUserWord } from '../../client/users';
+import { state, createUserWord, changeUserWord, getUserWords } from '../../client/users';
 import { iUserWord } from '../types';
 import html from './word.html';
 import './word.scss';
@@ -41,7 +41,9 @@ export class Word {
 
   difficult?: boolean;
 
-  constructor(word: iUserWord) {
+  level: number;
+
+  constructor(word: iUserWord, level: number) {
     this.card = document.createElement('li');
     this.id = word._id;
     this.group = word.group;
@@ -59,6 +61,7 @@ export class Word {
     this.textExampleTranslate = word.textExampleTranslate;
     this.userWord = word.userWord;
     this.difficult = false;
+    this.level = level;
   }
 
   async render() {
@@ -153,21 +156,33 @@ export class Word {
   }
 
   async addToDifficult() {
+    this.difficult = true;
     this.card.classList.add('word_difficult');
     const arg = {
       userId: state.currentUser?.userId,
       wordId: this.id,
       word: { difficulty: 'hard', optional: { done: false } },
     };
-    createUserWord(arg);
+    const response = await getUserWords(String(state.currentUser?.userId));
+    const userWords = response.data;
+    const isUserWord = userWords.includes((userWord: iUserWord) => userWord.wordId === this.id);
+
+    if (isUserWord) {
+      changeUserWord(arg);
+    } else {
+      createUserWord(arg);
+    }
   }
 
   async removeFromDifficult() {
+    this.difficult = false;
+    if (this.level === 7) {
+      this.card.style.cssText = 'transition: all 0.3s ease; opacity: 0;transform: translate(-100%);';
+      this.card.addEventListener('transitionend', () => {
+        this.card.remove();
+      });
+    }
     this.card.classList.remove('word_difficult');
-    this.card.style.cssText = 'transition: all 0.3s ease; opacity: 0;transform: translate(-100%);';
-    this.card.addEventListener('transitionend', () => {
-      this.card.remove();
-    });
     const arg = {
       userId: state.currentUser?.userId,
       wordId: this.id,
