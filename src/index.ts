@@ -5,6 +5,7 @@ import { Vocab } from './pages/vocab';
 import { SprintGame } from './pages/games/sprint';
 import { Error404 } from './pages/error404';
 import { Popup } from './core/components/popup';
+import { Stats } from './pages/stats';
 
 import { Header } from './core/components/header';
 import { Footer } from './core/components/footer';
@@ -23,11 +24,13 @@ export const vocab = new Vocab();
 export const sprint = new SprintGame();
 export const error404 = new Error404();
 export const popup = new Popup();
+export const stats = new Stats();
 
 const routes: Record<string, content> = {
   '/': main,
   '/vocab': vocab,
   '/sprint': sprint,
+  '/stats': stats,
 };
 
 export const router = async () => {
@@ -50,7 +53,8 @@ export const router = async () => {
   const parsedURL =
     (request.main ? `/${request.main}` : '/') +
     (request.vocab ? `/${request.vocab}` : '') +
-    (request.sprint ? `/${request.sprint}` : '');
+    (request.sprint ? `/${request.sprint}` : '') +
+    (request.stats ? `/${request.stats}` : '');
 
   const page = routes[parsedURL] ? routes[parsedURL] : error404;
   mainElem.innerHTML = await page.render();

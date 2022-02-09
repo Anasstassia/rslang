@@ -2,6 +2,7 @@ export interface urlRequest {
   main: string;
   vocab: string;
   sprint: string;
+  stats: string;
 }
 
 export const Utils = {
@@ -14,11 +15,13 @@ export const Utils = {
       main: '',
       vocab: '',
       sprint: '',
+      stats: '',
     };
-    const [main, vocab, sprint] = [r[1], r[2], r[3]];
+    const [main, vocab, sprint, stats] = [r[1], r[2], r[3], r[4]];
     request.main = main;
     request.vocab = vocab;
     request.sprint = sprint;
+    request.stats = stats;
 
     return request;
   },
