@@ -46,7 +46,8 @@ export class Vocab implements content {
       this.requestType = 'basic';
       this.group = Number(levelSelect.value);
       const levlClass = levels[this.group].slice(0, 2);
-
+      levelSelect.classList.remove('level_not-active');
+      document.querySelector('.pagination')?.classList.remove('hide');
       vocab.className = 'vocab section container';
 
       vocab.classList.add(`vocab_${levlClass.toLowerCase()}`);
@@ -99,6 +100,8 @@ export class Vocab implements content {
     difficultWords.addEventListener('click', () => {
       this.requestType = 'difficult';
       this.renderWords();
+      levelSelect.classList.add('level_not-active');
+      document.querySelector('.pagination')?.classList.add('hide');
       lvlHeader.innerHTML = 'Сложные слова';
       vocab.className = 'vocab section container';
       vocab.classList.add(`vocab_difficult`);

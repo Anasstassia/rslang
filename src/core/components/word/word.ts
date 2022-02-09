@@ -164,6 +164,10 @@ export class Word {
 
   async removeFromDifficult() {
     this.card.classList.remove('word_difficult');
+    this.card.style.cssText = 'transition: all 0.3s ease; opacity: 0;transform: translate(-100%);';
+    this.card.addEventListener('transitionend', () => {
+      this.card.remove();
+    });
     const arg = {
       userId: state.currentUser?.userId,
       wordId: this.id,
