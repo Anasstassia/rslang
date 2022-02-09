@@ -14,15 +14,6 @@ export class Form implements content {
   }
 
   async run() {
-    // this.addListeners();
+    return undefined;
   }
-
-  // addListeners = () => {
-  //   const [tabRegister, tabAuth] = document.querySelectorAll<HTMLElement>('.tab');
-  //   [tabRegister, tabAuth].forEach((el) =>
-  //     el.addEventListener('click', () => {
-  //       console.log(1);
-  //     })
-  //   );
-  // };
 }
