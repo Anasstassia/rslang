@@ -14,18 +14,21 @@ export class Vocab implements content {
 
   requestType: string;
 
+  levels: { [key: string]: string };
+
+  levelSelect: HTMLSelectElement;
+
+  vocab: HTMLElement;
+
+  levelHeader: HTMLElement;
+
+  pagesEl: HTMLSelectElement;
+
   constructor() {
     this.page = 0;
     this.group = 0;
     this.requestType = 'basic';
-  }
-
-  async render() {
-    return html;
-  }
-
-  async run() {
-    const levels: { [key: string]: string } = {
+    this.levels = {
       '0': 'A1 Beginner',
       '1': 'A2 Elementary',
       '2': 'B1 Intermediate',
@@ -33,43 +36,47 @@ export class Vocab implements content {
       '4': 'C1 Advanced',
       '5': 'C2 Proficiency',
     };
-    const PAGES = 30;
-
-    const levelSelect = document.querySelector('.level') as HTMLSelectElement;
-    const vocab = document.querySelector('.vocab') as HTMLElement;
+    this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
+    this.vocab = document.querySelector('.vocab') as HTMLElement;
     this.vocabList = document.querySelector('.vocab__page') as HTMLElement;
-    const lvlHeader = document.querySelector('.vocab__level-name') as HTMLElement;
+    this.levelHeader = document.querySelector('.vocab__level-name') as HTMLElement;
+    this.pagesEl = document.querySelector('.btn_page') as HTMLSelectElement;
+  }
+
+  async render() {
+    return html;
+  }
+
+  async run() {
+    const PAGES = 30;
+    this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
+    this.vocab = document.querySelector('.vocab') as HTMLElement;
+    this.vocabList = document.querySelector('.vocab__page') as HTMLElement;
+    this.levelHeader = document.querySelector('.vocab__level-name') as HTMLElement;
+    this.pagesEl = document.querySelector('.btn_page') as HTMLSelectElement;
 
     // change group
 
-    levelSelect.addEventListener('change', () => {
-      this.requestType = 'basic';
-      this.group = Number(levelSelect.value);
-      const levlClass = levels[this.group].slice(0, 2);
-      levelSelect.classList.remove('level_not-active');
-      document.querySelector('.pagination')?.classList.remove('hide');
-      vocab.className = 'vocab section container';
+    this.levelSelect.addEventListener('change', this.renderGroup);
 
-      vocab.classList.add(`vocab_${levlClass.toLowerCase()}`);
-      lvlHeader.innerHTML = levels[this.group];
-      pagesEl.value = String(0);
-      this.page = 0;
-      this.renderWords();
+    this.levelSelect.addEventListener('click', () => {
+      if (this.group === 7) {
+        this.renderGroup();
+      }
     });
 
     // render pages list
-    const pagesEl = document.querySelector('.btn_page') as HTMLSelectElement;
-    const pageId = pagesEl.querySelector('option') as HTMLElement;
+    const pageId = this.pagesEl.querySelector('option') as HTMLElement;
     for (let i = 2; i <= PAGES; i += 1) {
       const item = pageId.cloneNode() as HTMLInputElement;
       item.innerHTML = String(i);
       item.value = String(i - 1);
-      pagesEl.append(item);
+      this.pagesEl.append(item);
     }
 
     // render words by page
-    pagesEl.addEventListener('change', () => {
-      this.page = Number(pagesEl.value);
+    this.pagesEl.addEventListener('change', () => {
+      this.page = Number(this.pagesEl.value);
       this.renderWords();
     });
 
@@ -81,7 +88,7 @@ export class Vocab implements content {
       } else {
         this.page -= 1;
       }
-      pagesEl.value = String(this.page);
+      this.pagesEl.value = String(this.page);
       this.renderWords();
     });
 
@@ -91,7 +98,7 @@ export class Vocab implements content {
       } else {
         this.page += 1;
       }
-      pagesEl.value = String(this.page);
+      this.pagesEl.value = String(this.page);
       this.renderWords();
     });
 
@@ -101,11 +108,11 @@ export class Vocab implements content {
       this.group = 7; // difficult words
       this.requestType = 'difficult';
       this.renderWords();
-      levelSelect.classList.add('level_not-active');
+      this.levelSelect?.classList.add('level_not-active');
       document.querySelector('.pagination')?.classList.add('hide');
-      lvlHeader.innerHTML = 'Сложные слова';
-      vocab.className = 'vocab section container';
-      vocab.classList.add(`vocab_difficult`);
+      this.levelHeader.innerHTML = 'Сложные слова';
+      this.vocab.className = 'vocab section container';
+      this.vocab.classList.add(`vocab_difficult`);
     });
 
     await this.renderWords();
@@ -153,10 +160,24 @@ export class Vocab implements content {
     if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
     const items = await this.getWords(this.requestType);
-    console.log(items);
     items.forEach(async (item: iUserWord) => {
       const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
     });
+  };
+
+  renderGroup = async () => {
+    this.requestType = 'basic';
+    this.group = Number(this.levelSelect.value);
+    const levlClass = this.levels[this.group].slice(0, 2);
+    this.levelSelect.classList.remove('level_not-active');
+    document.querySelector('.pagination')?.classList.remove('hide');
+    this.vocab.className = 'vocab section container';
+
+    this.vocab.classList.add(`vocab_${levlClass.toLowerCase()}`);
+    this.levelHeader.innerHTML = this.levels[this.group];
+    this.page = 0;
+    this.pagesEl.value = String(0);
+    this.renderWords();
   };
 }
