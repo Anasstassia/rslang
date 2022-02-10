@@ -140,7 +140,6 @@ export class Vocab implements content {
     difficultWords.addEventListener('click', () => {
       this.resetRequest(0, 6, 'difficult');
       this.renderGroup();
-      this.renderWords();
       this.levelSelect?.classList.add('level_not-active');
       document.querySelector('.pagination')?.classList.add('hide');
     });
@@ -163,25 +162,10 @@ export class Vocab implements content {
         data = response.data;
       }
     } else if (request === 'difficult') {
-      /*
       response = await client.get(
-        `/users/${state.currentUser?.userId}/aggregatedWords?&wordsPerPage=200&filter={"userWord.difficulty":"hard"`
+        `/users/${state.currentUser?.userId}/aggregatedWords?wordsPerPage=200&filter={"userWord.difficulty":"hard"}`
       );
       data = response.data[0].paginatedResults;
-      */
-      response = await fetch(
-        `https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.userId}/aggregatedWords?filter={"userWord.difficulty":"hard"}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      const json = await response.json();
-      data = json[0].paginatedResults;
     }
     return data;
   };
@@ -190,9 +174,11 @@ export class Vocab implements content {
     if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
     const items = await this.getWords(this.requestType);
+    console.log(items);
     items.forEach(async (item: iUserWord) => {
       const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
+      console.log(word);
     });
   };
 
