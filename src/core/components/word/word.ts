@@ -165,7 +165,7 @@ export class Word {
     };
     const response = await getUserWords(String(state.currentUser?.userId));
     const userWords = response.data;
-    const isUserWord = userWords.includes((userWord: iUserWord) => userWord.wordId === this.id);
+    const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
 
     if (isUserWord) {
       changeUserWord(arg);
