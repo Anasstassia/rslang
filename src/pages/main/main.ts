@@ -8,6 +8,12 @@ export class Main implements content {
   }
 
   async run() {
+    const vocabLink = document.querySelector('.menu__link') as HTMLElement;
+    vocabLink.addEventListener('click', () => {
+      localStorage.setItem('page', '0');
+      localStorage.setItem('group', '0');
+      localStorage.setItem('request', 'basic');
+    });
     return undefined;
   }
 }

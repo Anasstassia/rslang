@@ -14,7 +14,7 @@
   position: relative;
   &__header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
   }
 
   &__difficult {
@@ -106,6 +106,10 @@
   font-size: 1.1em;
   width: 250px;
   margin-right: 2em;
+  &_not-active {
+    color: #979696;
+    border-color: #979696;
+  }
 }
 
 .btn_arrow {
@@ -117,7 +121,10 @@
   display: flex;
   flex-grow: 1;
   align-items: center;
-  
+  justify-content: flex-start;
+  &.hide{
+    display: none;
+  }
 
   .btn_prev {
     transform: rotate(-90deg)
