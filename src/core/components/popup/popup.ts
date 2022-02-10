@@ -78,7 +78,6 @@ export class Popup implements content {
           circle.style.top = `${yInside}px`;
           circle.style.left = `${xInside}px`;
           button.appendChild(circle);
-          console.log(passwordInputElement?.value);
           if (!emailInputElement || !spanEmail || !passwordInputElement || !spanPass) return;
           if (!this.validate(emailRegExp, emailInputElement?.value)) {
             this.notValid(emailInputElement, spanEmail, 'Проверка почты не пройдена, введите еще раз');
