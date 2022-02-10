@@ -23,7 +23,10 @@ export class Popup implements content {
   }
 
   addListeners = () => {
+    const userEmail = document.querySelector('.user-email');
     const elements = document.querySelectorAll('.popup__wrapper .tab');
+    if (!userEmail) return;
+
     elements.forEach((el) =>
       el.addEventListener('click', () => {
         elements.forEach((label) => label.classList.remove('active-tab'));
@@ -90,6 +93,13 @@ export class Popup implements content {
             this.valid(emailInputElement, spanEmail);
             this.valid(passwordInputElement, spanPass);
             handlers[i]({ email: emailInputElement?.value || '', password: emailPasswordElement?.value || '' });
+            switch (i) {
+              case 1:
+                userEmail.innerHTML = emailInputElement?.value;
+                break;
+              default:
+                return;
+            }
           }
           setTimeout(() => circle.remove(), 500);
         })
@@ -97,7 +107,10 @@ export class Popup implements content {
     );
 
     const logOutButton = document.querySelector('.menu__link_logout');
-    logOutButton?.addEventListener('click', withPreventDefault(logOut));
+    logOutButton?.addEventListener('click', () => {
+      withPreventDefault(logOut);
+      userEmail.innerHTML = '';
+    });
   };
 
   showForm = (type: string) => {
