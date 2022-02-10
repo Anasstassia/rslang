@@ -35,7 +35,20 @@ export class SprintGame implements content {
   }
 
   async run() {
+    this.checkLocalStarage();
     this.addListeners();
+  }
+
+  checkLocalStarage() {
+    const sound = localStorage.getItem('sound');
+    const soundBtn = document.getElementById('sprintSound') as HTMLImageElement;
+    if (sound === 'false') {
+      this.isSoundOn = false;
+      soundBtn.src = '../../../assets/icons/soundOff.svg';
+    } else {
+      this.isSoundOn = true;
+      soundBtn.src = '../../../assets/icons/soundOn.svg';
+    }
   }
 
   addListeners() {
@@ -46,6 +59,7 @@ export class SprintGame implements content {
     soundBtn.addEventListener('click', () => {
       this.isSoundOn = !this.isSoundOn;
       soundBtn.src = this.isSoundOn ? `${path}/soundOn.svg` : `${path}/soundOff.svg`;
+      localStorage.setItem('sound', `${this.isSoundOn}`);
     });
 
     // toggle fullscreen
@@ -78,7 +92,10 @@ export class SprintGame implements content {
     const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
 
     correctBtn.addEventListener('click', () => {
-      if (this.isCorrect) {
+      if (this.isCorrect && !correctBtn.classList.contains('disabled')) {
+        correctBtn.classList.add('disabled');
+        console.log(1);
+
         this.correctWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/tick.svg';
@@ -91,8 +108,11 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          correctBtn.classList.remove('disabled');
         }, 500);
-      } else {
+      } else if (!correctBtn.classList.contains('disabled')) {
+        correctBtn.classList.add('disabled');
+
         this.wrongWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/cross.svg';
@@ -105,12 +125,15 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          correctBtn.classList.remove('disabled');
         }, 500);
       }
     });
 
     wrongBtn.addEventListener('click', () => {
-      if (!this.isCorrect) {
+      if (!this.isCorrect && !wrongBtn.classList.contains('disabled')) {
+        wrongBtn.classList.add('disabled');
+
         this.correctWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/tick.svg';
@@ -123,8 +146,11 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          wrongBtn.classList.remove('disabled');
         }, 700);
-      } else {
+      } else if (!wrongBtn.classList.contains('disabled')) {
+        wrongBtn.classList.add('disabled');
+
         this.wrongWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/cross.svg';
@@ -137,6 +163,7 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          wrongBtn.classList.remove('disabled');
         }, 700);
       }
     });
@@ -234,6 +261,7 @@ export class SprintGame implements content {
     this.startGame();
 
     this.isGameOver = false;
+    this.words = [];
     this.correctWords = [];
     this.wrongWords = [];
     this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
