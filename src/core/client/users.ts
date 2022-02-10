@@ -39,6 +39,11 @@ export const createUserWord = async ({ userId, wordId, word }: iUserWordCreator)
   return response;
 };
 
+export const getUserWords = async (userId: string) => {
+  const response = await client.get(`/users/${userId}/words/`);
+  return response;
+};
+
 export const changeUserWord = async ({ userId, wordId, word }: iUserWordCreator) => {
   const response = await client.put(`/users/${userId}/words/${wordId}`, word);
   return response;

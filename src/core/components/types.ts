@@ -27,6 +27,7 @@ export interface iUserWord extends iWord {
       done: boolean;
     };
   };
+  wordId?: string;
 }
 
 export interface iUserWordCreator {

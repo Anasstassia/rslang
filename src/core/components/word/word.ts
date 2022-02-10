@@ -1,4 +1,4 @@
-import { state, createUserWord, changeUserWord } from '../../client/users';
+import { state, createUserWord, changeUserWord, getUserWords } from '../../client/users';
 import { iUserWord } from '../types';
 import html from './word.html';
 import './word.scss';
@@ -41,7 +41,11 @@ export class Word {
 
   difficult?: boolean;
 
-  constructor(word: iUserWord) {
+  learnt?: boolean;
+
+  level: number;
+
+  constructor(word: iUserWord, level: number) {
     this.card = document.createElement('li');
     this.id = word._id;
     this.group = word.group;
@@ -59,6 +63,8 @@ export class Word {
     this.textExampleTranslate = word.textExampleTranslate;
     this.userWord = word.userWord;
     this.difficult = false;
+    this.learnt = false;
+    this.level = level;
   }
 
   async render() {
@@ -74,6 +80,7 @@ export class Word {
 
     if (this.userWord) {
       this.difficult = this.userWord.difficulty === 'hard';
+      this.learnt = this.userWord.optional.done;
     }
     setData('.word__en', this.word);
     setData('.word__ru', this.wordTranslate);
@@ -128,9 +135,7 @@ export class Word {
 
     // learnt (done) words
     const doneBtn = card.querySelector('.btn_done') as HTMLElement;
-    doneBtn.addEventListener('click', () => {
-      card.classList.toggle('word_done');
-    });
+    doneBtn.addEventListener('click', this.changeLearnt.bind(this));
 
     // difficult words
     const difficultBtn = card.querySelector('.btn_difficult') as HTMLElement;
@@ -141,6 +146,12 @@ export class Word {
       this.card.classList.add('word_difficult');
       (this.card.querySelector('.checkbox_difficult') as HTMLInputElement).checked = true;
     }
+
+    if (this.learnt) {
+      this.card.classList.add('word_done');
+      (this.card.querySelector('.checkbox_done') as HTMLInputElement).checked = true;
+    }
+
     return this.card;
   }
 
@@ -152,17 +163,67 @@ export class Word {
     }
   }
 
+  changeLearnt() {
+    if (this.learnt) {
+      this.removeFromLearnt();
+    } else {
+      this.addToLearnt();
+    }
+  }
+
+  removeFromLearnt = async () => {
+    this.card.classList.remove('word_done');
+    this.learnt = false;
+    const arg = {
+      userId: state.currentUser?.userId,
+      wordId: this.id,
+      word: { difficulty: 'basic', optional: { done: false } },
+    };
+    changeUserWord(arg);
+  };
+
+  async addToLearnt() {
+    this.card.classList.add('word_done');
+    this.learnt = true;
+    (this.card.querySelector('.checkbox_difficult') as HTMLInputElement).checked = false;
+    if (this.difficult) {
+      this.removeFromDifficult();
+    }
+    const arg = {
+      userId: state.currentUser?.userId,
+      wordId: this.id,
+      word: { difficulty: 'basic', optional: { done: true } },
+    };
+    changeUserWord(arg);
+  }
+
   async addToDifficult() {
+    this.difficult = true;
     this.card.classList.add('word_difficult');
     const arg = {
       userId: state.currentUser?.userId,
       wordId: this.id,
       word: { difficulty: 'hard', optional: { done: false } },
     };
-    createUserWord(arg);
+    const response = await getUserWords(String(state.currentUser?.userId));
+    const userWords = response.data;
+    const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
+
+    if (isUserWord) {
+      changeUserWord(arg);
+    } else {
+      createUserWord(arg);
+    }
   }
 
   async removeFromDifficult() {
+    this.difficult = false;
+    if (this.level === 6) {
+      this.card.style.cssText = 'transition: all 0.3s ease; opacity: 0;transform: translate(-100%);';
+      this.card.addEventListener('transitionend', () => {
+        this.card.remove();
+      });
+    }
     this.card.classList.remove('word_difficult');
     const arg = {
       userId: state.currentUser?.userId,
