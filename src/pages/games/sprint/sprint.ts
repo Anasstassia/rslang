@@ -1,6 +1,6 @@
-/* eslint-disable no-param-reassign */
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
+import { sprintStatistics } from '../statistics';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -29,6 +29,8 @@ export class SprintGame implements content {
   ids: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
   currId = 0;
+
+  currWordsInRow = 0;
 
   async render() {
     return html;
@@ -94,7 +96,13 @@ export class SprintGame implements content {
     correctBtn.addEventListener('click', () => {
       if (this.isCorrect && !correctBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
-        console.log(1);
+
+        sprintStatistics.totalCorrectWords += 1;
+        this.currWordsInRow += 1;
+        sprintStatistics.mostWordsInRow =
+          this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
+
+        localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
 
         this.correctWords.push(this.words[this.currId]);
 
@@ -112,6 +120,8 @@ export class SprintGame implements content {
         }, 500);
       } else if (!correctBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
+
+        this.currWordsInRow = 0;
 
         this.wrongWords.push(this.words[this.currId]);
 
@@ -134,6 +144,13 @@ export class SprintGame implements content {
       if (!this.isCorrect && !wrongBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
 
+        sprintStatistics.totalCorrectWords += 1;
+        this.currWordsInRow += 1;
+        sprintStatistics.mostWordsInRow =
+          this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
+
+        localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+
         this.correctWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/tick.svg';
@@ -150,6 +167,8 @@ export class SprintGame implements content {
         }, 700);
       } else if (!wrongBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
+
+        this.currWordsInRow = 0;
 
         this.wrongWords.push(this.words[this.currId]);
 
@@ -238,6 +257,9 @@ export class SprintGame implements content {
     if (this.isGameOver) {
       return;
     }
+    sprintStatistics.gamesPlayed += 1;
+    localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+
     const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
 
     progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
