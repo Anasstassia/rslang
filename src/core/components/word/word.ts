@@ -218,7 +218,7 @@ export class Word {
 
   async removeFromDifficult() {
     this.difficult = false;
-    if (this.level === 7) {
+    if (this.level === 6) {
       this.card.style.cssText = 'transition: all 0.3s ease; opacity: 0;transform: translate(-100%);';
       this.card.addEventListener('transitionend', () => {
         this.card.remove();
