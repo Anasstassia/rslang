@@ -89,12 +89,6 @@ export class Vocab implements content {
       this.resetRequest(0, Number(this.levelSelect.value), 'basic');
       this.renderGroup();
     });
-    this.levelSelect.addEventListener('click', () => {
-      this.resetRequest(0, Number(this.levelSelect.value), 'basic');
-      if (this.group === 6) {
-        this.renderGroup();
-      }
-    });
     this.renderGroup();
 
     // render pages list
@@ -174,11 +168,9 @@ export class Vocab implements content {
     if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
     const items = await this.getWords(this.requestType);
-    console.log(items);
     items.forEach(async (item: iUserWord) => {
       const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
-      console.log(word);
     });
   };
 
@@ -199,7 +191,7 @@ export class Vocab implements content {
   };
 
   resetRequest = async (page?: number, group?: number, requestType?: string) => {
-    if (group) {
+    if (group !== undefined) {
       this.group = group;
     }
     if (page !== undefined) {
