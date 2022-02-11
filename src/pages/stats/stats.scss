@@ -13,6 +13,8 @@
   }
   &__cards {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     margin: 0 auto;
     padding: 23px;
     gap: 32px;
@@ -102,5 +104,10 @@
       margin: 0;
       width: 100%;
     }
+  }
+  .notification {
+    width: 100%;
+    font-size: 26px;
+    text-align: center;
   }
 }
