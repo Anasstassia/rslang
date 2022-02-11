@@ -84,6 +84,13 @@ export class SprintGame implements content {
     document.getElementById('startSprintGameBtn')?.addEventListener('click', () => {
       this.startGame();
     });
+    const startGame = (ev: KeyboardEvent) => {
+      if (ev.code === 'Enter') {
+        this.startGame();
+        document.removeEventListener('keydown', startGame);
+      }
+    };
+    document.addEventListener('keydown', startGame);
   }
 
   startGame() {
@@ -94,7 +101,7 @@ export class SprintGame implements content {
     correctSound.volume = 0.5;
     const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
 
-    correctBtn.addEventListener('click', () => {
+    const correctBtnPressed = () => {
       if (this.isCorrect && !correctBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
 
@@ -124,9 +131,10 @@ export class SprintGame implements content {
         }
         this.nextWord(mark, correctBtn, word, translatedWord);
       }
-    });
+    };
+    correctBtn.addEventListener('click', correctBtnPressed);
 
-    wrongBtn.addEventListener('click', () => {
+    const wrondBtnPressed = () => {
       if (!this.isCorrect && !wrongBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
 
@@ -156,7 +164,21 @@ export class SprintGame implements content {
         }
         this.nextWord(mark, wrongBtn, word, translatedWord);
       }
-    });
+    };
+    wrongBtn.addEventListener('click', wrondBtnPressed);
+
+    const checkBtn = (ev: KeyboardEvent) => {
+      if (this.isGameOver) {
+        document.removeEventListener('keydown', checkBtn);
+        return;
+      }
+      if (ev.code === 'ArrowLeft') {
+        wrondBtnPressed();
+      } else if (ev.code === 'ArrowRight') {
+        correctBtnPressed();
+      }
+    };
+    document.addEventListener('keydown', checkBtn);
 
     this.generateWords();
 

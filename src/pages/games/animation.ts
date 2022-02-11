@@ -102,7 +102,7 @@ export const hide = (element: HTMLElement, time: number, width: number, height: 
         easing: 'ease-in-out',
       },
       {
-        height,
+        height: `${height}px`,
         offset: 0.95,
       },
       {
