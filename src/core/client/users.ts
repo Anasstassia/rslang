@@ -69,3 +69,50 @@ export const logOut = () => {
   localStorage.removeItem('refreshToken');
   state.currentUser = null;
 };
+
+export class Stat {
+  id?: string;
+
+  learnedWords: number;
+
+  learnedPages: {
+    [key: number]: Array<number>;
+  };
+
+  constructor() {
+    this.id = state.currentUser?.userId;
+    this.learnedWords = 0;
+    this.learnedPages = {
+      0: [],
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+      6: [],
+    };
+  }
+
+  get = async () => {
+    const response = await client.get(`/users/${this.id}/statistics`);
+    const stat = response.data;
+    this.learnedWords = stat.learnedWords;
+    this.learnedPages = stat.optional.learnedPages;
+    return response.data;
+  };
+
+  send = async () => {
+    const arg = {
+      learnedWords: this.learnedWords,
+      optional: {
+        learnedPages: this.learnedPages,
+      },
+    };
+    await client.put(`/users/${this.id}/statistics`, arg);
+  };
+
+  update = async () => {
+    await this.send();
+    await this.get();
+  };
+}

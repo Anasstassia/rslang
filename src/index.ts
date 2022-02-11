@@ -14,7 +14,7 @@ import { Menu } from './core/components/menu';
 import { Utils } from './core/utils/utils';
 // import Types
 import { content } from './core/components/types';
-import { loginUser, state } from './core/client/users';
+import { Stat, loginUser, state } from './core/client/users';
 
 export const header = new Header();
 export const footer = new Footer();
@@ -26,6 +26,8 @@ export const error404 = new Error404();
 export const popup = new Popup();
 export const stats = new Stats();
 
+export const statistic = new Stat(); // временная сущность для разработки, впоследствии использовать stats
+
 const routes: Record<string, content> = {
   '/': main,
   '/vocab': vocab,
@@ -35,6 +37,9 @@ const routes: Record<string, content> = {
 
 export const router = async () => {
   await loginUser({ email: 'test-user@google.com', password: '12345678' });
+  statistic.id = state.currentUser?.userId;
+  statistic.get();
+
   const headerElem = document.querySelector('.header') as HTMLElement;
   const mainElem = document.querySelector('.content') as HTMLElement;
   const footerElem = document.querySelector('.footer') as HTMLElement;

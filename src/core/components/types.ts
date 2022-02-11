@@ -30,6 +30,15 @@ export interface iUserWord extends iWord {
   wordId?: string;
 }
 
+export interface iUserWordResponse {
+  id: string;
+  difficulty: string;
+  optional: {
+    done: boolean;
+  };
+  wordId: string;
+}
+
 export interface iUserWordCreator {
   userId: string | undefined;
   wordId: string;

@@ -3,8 +3,11 @@ import { content, iUserWord } from '../../core/components/types';
 import html from './vocab.html';
 import './vocab.scss';
 import { client } from '../../core/client';
-import { state } from '../../core/client/users';
+import { getUserWords, state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
+import { statistic } from '../../index';
+
+const PAGES = 30;
 
 export class Vocab implements content {
   _page: number;
@@ -77,7 +80,29 @@ export class Vocab implements content {
   }
 
   async run() {
-    const PAGES = 30;
+    /*
+    async function resetData() {
+      statistic.learnedPages = {
+        0: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+      };
+      statistic.learnedWords = 0;
+      const response = await getUserWords(String(state.currentUser?.userId));
+      const words = response.data;
+
+      words.forEach(async (word: iUserWordResponse) => {
+        await client.delete(`/users/${state.currentUser?.userId}/words/${word.wordId}`);
+      });
+    }
+
+    // resetData();
+    // для удаления userwords И очистки изученных в статистике
+    */
+
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
     this.vocabList = document.querySelector('.vocab__page') as HTMLElement;
@@ -89,18 +114,15 @@ export class Vocab implements content {
       this.resetRequest(0, Number(this.levelSelect.value), 'basic');
       this.renderGroup();
     });
-    this.renderGroup();
 
     // render pages list
-    const pageId = this.pagesEl.querySelector('option') as HTMLElement;
-    for (let i = 2; i <= PAGES; i += 1) {
-      const item = pageId.cloneNode() as HTMLInputElement;
+    for (let i = 1; i <= PAGES; i += 1) {
+      const item = document.createElement('option');
+      item.classList.add('page__option');
       item.innerHTML = String(i);
       item.value = String(i - 1);
       this.pagesEl.append(item);
     }
-    this.pagesEl.value = String(this.page);
-
     // render words by page
     this.pagesEl.addEventListener('change', () => {
       this.page = Number(this.pagesEl.value);
@@ -138,7 +160,8 @@ export class Vocab implements content {
       document.querySelector('.pagination')?.classList.add('hide');
     });
 
-    await this.renderWords();
+    this.renderGroup();
+
     return undefined;
   }
 
@@ -165,13 +188,19 @@ export class Vocab implements content {
   };
 
   renderWords = async () => {
+    this.markLearnedPages();
     if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
     const items = await this.getWords(this.requestType);
-    items.forEach(async (item: iUserWord) => {
+    await items.forEach(async (item: iUserWord) => {
       const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
     });
+    if (document.querySelectorAll('.word_done').length === items.length) {
+      this.makePageLearnt();
+    } else {
+      this.unlearnPage();
+    }
   };
 
   renderGroup = async () => {
@@ -200,5 +229,46 @@ export class Vocab implements content {
     if (requestType) {
       this.requestType = requestType;
     }
+  };
+
+  countLearnt = async (i: number) => {
+    statistic.learnedWords += i;
+    await statistic.update();
+    if (document.querySelectorAll('.word_done').length === document.querySelectorAll('.word').length) {
+      this.makePageLearnt();
+    } else {
+      this.unlearnPage();
+    }
+  };
+
+  makePageLearnt = async () => {
+    statistic.learnedPages[this.group].push(this.page);
+    await statistic.update();
+    this.vocab.classList.add('vocab_learnt');
+
+    const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
+    currentPage.innerHTML = `${this.page + 1} &#10003;`;
+  };
+
+  unlearnPage = async () => {
+    this.vocab.classList.remove('vocab_learnt');
+    const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
+    currentPage.innerHTML = `${this.page + 1}`;
+    const newPages = statistic.learnedPages[this.group].filter((i) => i !== this.page);
+    statistic.learnedPages[this.group] = newPages;
+    await statistic.update();
+  };
+
+  markLearnedPages = async () => {
+    const pages = document.querySelectorAll('.page__option') as NodeListOf<HTMLInputElement>;
+    await statistic.update();
+    const learnedPages = statistic.learnedPages[this.group];
+    pages.forEach((item) => {
+      if (learnedPages.includes(Number(item.value))) {
+        item.innerHTML = `${Number(item.value) + 1} &#10003;`;
+      } else {
+        item.innerHTML = `${Number(item.value) + 1}`;
+      }
+    });
   };
 }
