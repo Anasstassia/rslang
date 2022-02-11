@@ -1,3 +1,4 @@
+import { state } from '../../core/client/users';
 import { content } from '../../core/components/types';
 import html from './stats.html';
 import './stats.scss';
@@ -9,6 +10,7 @@ export class Stats implements content {
 
   async run() {
     this.getDate();
+    this.checkUser();
   }
 
   getDate() {
@@ -60,5 +62,16 @@ export class Stats implements content {
     }
     if (!dateElement) return;
     dateElement.innerHTML = `${day} ${month}`;
+  }
+
+  checkUser() {
+    const statsContainer = document.querySelector('.stats__cards');
+
+    if (!state.currentUser && statsContainer) {
+      const message = document.createElement('p');
+      message.innerHTML = 'Только авторизированные пользователи могут просматривать статистику';
+      message.classList.add('notification');
+      statsContainer.prepend(message);
+    }
   }
 }
