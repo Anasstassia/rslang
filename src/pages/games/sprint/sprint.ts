@@ -1,10 +1,11 @@
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
+import { createWord, getRandomNum, getWords } from '../utils';
 import html from './sprint.html';
 import './sprint.scss';
 
-type Word = {
+export type GameWord = {
   word: string;
   transcription: string;
   wordTranslate: string;
@@ -20,11 +21,11 @@ export class SprintGame implements content {
 
   isGameOver = false;
 
-  words: Array<Word> = [];
+  words: Array<GameWord> = [];
 
-  wrongWords: Array<Word> = [];
+  wrongWords: Array<GameWord> = [];
 
-  correctWords: Array<Word> = [];
+  correctWords: Array<GameWord> = [];
 
   ids: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 
@@ -97,12 +98,7 @@ export class SprintGame implements content {
       if (this.isCorrect && !correctBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
 
-        sprintStatistics.totalCorrectWords += 1;
-        this.currWordsInRow += 1;
-        sprintStatistics.mostWordsInRow =
-          this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
-
-        localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+        this.changeStat();
 
         this.correctWords.push(this.words[this.currId]);
 
@@ -112,12 +108,7 @@ export class SprintGame implements content {
         if (this.isSoundOn) {
           correctSound.play();
         }
-
-        setTimeout(() => {
-          mark.classList.add('hidden');
-          this.renderContent(word, translatedWord);
-          correctBtn.classList.remove('disabled');
-        }, 500);
+        this.nextWord(mark, correctBtn, word, translatedWord);
       } else if (!correctBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
 
@@ -131,12 +122,7 @@ export class SprintGame implements content {
         if (this.isSoundOn) {
           wrongSound.play();
         }
-
-        setTimeout(() => {
-          mark.classList.add('hidden');
-          this.renderContent(word, translatedWord);
-          correctBtn.classList.remove('disabled');
-        }, 500);
+        this.nextWord(mark, correctBtn, word, translatedWord);
       }
     });
 
@@ -144,12 +130,7 @@ export class SprintGame implements content {
       if (!this.isCorrect && !wrongBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
 
-        sprintStatistics.totalCorrectWords += 1;
-        this.currWordsInRow += 1;
-        sprintStatistics.mostWordsInRow =
-          this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
-
-        localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+        this.changeStat();
 
         this.correctWords.push(this.words[this.currId]);
 
@@ -159,12 +140,7 @@ export class SprintGame implements content {
         if (this.isSoundOn) {
           correctSound.play();
         }
-
-        setTimeout(() => {
-          mark.classList.add('hidden');
-          this.renderContent(word, translatedWord);
-          wrongBtn.classList.remove('disabled');
-        }, 700);
+        this.nextWord(mark, wrongBtn, word, translatedWord);
       } else if (!wrongBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
 
@@ -178,12 +154,7 @@ export class SprintGame implements content {
         if (this.isSoundOn) {
           wrongSound.play();
         }
-
-        setTimeout(() => {
-          mark.classList.add('hidden');
-          this.renderContent(word, translatedWord);
-          wrongBtn.classList.remove('disabled');
-        }, 700);
+        this.nextWord(mark, wrongBtn, word, translatedWord);
       }
     });
 
@@ -234,8 +205,7 @@ export class SprintGame implements content {
       if (wordWrap !== null && translatedWordWrap !== null) {
         wordWrap.innerHTML = this.words[id].word;
 
-        translatedWordWrap.innerHTML =
-          this.words[this.isCorrectTranslate() ? id : this.getRandomNum(0, 19)].wordTranslate;
+        translatedWordWrap.innerHTML = this.words[this.isCorrectTranslate() ? id : getRandomNum(0, 19)].wordTranslate;
       }
     } else {
       this.gameOver();
@@ -247,7 +217,7 @@ export class SprintGame implements content {
     if (this.ids.length === 0) {
       return false;
     }
-    const randNum = this.getRandomNum(0, this.ids.length - 1);
+    const randNum = getRandomNum(0, this.ids.length - 1);
     const id = this.ids[randNum];
     this.ids.splice(randNum, 1);
     return id;
@@ -266,10 +236,10 @@ export class SprintGame implements content {
     correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
 
     this.wrongWords.forEach((el) => {
-      wrongWords.appendChild(this.createWord(el));
+      wrongWords.appendChild(createWord(el));
     });
     this.correctWords.forEach((el) => {
-      correctWords.appendChild(this.createWord(el));
+      correctWords.appendChild(createWord(el));
     });
   }
 
@@ -280,19 +250,19 @@ export class SprintGame implements content {
     wrap.innerHTML = '';
     changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
 
-    this.startGame();
-
     this.isGameOver = false;
     this.words = [];
     this.correctWords = [];
     this.wrongWords = [];
     this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+
+    this.startGame();
   }
 
   generateWords() {
     const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
 
-    this.getWords(group).then((el) => {
+    getWords(group).then((el) => {
       el.forEach((element: iWord) => {
         const { word, transcription, wordTranslate, audio } = element;
         this.words.push({ word, transcription, wordTranslate, audio });
@@ -304,21 +274,8 @@ export class SprintGame implements content {
     });
   }
 
-  async getWords(group: string | undefined) {
-    const randPage = this.getRandomNum(0, 30);
-
-    const response = await (
-      await fetch(`https://rs-lang-irina-mokh.herokuapp.com/words?group=${group}&page=${randPage}`)
-    ).json();
-    return response;
-  }
-
-  getRandomNum(min: number, max: number) {
-    return Math.round(Math.random() * (max - min) + min);
-  }
-
   isCorrectTranslate() {
-    if (this.getRandomNum(1, 2) === 1) {
+    if (getRandomNum(1, 2) === 1) {
       this.isCorrect = true;
       return true;
     }
@@ -428,39 +385,6 @@ export class SprintGame implements content {
     return { progress, correctNums, wrongWords, correctWords };
   }
 
-  createWord(el: Word) {
-    const word = document.createElement('div');
-    word.classList.add('statistics__word');
-
-    const div = document.createElement('div');
-
-    const img = document.createElement('img');
-    img.classList.add('statistics__word__audio');
-    img.src = '../../../assets/icons/soundOn.svg';
-    img.alt = 'Sound';
-
-    img.addEventListener('click', () => {
-      const audio = new Audio(`https://rs-lang-irina-mokh.herokuapp.com/${el.audio}`);
-      audio.play();
-    });
-
-    const p1 = document.createElement('p');
-    p1.innerHTML = el.word;
-
-    const p2 = document.createElement('p');
-    p2.classList.add('transcription');
-    p2.innerHTML = el.transcription;
-
-    const p3 = document.createElement('p');
-    p3.classList.add('translate');
-    p3.innerHTML = el.wordTranslate;
-
-    div.append(img, p1);
-    word.append(div, p2, p3);
-
-    return word;
-  }
-
   createEndBtns() {
     const btnsWrap = document.createElement('div');
     btnsWrap.classList.add('btns-wrap');
@@ -489,5 +413,22 @@ export class SprintGame implements content {
 
     const wrap = document.querySelector('.sprint .container');
     wrap?.append(btnsWrap);
+  }
+
+  nextWord(mark: HTMLElement, btn: HTMLButtonElement, word: HTMLElement, translatedWord: HTMLElement) {
+    setTimeout(() => {
+      mark.classList.add('hidden');
+      this.renderContent(word, translatedWord);
+      btn.classList.remove('disabled');
+    }, 500);
+  }
+
+  changeStat() {
+    sprintStatistics.totalCorrectWords += 1;
+    this.currWordsInRow += 1;
+    sprintStatistics.mostWordsInRow =
+      this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
+
+    localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
   }
 }
