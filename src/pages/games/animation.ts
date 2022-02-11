@@ -90,8 +90,6 @@ export const show = (element: HTMLElement, time: number, width: number, offset: 
 };
 
 export const hide = (element: HTMLElement, time: number, width: number, height: number, offset: number) => {
-  console.log(element);
-
   element.animate(
     [
       {

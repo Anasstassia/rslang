@@ -1,6 +1,6 @@
-/* eslint-disable no-param-reassign */
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
+import { sprintStatistics } from '../statistics';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -30,12 +30,27 @@ export class SprintGame implements content {
 
   currId = 0;
 
+  currWordsInRow = 0;
+
   async render() {
     return html;
   }
 
   async run() {
+    this.checkLocalStarage();
     this.addListeners();
+  }
+
+  checkLocalStarage() {
+    const sound = localStorage.getItem('sound');
+    const soundBtn = document.getElementById('sprintSound') as HTMLImageElement;
+    if (sound === 'false') {
+      this.isSoundOn = false;
+      soundBtn.src = '../../../assets/icons/soundOff.svg';
+    } else {
+      this.isSoundOn = true;
+      soundBtn.src = '../../../assets/icons/soundOn.svg';
+    }
   }
 
   addListeners() {
@@ -46,6 +61,7 @@ export class SprintGame implements content {
     soundBtn.addEventListener('click', () => {
       this.isSoundOn = !this.isSoundOn;
       soundBtn.src = this.isSoundOn ? `${path}/soundOn.svg` : `${path}/soundOff.svg`;
+      localStorage.setItem('sound', `${this.isSoundOn}`);
     });
 
     // toggle fullscreen
@@ -78,7 +94,16 @@ export class SprintGame implements content {
     const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
 
     correctBtn.addEventListener('click', () => {
-      if (this.isCorrect) {
+      if (this.isCorrect && !correctBtn.classList.contains('disabled')) {
+        correctBtn.classList.add('disabled');
+
+        sprintStatistics.totalCorrectWords += 1;
+        this.currWordsInRow += 1;
+        sprintStatistics.mostWordsInRow =
+          this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
+
+        localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+
         this.correctWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/tick.svg';
@@ -91,8 +116,13 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          correctBtn.classList.remove('disabled');
         }, 500);
-      } else {
+      } else if (!correctBtn.classList.contains('disabled')) {
+        correctBtn.classList.add('disabled');
+
+        this.currWordsInRow = 0;
+
         this.wrongWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/cross.svg';
@@ -105,12 +135,22 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          correctBtn.classList.remove('disabled');
         }, 500);
       }
     });
 
     wrongBtn.addEventListener('click', () => {
-      if (!this.isCorrect) {
+      if (!this.isCorrect && !wrongBtn.classList.contains('disabled')) {
+        wrongBtn.classList.add('disabled');
+
+        sprintStatistics.totalCorrectWords += 1;
+        this.currWordsInRow += 1;
+        sprintStatistics.mostWordsInRow =
+          this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
+
+        localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+
         this.correctWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/tick.svg';
@@ -123,8 +163,13 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          wrongBtn.classList.remove('disabled');
         }, 700);
-      } else {
+      } else if (!wrongBtn.classList.contains('disabled')) {
+        wrongBtn.classList.add('disabled');
+
+        this.currWordsInRow = 0;
+
         this.wrongWords.push(this.words[this.currId]);
 
         mark.src = '../../../assets/icons/cross.svg';
@@ -137,6 +182,7 @@ export class SprintGame implements content {
         setTimeout(() => {
           mark.classList.add('hidden');
           this.renderContent(word, translatedWord);
+          wrongBtn.classList.remove('disabled');
         }, 700);
       }
     });
@@ -211,6 +257,9 @@ export class SprintGame implements content {
     if (this.isGameOver) {
       return;
     }
+    sprintStatistics.gamesPlayed += 1;
+    localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+
     const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
 
     progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
@@ -234,6 +283,7 @@ export class SprintGame implements content {
     this.startGame();
 
     this.isGameOver = false;
+    this.words = [];
     this.correctWords = [];
     this.wrongWords = [];
     this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
