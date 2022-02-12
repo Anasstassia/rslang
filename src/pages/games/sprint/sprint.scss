@@ -36,6 +36,7 @@
       font-size: 40px;
     }
     .line {
+			transition: width .3s linear;
       background-color: #fff;
       height: 2px;
       margin: 10px auto auto auto; 
