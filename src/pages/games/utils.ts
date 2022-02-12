@@ -74,3 +74,13 @@ export function toggleHeaderBtns(isSoundOn: boolean) {
     }
   });
 }
+
+export function checkLocalStarage() {
+  const sound = localStorage.getItem('sound');
+  const soundBtn = document.getElementById('gameSound') as HTMLImageElement;
+  if (sound === 'false') {
+    soundBtn.src = '../../../assets/icons/soundOff.svg';
+  } else {
+    soundBtn.src = '../../../assets/icons/soundOn.svg';
+  }
+}

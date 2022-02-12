@@ -1,7 +1,7 @@
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
-import { createWord, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
+import { checkLocalStarage, createWord, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -36,19 +36,9 @@ export class SprintGame implements content {
   }
 
   async run() {
-    this.checkLocalStarage();
+    checkLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
-  }
-
-  checkLocalStarage() {
-    const sound = localStorage.getItem('sound');
-    const soundBtn = document.getElementById('gameSound') as HTMLImageElement;
-    if (sound === 'false') {
-      soundBtn.src = '../../../assets/icons/soundOff.svg';
-    } else {
-      soundBtn.src = '../../../assets/icons/soundOn.svg';
-    }
   }
 
   addListeners() {
