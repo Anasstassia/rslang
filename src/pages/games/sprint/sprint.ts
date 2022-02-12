@@ -1,7 +1,7 @@
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
-import { createWord, getRandomNum, getWords } from '../utils';
+import { createWord, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -13,8 +13,6 @@ export type GameWord = {
 };
 
 export class SprintGame implements content {
-  isSoundOn = true;
-
   timeLeft = 60;
 
   isCorrect = false;
@@ -39,48 +37,21 @@ export class SprintGame implements content {
 
   async run() {
     this.checkLocalStarage();
+    toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
   }
 
   checkLocalStarage() {
     const sound = localStorage.getItem('sound');
-    const soundBtn = document.getElementById('sprintSound') as HTMLImageElement;
+    const soundBtn = document.getElementById('gameSound') as HTMLImageElement;
     if (sound === 'false') {
-      this.isSoundOn = false;
       soundBtn.src = '../../../assets/icons/soundOff.svg';
     } else {
-      this.isSoundOn = true;
       soundBtn.src = '../../../assets/icons/soundOn.svg';
     }
   }
 
   addListeners() {
-    const path = '../../../assets/icons';
-
-    // toggle sound
-    const soundBtn = document.getElementById('sprintSound') as HTMLImageElement;
-    soundBtn.addEventListener('click', () => {
-      this.isSoundOn = !this.isSoundOn;
-      soundBtn.src = this.isSoundOn ? `${path}/soundOn.svg` : `${path}/soundOff.svg`;
-      localStorage.setItem('sound', `${this.isSoundOn}`);
-    });
-
-    // toggle fullscreen
-    const fullscreenBtn = document.getElementById('sprintFullscreen') as HTMLImageElement;
-    fullscreenBtn.addEventListener('click', () => {
-      const sprintContent = document.querySelector('.sprint__content') as HTMLElement;
-
-      if (!document.fullscreenElement) {
-        document.querySelector('.sprint')?.requestFullscreen();
-        sprintContent.style.marginTop = '20vh';
-        fullscreenBtn.src = `${path}/fullscreenOff.svg`;
-      } else {
-        document.exitFullscreen();
-        fullscreenBtn.src = `${path}/fullscreenOn.svg`;
-        sprintContent.style.marginTop = '';
-      }
-    });
-
     document.getElementById('startSprintGameBtn')?.addEventListener('click', () => {
       this.startGame();
     });
@@ -112,7 +83,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
         this.nextWord(mark, correctBtn, word, translatedWord);
@@ -126,7 +97,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/cross.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
         this.nextWord(mark, correctBtn, word, translatedWord);
@@ -145,7 +116,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
         this.nextWord(mark, wrongBtn, word, translatedWord);
@@ -159,7 +130,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/cross.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
         this.nextWord(mark, wrongBtn, word, translatedWord);

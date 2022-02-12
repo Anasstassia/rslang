@@ -1,126 +1,16 @@
 @use "../../../scss/vars.scss";
+@import '../game';
 
 .sprint {
-  color: #fff;
-	background: linear-gradient(-45deg, #f73e3e, #ee7752 , #236ad5, #9708aa);
-  height: 100% !important;
-  padding-top: 25px;
-  position: relative;
-	background-size: 200% 200%;
-	animation: gradient 20s ease infinite;
-
-  button {
-    background: transparent;
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-    border: 1px solid #ffffff;
-    border-radius: 20px;
-    padding: 10px 20px;
-    transition: all 0.3s linear;
-
-    &:hover {
-      color: vars.$jet;
-      background-color: #fff;
-    }
-
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .buttons {
-      cursor: pointer;
-      filter: vars.$filter-snow;
-
-      display: flex;
-      align-items: center;
-      column-gap: 40px;
-
-      transform: scale(1);
-      img {
-        transition: transform .07s linear;
-        &:hover {
-          transform: scale(1.1);
-        }
-      }
-
-      &__sound-img {
-        width: 40px;
-        height: 40px;
-      }
-      &__fullScreen-img {
-        width: 30px;
-        height: 30px;
-      }
-    }
-
-    .diff {
-      display: block;
-      text-decoration: none;
-      border: 1px solid transparent;
-      border-radius: 30px;
-      outline: none;
-      background: transparent !important;
-      cursor: pointer;
-      color: #fff;
-      font-size: 18px;
-
-      padding: 10px;
-
-      transition: border .2s linear;
-
-      &:hover {
-        border: 1px solid rgb(255, 255, 255);
-      }
-
-      &__option {
-        background: rgb(199, 152, 152);
-      }
-    }
-
-  }
-
+	background-image: linear-gradient(-45deg, #f73e3e, #ee7752 , #236ad5, #9708aa);
 
   &__content {
-    animation: appearanceWrap 2.5s ease-in-out;
-    animation-fill-mode: forwards;
-    overflow: hidden;
-    width: 2px;
-    height: 2px;
-    margin: 0 auto;
-    margin-top: 15vh;
-    border: 1px solid #fff;
-    text-align: center;
-
-    &__title {
-      animation: appearanceContent 2.7s ease-in-out;
-      animation-fill-mode: forwards;
-      font-size: 27px;
-    }
-    &__subtitle {
-      animation: appearanceContent 2.7s ease-in-out;
-      animation-fill-mode: forwards;
-      font-size: 23px;
-    }
-
-    &__start-btn {
-      animation: appearanceContent 2.7s ease-in-out;
-      animation-fill-mode: forwards;
-    }
-
-    // 
-    // 
-    //
     &__word {
       font-size: 35px;
     }
     &__translate {
       font-size: 30px;
     }
-
     .answer-btns {
       display: flex;
       justify-content: space-between;
@@ -153,59 +43,6 @@
     }
   }
 
-  .statistics {
-    display: flex;
-    flex-direction: column;
-    row-gap: 30px;
-    text-align: left;
-
-    p {
-      margin: 0;
-    }
-
-    &__progress {
-      font-size: 32px;
-    }
-
-    &__correct-num {
-      font-size: 25px;
-    }
-
-    &__mistakes, &__correctly  {
-      display: flex;
-      flex-direction: column;
-      row-gap: 10px;
-      p {
-        font-size: 25px;
-      }
-    }
-
-    &__word {
-      display: flex;
-      div {
-        display: flex;
-        align-items: center;
-        column-gap: 10px;
-        margin-right: auto;
-      }
-      p {
-      font-size: 20px !important;
-      }
-      .transcription {
-        width: 100px;
-      }
-      .translate {
-        width: 150px;
-        text-align: right;
-        word-wrap: normal;
-      }
-      &__audio {
-        filter: invert(90%) sepia(4%) saturate(263%) hue-rotate(303deg) brightness(106%) contrast(105%);
-        height: 25px;
-      }
-    }
-  }
-
   .btns-wrap {
     overflow: hidden;
     width: 500px;
@@ -213,51 +50,5 @@
     margin-top: 50px;
     display: flex;
     justify-content: space-evenly;
-  }
-}
-
-@keyframes gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
-}
-
-@keyframes appearanceWrap {
-  0% {
-    padding: 0;
-    width: 2px;
-    height: 2px;
-  }
-  50% {
-    width: 2px;
-    height: 300px;
-  }
-  55% {
-    padding: 20px 0;
-  }
-  90% {
-    padding: 20px 0;
-  }
-  100% {
-    width: 600px;
-    height: 300px;
-    padding: 20px;
-  }
-}
-@keyframes appearanceContent {
-  0% {
-    opacity: 0;
-  }
-  95% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
   }
 }

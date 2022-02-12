@@ -45,3 +45,32 @@ export function createWord(el: GameWord) {
 
   return word;
 }
+
+export function toggleHeaderBtns(isSoundOn: boolean) {
+  const path = '../../../assets/icons';
+  let soundState = isSoundOn;
+
+  // toggle sound
+  const soundBtn = document.getElementById('gameSound') as HTMLImageElement;
+  soundBtn.addEventListener('click', () => {
+    soundState = !soundState;
+    soundBtn.src = soundState ? `${path}/soundOn.svg` : `${path}/soundOff.svg`;
+    localStorage.setItem('sound', `${soundState}`);
+  });
+
+  // toggle fullscreen
+  const fullscreenBtn = document.getElementById('gameFullscreen') as HTMLImageElement;
+  fullscreenBtn.addEventListener('click', () => {
+    const content = document.querySelector('.game__content') as HTMLElement;
+
+    if (!document.fullscreenElement) {
+      document.querySelector('.game')?.requestFullscreen();
+      content.style.marginTop = '20vh';
+      fullscreenBtn.src = `${path}/fullscreenOff.svg`;
+    } else {
+      document.exitFullscreen();
+      fullscreenBtn.src = `${path}/fullscreenOn.svg`;
+      content.style.marginTop = '';
+    }
+  });
+}
