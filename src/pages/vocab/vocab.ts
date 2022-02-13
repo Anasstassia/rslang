@@ -153,9 +153,9 @@ export class Vocab implements content {
     let response = null;
     let data = null;
     if (request === 'basic') {
-      if (state.currentUser?.userId) {
+      if (state.currentUser?.id) {
         response = await client.get(
-          `/users/${state.currentUser?.userId}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
+          `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
         );
         data = response.data[0].paginatedResults;
       } else {
@@ -170,7 +170,7 @@ export class Vocab implements content {
       data = response.data[0].paginatedResults;
       */
       response = await fetch(
-        `https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.userId}/aggregatedWords?filter={"userWord.difficulty":"hard"}`,
+        `https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.id}/aggregatedWords?filter={"userWord.difficulty":"hard"}`,
         {
           method: 'GET',
           headers: {

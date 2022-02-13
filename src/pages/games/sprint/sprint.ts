@@ -211,6 +211,8 @@ export class SprintGame implements content {
       return;
     }
     sprintStatistics.gamesPlayed += 1;
+    const todayDate = new Date();
+    sprintStatistics.currentDay = todayDate.getDate();
     localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
 
     const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
