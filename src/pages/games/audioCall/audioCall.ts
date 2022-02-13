@@ -1,5 +1,5 @@
 import { content } from '../../../core/components/types';
-import { changeContent } from '../animation';
+import { changeContent, show } from '../animation';
 import { checkLocalStarage, toggleHeaderBtns } from '../utils';
 import html from './audioCall.html';
 import './audioCall.scss';
@@ -30,6 +30,28 @@ export class AudioCall implements content {
 
   startGame() {
     this.generateContentUI();
+    /* const heartWrap = */ this.generateHeartsUI();
+  }
+
+  generateHeartsUI() {
+    const heartWrap = document.createElement('div');
+    heartWrap.classList.add('hearts');
+
+    for (let i = 1; i < 6; i += 1) {
+      const heart = document.createElement('div');
+      heart.classList.add('hearts__item');
+      heart.id = i.toString();
+
+      heartWrap.appendChild(heart);
+    }
+
+    const wrap = document.querySelector('.audio-call .container') as HTMLElement;
+
+    show(heartWrap, 3000, 300, 0.7);
+
+    wrap.appendChild(heartWrap);
+
+    return heartWrap;
   }
 
   generateContentUI() {
