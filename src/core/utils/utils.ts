@@ -1,3 +1,8 @@
+import { iUserWordResponse } from '../components/types';
+import { getUserWords, state } from '../client/users';
+import { stats } from '../../index';
+import { client } from '../client';
+
 export interface urlRequest {
   main: string;
   vocab: string;
@@ -27,6 +32,24 @@ export const Utils = {
     request.stats = stats;
 
     return request;
+  },
+
+  resetData: async () => {
+    stats.learnedPages = {
+      0: [],
+      1: [],
+      2: [],
+      3: [],
+      4: [],
+      5: [],
+    };
+    stats.learnedWords = 0;
+    const response = await getUserWords(String(state.currentUser?.id));
+    const words = response.data;
+
+    words.forEach(async (word: iUserWordResponse) => {
+      await client.delete(`/users/${state.currentUser?.id}/words/${word.wordId}`);
+    });
   },
 };
 

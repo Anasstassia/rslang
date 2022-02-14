@@ -5,7 +5,8 @@ import './vocab.scss';
 import { client } from '../../core/client';
 import { state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
-import { statistic } from '../../index';
+import { stats } from '../../index';
+// import { Utils } from '../../core/utils/utils';
 
 const PAGES = 30;
 
@@ -80,28 +81,8 @@ export class Vocab implements content {
   }
 
   async run() {
-    /*
-    async function resetData() {
-      statistic.learnedPages = {
-        0: [],
-        1: [],
-        2: [],
-        3: [],
-        4: [],
-        5: [],
-      };
-      statistic.learnedWords = 0;
-      const response = await getUserWords(String(state.currentUser?.userId));
-      const words = response.data;
-
-      words.forEach(async (word: iUserWordResponse) => {
-        await client.delete(`/users/${state.currentUser?.userId}/words/${word.wordId}`);
-      });
-    }
-
-    // resetData();
+    // await Utils.resetData();
     // для удаления userwords И очистки изученных в статистике
-    */
 
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
@@ -232,8 +213,8 @@ export class Vocab implements content {
   };
 
   countLearnt = async (i: number) => {
-    statistic.learnedWords += i;
-    await statistic.update();
+    stats.learnedWords += i;
+    await stats.update();
     if (document.querySelectorAll('.word_done').length === document.querySelectorAll('.word').length) {
       this.makePageLearnt();
     } else {
@@ -242,8 +223,8 @@ export class Vocab implements content {
   };
 
   makePageLearnt = async () => {
-    statistic.learnedPages[this.group].push(this.page);
-    await statistic.update();
+    stats.learnedPages[this.group].push(this.page);
+    await stats.update();
     this.vocab.classList.add('vocab_learnt');
 
     const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
@@ -254,15 +235,15 @@ export class Vocab implements content {
     this.vocab.classList.remove('vocab_learnt');
     const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
     currentPage.innerHTML = `${this.page + 1}`;
-    const newPages = statistic.learnedPages[this.group].filter((i) => i !== this.page);
-    statistic.learnedPages[this.group] = newPages;
-    await statistic.update();
+    const newPages = stats.learnedPages[this.group].filter((i) => i !== this.page);
+    stats.learnedPages[this.group] = newPages;
+    await stats.update();
   };
 
   markLearnedPages = async () => {
     const pages = document.querySelectorAll('.page__option') as NodeListOf<HTMLInputElement>;
-    await statistic.update();
-    const learnedPages = statistic.learnedPages[this.group];
+    await stats.update();
+    const learnedPages = stats.learnedPages[this.group];
     pages.forEach((item) => {
       if (learnedPages.includes(Number(item.value))) {
         item.innerHTML = `${Number(item.value) + 1} &#10003;`;

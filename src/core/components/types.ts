@@ -21,29 +21,25 @@ export interface iWord {
 }
 
 export interface iUserWord extends iWord {
-  userWord?: {
-    difficulty: string;
-    optional: {
-      done: boolean;
-    };
-  };
+  userWord?: userWord;
   wordId?: string;
 }
 
-export interface iUserWordResponse {
+export interface iUserWordResponse extends userWord {
   id: string;
-  difficulty: string;
-  optional: {
-    done: boolean;
-  };
   wordId: string;
 }
 
 export interface iUserWordCreator {
   userId: string | undefined;
   wordId: string;
-  word: {
-    difficulty: string;
-    optional: { done: boolean };
-  };
+  word: userWord;
 }
+
+export type userWord = {
+  difficulty: string;
+  optional: {
+    done: boolean;
+    date: Date;
+  };
+};

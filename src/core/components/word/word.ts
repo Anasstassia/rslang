@@ -1,6 +1,6 @@
 import { state, createUserWord, changeUserWord } from '../../client/users';
 import { vocab } from '../../../index';
-import { iUserWord, iUserWordCreator } from '../types';
+import { iUserWord, iUserWordCreator, userWord } from '../types';
 import html from './word.html';
 import './word.scss';
 
@@ -35,10 +35,7 @@ export class Word {
 
   textExampleTranslate: string;
 
-  userWord?: {
-    difficulty: string;
-    optional: { done: boolean };
-  };
+  userWord?: userWord;
 
   isUserWord: boolean;
 
@@ -74,7 +71,13 @@ export class Word {
     this.config = {
       userId: state.currentUser?.id,
       wordId: this.id,
-      word: { difficulty: 'basic', optional: { done: false } },
+      word: {
+        difficulty: 'basic',
+        optional: {
+          done: false,
+          date: new Date(),
+        },
+      },
     };
   }
 
@@ -190,6 +193,7 @@ export class Word {
     this.learnt = false;
     vocab.countLearnt(-1);
     this.config.word.optional.done = false;
+    this.config.word.optional.date = new Date();
     this.updateUserWord();
   };
 
@@ -202,6 +206,7 @@ export class Word {
       this.removeFromDifficult();
     }
     this.config.word.optional.done = true;
+    this.config.word.optional.date = new Date();
     this.updateUserWord();
   }
 
