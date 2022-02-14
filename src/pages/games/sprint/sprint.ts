@@ -1,3 +1,6 @@
+import { isToday } from 'date-fns';
+import { client } from '../../../core/client';
+import { state, StatResponse } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
@@ -211,8 +214,9 @@ export class SprintGame implements content {
       return;
     }
     sprintStatistics.gamesPlayed += 1;
+    const todayDate = new Date();
+    sprintStatistics.currentDay = todayDate.getDate();
     localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
-
     const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
 
     progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
@@ -223,6 +227,36 @@ export class SprintGame implements content {
     });
     this.correctWords.forEach((el) => {
       correctWords.appendChild(createWord(el));
+    });
+    client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`).then((stat) => {
+      const isActualStat = isToday(new Date(stat.data.optional.date));
+      if (isActualStat) {
+        client.put(`/users/${state?.currentUser?.id}/statistics`, {
+          learnedWords: stat.data.learnedWords,
+          optional: {
+            date: todayDate,
+            sprintGame: {
+              gamesPlayed: sprintStatistics.gamesPlayed,
+              totalCorrectWords: sprintStatistics.totalCorrectWords,
+              mostWordsInRow: sprintStatistics.mostWordsInRow,
+              newWords: 0,
+            },
+          },
+        });
+      } else {
+        client.put(`/users/${state?.currentUser?.id}/statistics`, {
+          learnedWords: 10,
+          optional: {
+            date: todayDate,
+            sprintGame: {
+              gamesPlayed: sprintStatistics.gamesPlayed,
+              totalCorrectWords: sprintStatistics.totalCorrectWords,
+              mostWordsInRow: sprintStatistics.mostWordsInRow,
+              newWords: 0,
+            },
+          },
+        });
+      }
     });
   }
 

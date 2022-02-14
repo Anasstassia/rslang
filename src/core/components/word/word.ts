@@ -175,7 +175,7 @@ export class Word {
     this.card.classList.remove('word_done');
     this.learnt = false;
     const arg = {
-      userId: state.currentUser?.userId,
+      userId: state.currentUser?.id,
       wordId: this.id,
       word: { difficulty: 'basic', optional: { done: false } },
     };
@@ -190,22 +190,30 @@ export class Word {
       this.removeFromDifficult();
     }
     const arg = {
-      userId: state.currentUser?.userId,
+      userId: state.currentUser?.id,
       wordId: this.id,
       word: { difficulty: 'basic', optional: { done: true } },
     };
-    changeUserWord(arg);
+    const response = await getUserWords(String(state.currentUser?.id));
+    const userWords = response.data;
+    const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
+
+    if (isUserWord) {
+      changeUserWord(arg);
+    } else {
+      createUserWord(arg);
+    }
   }
 
   async addToDifficult() {
     this.difficult = true;
     this.card.classList.add('word_difficult');
     const arg = {
-      userId: state.currentUser?.userId,
+      userId: state.currentUser?.id,
       wordId: this.id,
       word: { difficulty: 'hard', optional: { done: false } },
     };
-    const response = await getUserWords(String(state.currentUser?.userId));
+    const response = await getUserWords(String(state.currentUser?.id));
     const userWords = response.data;
     const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
 
@@ -226,7 +234,7 @@ export class Word {
     }
     this.card.classList.remove('word_difficult');
     const arg = {
-      userId: state.currentUser?.userId,
+      userId: state.currentUser?.id,
       wordId: this.id,
       word: { difficulty: 'basic', optional: { done: false } },
     };
