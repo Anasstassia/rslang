@@ -71,11 +71,13 @@ export class Word {
     this.config = {
       userId: state.currentUser?.id,
       wordId: this.id,
-      word: {
+      userWord: {
         difficulty: 'basic',
         optional: {
           done: false,
           date: new Date(),
+          rightAnswers: 0,
+          wrongAnswers: 0,
         },
       },
     };
@@ -167,6 +169,14 @@ export class Word {
       (this.card.querySelector('.checkbox_done') as HTMLInputElement).checked = true;
     }
 
+    // answers
+    if (this.isUserWord) {
+      const right = card.querySelector('.word__right-ans') as HTMLElement;
+      const wrong = card.querySelector('.word__wrong-ans') as HTMLElement;
+      right.innerHTML = String(this.userWord?.optional.rightAnswers);
+      wrong.innerHTML = String(this.userWord?.optional.wrongAnswers);
+    }
+
     return this.card;
   }
 
@@ -192,8 +202,8 @@ export class Word {
     this.card.classList.remove('word_done');
     this.learnt = false;
     vocab.countLearnt(-1);
-    this.config.word.optional.done = false;
-    this.config.word.optional.date = new Date();
+    this.config.userWord.optional.done = false;
+    this.config.userWord.optional.date = new Date();
     this.updateUserWord();
   };
 
@@ -205,15 +215,15 @@ export class Word {
     if (this.difficult) {
       this.removeFromDifficult();
     }
-    this.config.word.optional.done = true;
-    this.config.word.optional.date = new Date();
+    this.config.userWord.optional.done = true;
+    this.config.userWord.optional.date = new Date();
     this.updateUserWord();
   }
 
   async addToDifficult() {
     this.difficult = true;
     this.card.classList.add('word_difficult');
-    this.config.word.difficulty = 'hard';
+    this.config.userWord.difficulty = 'hard';
     this.updateUserWord();
   }
 
@@ -226,7 +236,7 @@ export class Word {
       });
     }
     this.card.classList.remove('word_difficult');
-    this.config.word.difficulty = 'basic';
+    this.config.userWord.difficulty = 'basic';
     this.updateUserWord();
   }
 

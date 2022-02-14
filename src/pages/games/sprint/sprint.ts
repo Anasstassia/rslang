@@ -1,6 +1,6 @@
 import { isToday } from 'date-fns';
 import { client } from '../../../core/client';
-import { state, StatResponse } from '../../../core/client/users';
+import { state, StatResponse, countAnswersForUserWord } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
@@ -13,6 +13,7 @@ export type GameWord = {
   transcription: string;
   wordTranslate: string;
   audio: string;
+  id: string;
 };
 
 export class SprintGame implements content {
@@ -95,6 +96,7 @@ export class SprintGame implements content {
         }
         this.nextWord(mark, correctBtn, word, translatedWord);
       }
+      countAnswersForUserWord(this.words[this.currId].id, true);
     };
     correctBtn.addEventListener('click', correctBtnPressed);
 
@@ -128,6 +130,7 @@ export class SprintGame implements content {
         }
         this.nextWord(mark, wrongBtn, word, translatedWord);
       }
+      countAnswersForUserWord(this.words[this.currId].id, false);
     };
     wrongBtn.addEventListener('click', wrondBtnPressed);
 
@@ -281,8 +284,8 @@ export class SprintGame implements content {
 
     getWords(group).then((el) => {
       el.forEach((element: iWord) => {
-        const { word, transcription, wordTranslate, audio } = element;
-        this.words.push({ word, transcription, wordTranslate, audio });
+        const { word, transcription, wordTranslate, audio, id } = element;
+        this.words.push({ word, transcription, wordTranslate, audio, id });
       });
       this.renderContent(
         document.querySelector<HTMLElement>('.sprint__content__word'),

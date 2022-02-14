@@ -5,6 +5,7 @@ export interface content {
 
 export interface iWord {
   _id: string;
+  id: string;
   group: number;
   page: number;
   word: string;
@@ -33,7 +34,7 @@ export interface iUserWordResponse extends userWord {
 export interface iUserWordCreator {
   userId: string | undefined;
   wordId: string;
-  word: userWord;
+  userWord: userWord;
 }
 
 export type userWord = {
@@ -41,5 +42,7 @@ export type userWord = {
   optional: {
     done: boolean;
     date: Date;
+    rightAnswers: number;
+    wrongAnswers: number;
   };
 };
