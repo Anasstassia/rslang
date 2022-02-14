@@ -1,4 +1,5 @@
-import { state } from '../../core/client/users';
+import { client } from '../../core/client';
+import { state, StatResponse } from '../../core/client/users';
 import { content } from '../../core/components/types';
 import { sprintStatistics } from '../games/statistics';
 import html from './stats.html';
@@ -11,7 +12,6 @@ export class Stats implements content {
 
   async run() {
     this.getDate();
-    this.checkUser();
     this.setStatistics();
   }
 
@@ -40,55 +40,45 @@ export class Stats implements content {
     dateElement.innerHTML = `${day} ${month}`;
   }
 
-  checkUser() {
-    const statsContainer = document.querySelector('.stats__cards');
-    const message = document.createElement('p');
-
-    if (!state.currentUser && statsContainer) {
-      message.innerHTML = 'Только авторизированные пользователи могут просматривать статистику';
-      message.classList.add('notification');
-      statsContainer.prepend(message);
-    } else {
-      message.remove();
-    }
+  async setStatistics() {
+    this.setGameStatistics('sprint');
+    // this.setGameStatistics('audio'); TODO
+    this.setGeneralStatistics();
   }
 
-  setStatistics() {
-    const todayDate = new Date();
-    const currentDay = todayDate.getDate();
+  setGameStatistics = async (game: 'audio' | 'sprint') => {
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const gameCard = document.querySelector(`.card_${game}`);
+    const newWords = gameCard?.querySelector('.words_number');
+    const percentCorrect = gameCard?.querySelector('.words_perc');
+    const mostInRow = gameCard?.querySelector('.words_max');
 
-    const setGameStatistics = (game: 'audio' | 'sprint') => {
-      const gameCard = document.querySelector(`.card_${game}`);
-      const gamesCount = sprintStatistics.gamesPlayed;
-      const newWords = gameCard?.querySelector('.words_number');
-      const percentCorrect = gameCard?.querySelector('.words_perc');
-      const mostInRow = gameCard?.querySelector('.words_max');
+    const countNewWords = stat.data.optional.sprintGame?.newWords;
+    const countTotalCorrect = stat.data.optional.sprintGame?.totalCorrectWords;
+    const gamesCount = stat.data.optional.sprintGame?.gamesPlayed;
 
-      if (!percentCorrect || !mostInRow || !newWords) return;
-      if (currentDay === sprintStatistics.currentDay) {
-        newWords.innerHTML = ``;
-        percentCorrect.innerHTML = `${Math.round((sprintStatistics.totalCorrectWords * 100) / (20 * gamesCount))}%`;
-        mostInRow.innerHTML = `${sprintStatistics.mostWordsInRow}`;
-      } else {
-        // newWords?.innerHTML = ``;
-        percentCorrect.innerHTML = `0%`;
-        mostInRow.innerHTML = `0`;
-      }
-    };
+    if (!percentCorrect || !mostInRow || !newWords || !countTotalCorrect || !gamesCount) return;
 
-    const setGeneralStatistics = () => {
-      const totalLearnedWords = document.querySelector('.learned-count');
-      const totalPercentCorrect = document.querySelector('.total-percent');
-      const totalNewWords = document.querySelector('.total_new');
+    newWords.innerHTML = `${countNewWords}`;
+    percentCorrect.innerHTML = `${Math.round((countTotalCorrect * 100) / (20 * gamesCount))}%`;
+    mostInRow.innerHTML = `${sprintStatistics.mostWordsInRow}`;
+  };
 
-      if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
-      totalLearnedWords.innerHTML = '0';
-      totalPercentCorrect.innerHTML = '0';
-      totalNewWords.innerHTML = '0';
-    };
+  setGeneralStatistics = async () => {
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
 
-    setGameStatistics('sprint');
-    // setGameStatistics('audio');
-    setGeneralStatistics();
-  }
+    const totalLearnedWords = document.querySelector('.words_new');
+    const totalPercentCorrect = document.querySelector('.total-percent');
+    const totalNewWords = document.querySelector('.total_new');
+
+    const countTotalLearned = stat.data.learnedWords;
+    const countTotalPercent = 0; // TODO
+    const countTotalNew = 0; // TODO
+
+    if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
+
+    totalLearnedWords.innerHTML = `${countTotalLearned}`;
+    totalPercentCorrect.innerHTML = `${countTotalPercent}%`;
+    totalNewWords.innerHTML = `${countTotalNew}`;
+  };
 }

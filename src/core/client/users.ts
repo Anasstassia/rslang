@@ -1,3 +1,4 @@
+import { isToday } from 'date-fns';
 import { client } from '.';
 import { renderAuthElements } from '../..';
 import { iUserWordCreator } from '../components/types';
@@ -23,6 +24,20 @@ type AuthUserResponse = {
   userId: 'string';
 };
 
+export type StatResponse = {
+  id: string;
+  learnedWords: number;
+  optional: {
+    date: Date;
+    sprintGame?: {
+      gamesPlayed: number;
+      totalCorrectWords: number;
+      mostWordsInRow: number;
+      newWords: number;
+    };
+  };
+};
+
 export const createUser = async (user: UserRequest) => {
   const response = await client.post<unknown, UserResponse>('/users', user);
   return response;
@@ -43,6 +58,23 @@ export const loginUser = async (user: UserRequest) => {
 
 export const createUserWord = async ({ userId, wordId, word }: iUserWordCreator) => {
   const response = await client.post(`/users/${userId}/words/${wordId}`, word);
+  const stat = await client.get<unknown, { data: StatResponse }>(`/users/${userId}/statistics`);
+  const isActualStat = isToday(new Date(stat.data.optional.date));
+  if (isActualStat) {
+    await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
+      learnedWords: stat.data.learnedWords + 1,
+      optional: {
+        date: new Date(),
+      },
+    });
+  } else {
+    await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
+      learnedWords: 1,
+      optional: {
+        date: new Date(),
+      },
+    });
+  }
   return response;
 };
 

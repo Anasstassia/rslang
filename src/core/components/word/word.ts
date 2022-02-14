@@ -194,7 +194,15 @@ export class Word {
       wordId: this.id,
       word: { difficulty: 'basic', optional: { done: true } },
     };
-    changeUserWord(arg);
+    const response = await getUserWords(String(state.currentUser?.id));
+    const userWords = response.data;
+    const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
+
+    if (isUserWord) {
+      changeUserWord(arg);
+    } else {
+      createUserWord(arg);
+    }
   }
 
   async addToDifficult() {
