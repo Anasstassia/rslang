@@ -1,4 +1,4 @@
-import { state, createUserWord, changeUserWord, getUserWords } from '../../client/users';
+import { state, createUserWord, changeUserWord } from '../../client/users';
 import { vocab } from '../../../index';
 import { iUserWord, iUserWordCreator } from '../types';
 import html from './word.html';
@@ -72,7 +72,7 @@ export class Word {
     this.level = level;
     this.isUserWord = false;
     this.config = {
-      userId: state.currentUser?.userId,
+      userId: state.currentUser?.id,
       wordId: this.id,
       word: { difficulty: 'basic', optional: { done: false } },
     };

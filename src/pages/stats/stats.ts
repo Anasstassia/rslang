@@ -1,5 +1,7 @@
-import { state } from '../../core/client/users';
+import { client } from '../../core/client';
+import { state, StatResponse } from '../../core/client/users';
 import { content } from '../../core/components/types';
+import { sprintStatistics } from '../games/statistics';
 import html from './stats.html';
 import './stats.scss';
 
@@ -10,7 +12,7 @@ export class Stats implements content {
 
   async run() {
     this.getDate();
-    this.checkUser();
+    this.setStatistics();
   }
 
   getDate() {
@@ -18,60 +20,65 @@ export class Stats implements content {
     const date = new Date();
     const monthNumber = date.getMonth();
     const day = date.getDate();
-    let month = '';
+    const months = [
+      'января',
+      'февраля',
+      'марта',
+      'апреля',
+      'мае',
+      'июня',
+      'июля',
+      'августа',
+      'сентября',
+      'октября',
+      'ноября',
+      'декабря',
+    ];
+    const month = months[monthNumber];
 
-    switch (monthNumber) {
-      case 0:
-        month = 'января';
-        break;
-      case 1:
-        month = 'февраля';
-        break;
-      case 2:
-        month = 'марта';
-        break;
-      case 3:
-        month = 'апреля';
-        break;
-      case 4:
-        month = 'мае';
-        break;
-      case 5:
-        month = 'июня';
-        break;
-      case 6:
-        month = 'июля';
-        break;
-      case 7:
-        month = 'августа';
-        break;
-      case 8:
-        month = 'сентября';
-        break;
-      case 9:
-        month = 'октября';
-        break;
-      case 10:
-        month = 'ноября';
-        break;
-      case 11:
-        month = 'декабря';
-        break;
-      default:
-        return;
-    }
     if (!dateElement) return;
     dateElement.innerHTML = `${day} ${month}`;
   }
 
-  checkUser() {
-    const statsContainer = document.querySelector('.stats__cards');
-
-    if (!state.currentUser && statsContainer) {
-      const message = document.createElement('p');
-      message.innerHTML = 'Только авторизированные пользователи могут просматривать статистику';
-      message.classList.add('notification');
-      statsContainer.prepend(message);
-    }
+  async setStatistics() {
+    this.setGameStatistics('sprint');
+    // this.setGameStatistics('audio'); TODO
+    this.setGeneralStatistics();
   }
+
+  setGameStatistics = async (game: 'audio' | 'sprint') => {
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const gameCard = document.querySelector(`.card_${game}`);
+    const newWords = gameCard?.querySelector('.words_number');
+    const percentCorrect = gameCard?.querySelector('.words_perc');
+    const mostInRow = gameCard?.querySelector('.words_max');
+
+    const countNewWords = stat.data.optional.sprintGame?.newWords;
+    const countTotalCorrect = stat.data.optional.sprintGame?.totalCorrectWords;
+    const gamesCount = stat.data.optional.sprintGame?.gamesPlayed;
+
+    if (!percentCorrect || !mostInRow || !newWords || !countTotalCorrect || !gamesCount) return;
+
+    newWords.innerHTML = `${countNewWords}`;
+    percentCorrect.innerHTML = `${Math.round((countTotalCorrect * 100) / (20 * gamesCount))}%`;
+    mostInRow.innerHTML = `${sprintStatistics.mostWordsInRow}`;
+  };
+
+  setGeneralStatistics = async () => {
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+
+    const totalLearnedWords = document.querySelector('.words_new');
+    const totalPercentCorrect = document.querySelector('.total-percent');
+    const totalNewWords = document.querySelector('.total_new');
+
+    const countTotalLearned = stat.data.learnedWords;
+    const countTotalPercent = 0; // TODO
+    const countTotalNew = 0; // TODO
+
+    if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
+
+    totalLearnedWords.innerHTML = `${countTotalLearned}`;
+    totalPercentCorrect.innerHTML = `${countTotalPercent}%`;
+    totalNewWords.innerHTML = `${countTotalNew}`;
+  };
 }

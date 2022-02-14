@@ -3,6 +3,7 @@ interface statistics {
   gamesPlayed: number;
   totalCorrectWords: number;
   mostWordsInRow: number;
+  currentDay?: number;
 }
 
 export const sprintStatistics: statistics = {
@@ -18,4 +19,5 @@ if (storageItem) {
   sprintStatistics.gamesPlayed = stat.gamesPlayed;
   sprintStatistics.totalCorrectWords = stat.totalCorrectWords;
   sprintStatistics.mostWordsInRow = stat.mostWordsInRow;
+  sprintStatistics.currentDay = stat.currentDay;
 }

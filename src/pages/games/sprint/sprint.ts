@@ -1,7 +1,10 @@
+import { isToday } from 'date-fns';
+import { client } from '../../../core/client';
+import { state, StatResponse } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
-import { createWord, getRandomNum, getWords } from '../utils';
+import { checkLocalStarage, createWord, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
 import html from './sprint.html';
 import './sprint.scss';
 
@@ -13,8 +16,6 @@ export type GameWord = {
 };
 
 export class SprintGame implements content {
-  isSoundOn = true;
-
   timeLeft = 60;
 
   isCorrect = false;
@@ -38,49 +39,12 @@ export class SprintGame implements content {
   }
 
   async run() {
-    this.checkLocalStarage();
+    checkLocalStarage();
+    toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
   }
 
-  checkLocalStarage() {
-    const sound = localStorage.getItem('sound');
-    const soundBtn = document.getElementById('sprintSound') as HTMLImageElement;
-    if (sound === 'false') {
-      this.isSoundOn = false;
-      soundBtn.src = '../../../assets/icons/soundOff.svg';
-    } else {
-      this.isSoundOn = true;
-      soundBtn.src = '../../../assets/icons/soundOn.svg';
-    }
-  }
-
   addListeners() {
-    const path = '../../../assets/icons';
-
-    // toggle sound
-    const soundBtn = document.getElementById('sprintSound') as HTMLImageElement;
-    soundBtn.addEventListener('click', () => {
-      this.isSoundOn = !this.isSoundOn;
-      soundBtn.src = this.isSoundOn ? `${path}/soundOn.svg` : `${path}/soundOff.svg`;
-      localStorage.setItem('sound', `${this.isSoundOn}`);
-    });
-
-    // toggle fullscreen
-    const fullscreenBtn = document.getElementById('sprintFullscreen') as HTMLImageElement;
-    fullscreenBtn.addEventListener('click', () => {
-      const sprintContent = document.querySelector('.sprint__content') as HTMLElement;
-
-      if (!document.fullscreenElement) {
-        document.querySelector('.sprint')?.requestFullscreen();
-        sprintContent.style.marginTop = '20vh';
-        fullscreenBtn.src = `${path}/fullscreenOff.svg`;
-      } else {
-        document.exitFullscreen();
-        fullscreenBtn.src = `${path}/fullscreenOn.svg`;
-        sprintContent.style.marginTop = '';
-      }
-    });
-
     document.getElementById('startSprintGameBtn')?.addEventListener('click', () => {
       this.startGame();
     });
@@ -112,7 +76,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
         this.nextWord(mark, correctBtn, word, translatedWord);
@@ -126,7 +90,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/cross.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
         this.nextWord(mark, correctBtn, word, translatedWord);
@@ -145,7 +109,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/tick.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
         this.nextWord(mark, wrongBtn, word, translatedWord);
@@ -159,7 +123,7 @@ export class SprintGame implements content {
         mark.src = '../../../assets/icons/cross.svg';
         mark.classList.remove('hidden');
 
-        if (this.isSoundOn) {
+        if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
         this.nextWord(mark, wrongBtn, word, translatedWord);
@@ -250,8 +214,9 @@ export class SprintGame implements content {
       return;
     }
     sprintStatistics.gamesPlayed += 1;
+    const todayDate = new Date();
+    sprintStatistics.currentDay = todayDate.getDate();
     localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
-
     const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
 
     progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
@@ -262,6 +227,36 @@ export class SprintGame implements content {
     });
     this.correctWords.forEach((el) => {
       correctWords.appendChild(createWord(el));
+    });
+    client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`).then((stat) => {
+      const isActualStat = isToday(new Date(stat.data.optional.date));
+      if (isActualStat) {
+        client.put(`/users/${state?.currentUser?.id}/statistics`, {
+          learnedWords: stat.data.learnedWords,
+          optional: {
+            date: todayDate,
+            sprintGame: {
+              gamesPlayed: sprintStatistics.gamesPlayed,
+              totalCorrectWords: sprintStatistics.totalCorrectWords,
+              mostWordsInRow: sprintStatistics.mostWordsInRow,
+              newWords: 0,
+            },
+          },
+        });
+      } else {
+        client.put(`/users/${state?.currentUser?.id}/statistics`, {
+          learnedWords: 10,
+          optional: {
+            date: todayDate,
+            sprintGame: {
+              gamesPlayed: sprintStatistics.gamesPlayed,
+              totalCorrectWords: sprintStatistics.totalCorrectWords,
+              mostWordsInRow: sprintStatistics.mostWordsInRow,
+              newWords: 0,
+            },
+          },
+        });
+      }
     });
   }
 

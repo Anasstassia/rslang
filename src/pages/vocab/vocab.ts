@@ -3,7 +3,7 @@ import { content, iUserWord } from '../../core/components/types';
 import html from './vocab.html';
 import './vocab.scss';
 import { client } from '../../core/client';
-import { getUserWords, state } from '../../core/client/users';
+import { state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
 import { statistic } from '../../index';
 
@@ -169,9 +169,9 @@ export class Vocab implements content {
     let response = null;
     let data = null;
     if (request === 'basic') {
-      if (state.currentUser?.userId) {
+      if (state.currentUser?.id) {
         response = await client.get(
-          `/users/${state.currentUser?.userId}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
+          `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
         );
         data = response.data[0].paginatedResults;
       } else {
@@ -180,7 +180,7 @@ export class Vocab implements content {
       }
     } else if (request === 'difficult') {
       response = await client.get(
-        `/users/${state.currentUser?.userId}/aggregatedWords?wordsPerPage=200&filter={"userWord.difficulty":"hard"}`
+        `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=200&filter={"userWord.difficulty":"hard"}`
       );
       data = response.data[0].paginatedResults;
     }
