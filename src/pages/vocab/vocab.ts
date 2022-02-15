@@ -5,6 +5,10 @@ import './vocab.scss';
 import { client } from '../../core/client';
 import { state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
+import { stats } from '../../index';
+// import { Utils } from '../../core/utils/utils';
+
+const PAGES = 30;
 
 export class Vocab implements content {
   _page: number;
@@ -77,7 +81,9 @@ export class Vocab implements content {
   }
 
   async run() {
-    const PAGES = 30;
+    // await Utils.resetData();
+    // для удаления userwords И очистки изученных в статистике
+
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
     this.vocabList = document.querySelector('.vocab__page') as HTMLElement;
@@ -89,24 +95,15 @@ export class Vocab implements content {
       this.resetRequest(0, Number(this.levelSelect.value), 'basic');
       this.renderGroup();
     });
-    this.levelSelect.addEventListener('click', () => {
-      this.resetRequest(0, Number(this.levelSelect.value), 'basic');
-      if (this.group === 6) {
-        this.renderGroup();
-      }
-    });
-    this.renderGroup();
 
     // render pages list
-    const pageId = this.pagesEl.querySelector('option') as HTMLElement;
-    for (let i = 2; i <= PAGES; i += 1) {
-      const item = pageId.cloneNode() as HTMLInputElement;
+    for (let i = 1; i <= PAGES; i += 1) {
+      const item = document.createElement('option');
+      item.classList.add('page__option');
       item.innerHTML = String(i);
       item.value = String(i - 1);
       this.pagesEl.append(item);
     }
-    this.pagesEl.value = String(this.page);
-
     // render words by page
     this.pagesEl.addEventListener('change', () => {
       this.page = Number(this.pagesEl.value);
@@ -140,12 +137,12 @@ export class Vocab implements content {
     difficultWords.addEventListener('click', () => {
       this.resetRequest(0, 6, 'difficult');
       this.renderGroup();
-      this.renderWords();
       this.levelSelect?.classList.add('level_not-active');
       document.querySelector('.pagination')?.classList.add('hide');
     });
 
-    await this.renderWords();
+    this.renderGroup();
+
     return undefined;
   }
 
@@ -153,9 +150,9 @@ export class Vocab implements content {
     let response = null;
     let data = null;
     if (request === 'basic') {
-      if (state.currentUser?.userId) {
+      if (state.currentUser?.id) {
         response = await client.get(
-          `/users/${state.currentUser?.userId}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
+          `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
         );
         data = response.data[0].paginatedResults;
       } else {
@@ -163,37 +160,28 @@ export class Vocab implements content {
         data = response.data;
       }
     } else if (request === 'difficult') {
-      /*
       response = await client.get(
-        `/users/${state.currentUser?.userId}/aggregatedWords?&wordsPerPage=200&filter={"userWord.difficulty":"hard"`
+        `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=200&filter={"userWord.difficulty":"hard"}`
       );
       data = response.data[0].paginatedResults;
-      */
-      response = await fetch(
-        `https://rs-lang-irina-mokh.herokuapp.com/users/${state.currentUser?.userId}/aggregatedWords?filter={"userWord.difficulty":"hard"}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${localStorage.token}`,
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      const json = await response.json();
-      data = json[0].paginatedResults;
     }
     return data;
   };
 
   renderWords = async () => {
+    this.markLearnedPages();
     if (!this.vocabList) return;
     this.vocabList.innerHTML = '';
     const items = await this.getWords(this.requestType);
-    items.forEach(async (item: iUserWord) => {
+    await items.forEach(async (item: iUserWord) => {
       const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
     });
+    if (document.querySelectorAll('.word_done').length === items.length) {
+      this.makePageLearnt();
+    } else {
+      this.unlearnPage();
+    }
   };
 
   renderGroup = async () => {
@@ -213,7 +201,7 @@ export class Vocab implements content {
   };
 
   resetRequest = async (page?: number, group?: number, requestType?: string) => {
-    if (group) {
+    if (group !== undefined) {
       this.group = group;
     }
     if (page !== undefined) {
@@ -222,5 +210,46 @@ export class Vocab implements content {
     if (requestType) {
       this.requestType = requestType;
     }
+  };
+
+  countLearnt = async (i: number) => {
+    stats.learnedWords += i;
+    await stats.update();
+    if (document.querySelectorAll('.word_done').length === document.querySelectorAll('.word').length) {
+      this.makePageLearnt();
+    } else {
+      this.unlearnPage();
+    }
+  };
+
+  makePageLearnt = async () => {
+    stats.learnedPages[this.group].push(this.page);
+    await stats.update();
+    this.vocab.classList.add('vocab_learnt');
+
+    const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
+    currentPage.innerHTML = `${this.page + 1} &#10003;`;
+  };
+
+  unlearnPage = async () => {
+    this.vocab.classList.remove('vocab_learnt');
+    const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
+    currentPage.innerHTML = `${this.page + 1}`;
+    const newPages = stats.learnedPages[this.group].filter((i) => i !== this.page);
+    stats.learnedPages[this.group] = newPages;
+    await stats.update();
+  };
+
+  markLearnedPages = async () => {
+    const pages = document.querySelectorAll('.page__option') as NodeListOf<HTMLInputElement>;
+    await stats.update();
+    const learnedPages = stats.learnedPages[this.group];
+    pages.forEach((item) => {
+      if (learnedPages.includes(Number(item.value))) {
+        item.innerHTML = `${Number(item.value) + 1} &#10003;`;
+      } else {
+        item.innerHTML = `${Number(item.value) + 1}`;
+      }
+    });
   };
 }
