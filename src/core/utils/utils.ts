@@ -1,6 +1,6 @@
 import { iUserWordResponse } from '../components/types';
 import { getUserWords, state } from '../client/users';
-import { stats } from '../../index';
+import { stats as statistics } from '../../index';
 import { client } from '../client';
 
 export interface urlRequest {
@@ -35,7 +35,7 @@ export const Utils = {
   },
 
   resetData: async () => {
-    stats.learnedPages = {
+    statistics.learnedPages = {
       0: [],
       1: [],
       2: [],
@@ -43,7 +43,7 @@ export const Utils = {
       4: [],
       5: [],
     };
-    stats.learnedWords = 0;
+    statistics.learnedWords = 0;
     const response = await getUserWords(String(state.currentUser?.id));
     const words = response.data;
 

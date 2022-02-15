@@ -1,7 +1,7 @@
 import { isToday } from 'date-fns';
 import { client } from '../../core/client';
 import { state, StatResponse } from '../../core/client/users';
-import { content, iUserWord, userWord } from '../../core/components/types';
+import { content, iUserWord } from '../../core/components/types';
 import { sprintStatistics } from '../games/statistics';
 import html from './stats.html';
 import './stats.scss';
