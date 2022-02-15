@@ -1,5 +1,5 @@
 import { content } from '../../../core/components/types';
-import { changeContent, show } from '../animation';
+import { appearanceContent, changeContent, show } from '../animation';
 import { checkLocalStarage, toggleHeaderBtns } from '../utils';
 import html from './audioCall.html';
 import '../game.scss';
@@ -57,6 +57,29 @@ export class AudioCall implements content {
 
   generateContentUI() {
     const wrap = document.querySelector('.audio-call__content') as HTMLElement;
-    changeContent(wrap, 3000, 600, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+
+    const audioIcon = document.createElement('img');
+    audioIcon.classList.add('audio-icon');
+    audioIcon.src = '../../../assets/icons/volume.svg';
+    audioIcon.alt = 'Sound';
+
+    const btnsWrap = document.createElement('div');
+    btnsWrap.classList.add('audio-call__content__answer-btns');
+
+    const btn1 = document.createElement('button');
+    const btn2 = document.createElement('button');
+    const btn3 = document.createElement('button');
+    const btn4 = document.createElement('button');
+
+    btnsWrap.append(btn1, btn2, btn3, btn4);
+
+    changeContent(wrap, 3000, 600, 300, 750, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+    appearanceContent(audioIcon, 3200);
+    appearanceContent(btnsWrap, 3200);
+
+    wrap.innerHTML = '';
+    wrap.append(audioIcon, btnsWrap);
+
+    return { audioIcon, btns: { btnsWrap, btn1, btn2, btn3, btn4 } };
   }
 }

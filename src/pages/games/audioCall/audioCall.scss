@@ -55,14 +55,52 @@
 		}
     
 		.transition-hide {
-			// transition: all .5s linear;
 			animation: scaled .5s linear;
 		}
 
 		.hide {
 			display: none;
 		}
+	}
+
+	&__content {
+
+		.audio-icon {
+			filter: invert(90%) sepia(4%) saturate(263%) hue-rotate(303deg) brightness(106%) contrast(105%);
+			height: 100px;
+			margin-top: 20px;
+			cursor: pointer;
+
+			transition: transform .1s linear;
+			&:hover {
+				transform: scale(1.05);
+			}
+		}
 		
+		&__answer-btns {
+			margin-top: 50px;
+			display: flex;
+			align-items: center;
+			justify-content: space-evenly;
+			button {
+				position: relative;
+				flex: 0.15;
+				&.correct {
+					background-color: vars.$green;
+					border-color: vars.$green;
+					&:hover {
+						color: #fff;
+					}
+				}
+				&.wrong {
+					background-color: vars.$red;
+					border-color: vars.$red;
+					&:hover {
+						color: #fff;
+					}
+				}
+			}
+		}
 	}
 }
 
