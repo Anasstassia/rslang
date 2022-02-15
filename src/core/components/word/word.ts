@@ -1,5 +1,6 @@
-import { state, createUserWord, changeUserWord, getUserWords } from '../../client/users';
-import { iUserWord } from '../types';
+import { state, createUserWord, changeUserWord } from '../../client/users';
+import { vocab } from '../../../index';
+import { iUserWord, iUserWordCreator, userWord } from '../types';
 import html from './word.html';
 import './word.scss';
 
@@ -34,16 +35,17 @@ export class Word {
 
   textExampleTranslate: string;
 
-  userWord?: {
-    difficulty: string;
-    optional: { done: boolean };
-  };
+  userWord?: userWord;
+
+  isUserWord: boolean;
 
   difficult?: boolean;
 
   learnt?: boolean;
 
   level: number;
+
+  config: iUserWordCreator;
 
   constructor(word: iUserWord, level: number) {
     this.card = document.createElement('li');
@@ -65,6 +67,20 @@ export class Word {
     this.difficult = false;
     this.learnt = false;
     this.level = level;
+    this.isUserWord = false;
+    this.config = {
+      userId: state.currentUser?.id,
+      wordId: this.id,
+      userWord: {
+        difficulty: 'basic',
+        optional: {
+          done: false,
+          date: new Date(),
+          rightAnswers: 0,
+          wrongAnswers: 0,
+        },
+      },
+    };
   }
 
   async render() {
@@ -79,6 +95,7 @@ export class Word {
     img.src = `https://rs-lang-irina-mokh.herokuapp.com/${this.image}`;
 
     if (this.userWord) {
+      this.isUserWord = true;
       this.difficult = this.userWord.difficulty === 'hard';
       this.learnt = this.userWord.optional.done;
     }
@@ -152,6 +169,14 @@ export class Word {
       (this.card.querySelector('.checkbox_done') as HTMLInputElement).checked = true;
     }
 
+    // answers
+    if (this.isUserWord) {
+      const right = card.querySelector('.word__right-ans') as HTMLElement;
+      const wrong = card.querySelector('.word__wrong-ans') as HTMLElement;
+      right.innerHTML = String(this.userWord?.optional.rightAnswers);
+      wrong.innerHTML = String(this.userWord?.optional.wrongAnswers);
+    }
+
     return this.card;
   }
 
@@ -160,6 +185,7 @@ export class Word {
       this.removeFromDifficult();
     } else {
       this.addToDifficult();
+      this.isUserWord = true;
     }
   }
 
@@ -168,60 +194,37 @@ export class Word {
       this.removeFromLearnt();
     } else {
       this.addToLearnt();
+      this.isUserWord = true;
     }
   }
 
   removeFromLearnt = async () => {
     this.card.classList.remove('word_done');
     this.learnt = false;
-    const arg = {
-      userId: state.currentUser?.id,
-      wordId: this.id,
-      word: { difficulty: 'basic', optional: { done: false } },
-    };
-    changeUserWord(arg);
+    vocab.countLearnt(-1);
+    this.config.userWord.optional.done = false;
+    this.config.userWord.optional.date = new Date();
+    this.updateUserWord();
   };
 
   async addToLearnt() {
     this.card.classList.add('word_done');
     this.learnt = true;
+    vocab.countLearnt(1);
     (this.card.querySelector('.checkbox_difficult') as HTMLInputElement).checked = false;
     if (this.difficult) {
       this.removeFromDifficult();
     }
-    const arg = {
-      userId: state.currentUser?.id,
-      wordId: this.id,
-      word: { difficulty: 'basic', optional: { done: true } },
-    };
-    const response = await getUserWords(String(state.currentUser?.id));
-    const userWords = response.data;
-    const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
-
-    if (isUserWord) {
-      changeUserWord(arg);
-    } else {
-      createUserWord(arg);
-    }
+    this.config.userWord.optional.done = true;
+    this.config.userWord.optional.date = new Date();
+    this.updateUserWord();
   }
 
   async addToDifficult() {
     this.difficult = true;
     this.card.classList.add('word_difficult');
-    const arg = {
-      userId: state.currentUser?.id,
-      wordId: this.id,
-      word: { difficulty: 'hard', optional: { done: false } },
-    };
-    const response = await getUserWords(String(state.currentUser?.id));
-    const userWords = response.data;
-    const isUserWord = userWords.filter((userWord: iUserWord) => userWord.wordId === this.id).length > 0;
-
-    if (isUserWord) {
-      changeUserWord(arg);
-    } else {
-      createUserWord(arg);
-    }
+    this.config.userWord.difficulty = 'hard';
+    this.updateUserWord();
   }
 
   async removeFromDifficult() {
@@ -233,11 +236,15 @@ export class Word {
       });
     }
     this.card.classList.remove('word_difficult');
-    const arg = {
-      userId: state.currentUser?.id,
-      wordId: this.id,
-      word: { difficulty: 'basic', optional: { done: false } },
-    };
-    changeUserWord(arg);
+    this.config.userWord.difficulty = 'basic';
+    this.updateUserWord();
+  }
+
+  updateUserWord() {
+    if (this.isUserWord) {
+      changeUserWord(this.config);
+    } else {
+      createUserWord(this.config);
+    }
   }
 }

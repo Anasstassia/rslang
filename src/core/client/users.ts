@@ -1,4 +1,4 @@
-import { isToday } from 'date-fns';
+// import { isToday } from 'date-fns';
 import { client } from '.';
 import { renderAuthElements } from '../..';
 import { iUserWordCreator } from '../components/types';
@@ -56,9 +56,11 @@ export const loginUser = async (user: UserRequest) => {
   return response.data;
 };
 
-export const createUserWord = async ({ userId, wordId, word }: iUserWordCreator) => {
-  const response = await client.post(`/users/${userId}/words/${wordId}`, word);
+export const createUserWord = async ({ userId, wordId, userWord }: iUserWordCreator) => {
+  const response = await client.post(`/users/${userId}/words/${wordId}`, userWord);
+  /*
   const stat = await client.get<unknown, { data: StatResponse }>(`/users/${userId}/statistics`);
+  
   const isActualStat = isToday(new Date(stat.data.optional.date));
   if (isActualStat) {
     await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
@@ -75,6 +77,7 @@ export const createUserWord = async ({ userId, wordId, word }: iUserWordCreator)
       },
     });
   }
+  */
   return response;
 };
 
@@ -83,8 +86,8 @@ export const getUserWords = async (userId: string) => {
   return response;
 };
 
-export const changeUserWord = async ({ userId, wordId, word }: iUserWordCreator) => {
-  const response = await client.put(`/users/${userId}/words/${wordId}`, word);
+export const changeUserWord = async ({ userId, wordId, userWord }: iUserWordCreator) => {
+  const response = await client.put(`/users/${userId}/words/${wordId}`, userWord);
   return response;
 };
 
@@ -128,4 +131,49 @@ export const getCurrentUser = async () => {
     return response.data;
   }
   return null;
+};
+
+export const countAnswersForUserWord = async (wordId: string, isTrue: boolean) => {
+  const config = {
+    userId: state.currentUser?.id,
+    wordId,
+    userWord: {
+      difficulty: 'basic',
+      optional: {
+        done: false,
+        date: new Date(),
+        rightAnswers: 0,
+        wrongAnswers: 0,
+      },
+    },
+  };
+  async function changeCount() {
+    if (isTrue) {
+      config.userWord.optional.rightAnswers += 1;
+    } else {
+      config.userWord.optional.wrongAnswers += 1;
+    }
+  }
+  if (await isUserWord(wordId)) {
+    const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${wordId}`);
+    config.userWord = response.data[0].userWord;
+    await changeCount();
+    changeUserWord(config);
+  } else {
+    await changeCount();
+    createUserWord(config);
+  }
+};
+
+const isUserWord = async (id: string) => {
+  let result = false;
+  try {
+    const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${id}`);
+    if (response.data[0].userWord) {
+      result = true;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+  return result;
 };

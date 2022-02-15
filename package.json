@@ -59,6 +59,7 @@
   "dependencies": {
     "axios": "^0.25.0",
     "date-fns": "^2.28.0",
-    "normalize.css": "^8.0.1"
+    "normalize.css": "^8.0.1",
+    "pre-commit": "^1.2.2"
   }
 }

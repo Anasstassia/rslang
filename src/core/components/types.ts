@@ -5,6 +5,7 @@ export interface content {
 
 export interface iWord {
   _id: string;
+  id: string;
   group: number;
   page: number;
   word: string;
@@ -21,20 +22,27 @@ export interface iWord {
 }
 
 export interface iUserWord extends iWord {
-  userWord?: {
-    difficulty: string;
-    optional: {
-      done: boolean;
-    };
-  };
+  userWord?: userWord;
   wordId?: string;
+}
+
+export interface iUserWordResponse extends userWord {
+  id: string;
+  wordId: string;
 }
 
 export interface iUserWordCreator {
   userId: string | undefined;
   wordId: string;
-  word: {
-    difficulty: string;
-    optional: { done: boolean };
-  };
+  userWord: userWord;
 }
+
+export type userWord = {
+  difficulty: string;
+  optional: {
+    done: boolean;
+    date: Date;
+    rightAnswers: number;
+    wrongAnswers: number;
+  };
+};
