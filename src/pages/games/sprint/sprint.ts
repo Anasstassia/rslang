@@ -6,6 +6,7 @@ import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
 import { checkLocalStarage, createWord, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
 import html from './sprint.html';
+import '../game.scss';
 import './sprint.scss';
 
 export type GameWord = {

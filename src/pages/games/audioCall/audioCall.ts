@@ -2,6 +2,7 @@ import { content } from '../../../core/components/types';
 import { changeContent, show } from '../animation';
 import { checkLocalStarage, toggleHeaderBtns } from '../utils';
 import html from './audioCall.html';
+import '../game.scss';
 import './audioCall.scss';
 
 export class AudioCall implements content {
