@@ -25,6 +25,8 @@ export class AudioCall implements content {
 
   wrongWords: Array<GameWord> = [];
 
+  lives = 5;
+
   async render() {
     return html;
   }
@@ -50,6 +52,7 @@ export class AudioCall implements content {
 
   startGame() {
     const { audioIcon, btnsWrap } = this.generateContentUI();
+    const heartWrap = this.generateHeartsUI();
 
     const correctSound = new Audio('../../../assets/sounds/correct.mp3');
     correctSound.volume = 0.5;
@@ -57,7 +60,7 @@ export class AudioCall implements content {
 
     Array.from(btnsWrap.children).forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (!btn.classList.contains('disabled')) {
+        if (!btn.classList.contains('disabled') && this.lives > 0) {
           Array.from(btnsWrap.children).forEach((item) => {
             if (item.id === this.correctPos.toString()) {
               item.classList.add('correct', 'disabled');
@@ -72,6 +75,15 @@ export class AudioCall implements content {
               correctSound.play();
             }
           } else {
+            const heart = heartWrap.children.item(this.lives - 1);
+            heart?.classList.add('transition-hide');
+            setTimeout(() => {
+              heart?.classList.add('hide');
+            }, 950);
+            this.lives -= 1;
+            if (this.lives === 0) {
+              this.gameOver();
+            }
             this.nextWord(btnsWrap);
             this.wrongWords.push(this.words[this.currId]);
             if (localStorage.getItem('sound') === 'true') {
@@ -82,9 +94,10 @@ export class AudioCall implements content {
       });
     });
     audioIcon.addEventListener('click', () => {
-      this.wordSound.play();
+      if (this.lives > 0) {
+        this.wordSound.play();
+      }
     });
-    /* const heartWrap = */ this.generateHeartsUI();
   }
 
   gameOver() {
