@@ -1,3 +1,4 @@
+import { changeContent, appearanceContent, hide } from './animation';
 import { GameWord } from './sprint/sprint';
 
 export function getRandomNum(min: number, max: number) {
@@ -83,4 +84,73 @@ export function checkLocalStarage() {
   } else {
     soundBtn.src = '../../../assets/icons/soundOn.svg';
   }
+}
+
+export function generateStatisticsUI(game: 'sprint' | 'audio-call', startWidth: number) {
+  const wrap = document.createElement('div');
+  wrap.classList.add('statistics');
+
+  const progress = document.createElement('p');
+  progress.classList.add('statistics__progress');
+
+  const correctNums = document.createElement('p');
+  correctNums.classList.add('statistics__correct-num');
+
+  const wrongWords = document.createElement('div');
+  wrongWords.classList.add('statistics__mistakes');
+  wrongWords.innerHTML = '<p>Не угадано:</p>';
+
+  const correctWords = document.createElement('div');
+  correctWords.classList.add('statistics__correctly');
+  correctWords.innerHTML = '<p>Угадано:</p>';
+
+  wrap.append(progress, correctNums, wrongWords, correctWords);
+
+  const content = document.querySelector(`.${game}__content`) as HTMLElement;
+
+  changeContent(content, 3000, startWidth, 300, 500, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+  appearanceContent(wrap, 3200);
+
+  if (game === 'sprint') {
+    const timer = document.querySelector('.timer') as HTMLElement;
+    hide(timer, 1500, 600, 64, 0);
+    setTimeout(() => {
+      // timer.style.margin = '0';
+      timer.remove();
+    }, 1450);
+  } else {
+    const hearts = document.querySelector('.hearts') as HTMLElement;
+    hide(hearts, 1500, 600, 64, 0);
+    setTimeout(() => {
+      hearts.remove();
+    }, 1450);
+  }
+
+  content.innerHTML = '';
+  content.appendChild(wrap);
+
+  return { progress, correctNums, wrongWords, correctWords };
+}
+
+export function createEndBtns(game: 'sprint' | 'audio-call') {
+  const btnsWrap = document.createElement('div');
+  btnsWrap.classList.add('btns-wrap');
+
+  const restart = document.createElement('button');
+  restart.classList.add('restart');
+  restart.innerHTML = 'Играть заново';
+
+  const mainPage = document.createElement('button');
+  mainPage.classList.add('main-page-btn');
+  mainPage.innerHTML = 'Главная страница';
+
+  mainPage.addEventListener('click', () => {
+    window.location.href = '../';
+  });
+
+  btnsWrap.append(restart, mainPage);
+
+  const wrap = document.querySelector(`.${game} .container`);
+  wrap?.append(btnsWrap);
+  return { restart, btnsWrap };
 }

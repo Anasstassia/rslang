@@ -1,10 +1,19 @@
 import { content, iWord } from '../../../core/components/types';
-import { appearanceContent, changeContent, show } from '../animation';
-import { checkLocalStarage, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
+import { appearanceContent, changeContent, hide, show } from '../animation';
+import {
+  checkLocalStarage,
+  createEndBtns,
+  createWord,
+  generateStatisticsUI,
+  getRandomNum,
+  getWords,
+  toggleHeaderBtns,
+} from '../utils';
 import html from './audioCall.html';
 import '../game.scss';
 import './audioCall.scss';
 import { GameWord } from '../sprint/sprint';
+import { audioCallStatistics } from '../statistics';
 
 export class AudioCall implements content {
   words: Array<GameWord> = [];
@@ -82,10 +91,19 @@ export class AudioCall implements content {
             }, 950);
             this.lives -= 1;
             if (this.lives === 0) {
-              this.gameOver();
+              setTimeout(() => {
+                Array.from(btnsWrap.children).forEach((item) => {
+                  item.classList.remove('wrong', 'correct', 'disabled');
+                });
+                setTimeout(() => {
+                  this.gameOver();
+                }, 500);
+              }, 1500);
+            } else {
+              this.nextWord(btnsWrap);
+              this.wrongWords.push(this.words[this.currId]);
             }
-            this.nextWord(btnsWrap);
-            this.wrongWords.push(this.words[this.currId]);
+
             if (localStorage.getItem('sound') === 'true') {
               wrongSound.play();
             }
@@ -101,7 +119,33 @@ export class AudioCall implements content {
   }
 
   gameOver() {
-    console.log('Game Over!');
+    audioCallStatistics.gamesPlayed += 1;
+    const todayDate = new Date();
+    audioCallStatistics.currentDay = todayDate.getDate();
+    localStorage.setItem('audioCallStatistics', JSON.stringify(audioCallStatistics));
+
+    const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('audio-call', 750);
+    setTimeout(() => {
+      document.querySelector<HTMLElement>('.audio-call__content')!.style.overflowY = 'scroll';
+      const { restart, btnsWrap } = createEndBtns('audio-call');
+      restart.addEventListener('click', () => {
+        this.restart();
+        hide(btnsWrap, 1500, 500, 45, 0);
+        setTimeout(() => {
+          btnsWrap.remove();
+        }, 1550);
+      });
+    }, 3000);
+
+    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
+    correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
+
+    this.wrongWords.forEach((el) => {
+      wrongWords.appendChild(createWord(el));
+    });
+    this.correctWords.forEach((el) => {
+      correctWords.appendChild(createWord(el));
+    });
   }
 
   generateHeartsUI() {
@@ -216,5 +260,9 @@ export class AudioCall implements content {
         item.classList.remove('wrong', 'correct', 'disabled');
       });
     }, 2000);
+  }
+
+  restart() {
+    console.log('restart');
   }
 }
