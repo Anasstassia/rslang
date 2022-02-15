@@ -1,11 +1,30 @@
-import { content } from '../../../core/components/types';
+import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, show } from '../animation';
-import { checkLocalStarage, toggleHeaderBtns } from '../utils';
+import { checkLocalStarage, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
 import html from './audioCall.html';
 import '../game.scss';
 import './audioCall.scss';
+import { GameWord } from '../sprint/sprint';
 
 export class AudioCall implements content {
+  words: Array<GameWord> = [];
+
+  fakeWords: Array<string> = [];
+
+  wordSound = new Audio();
+
+  ids: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+
+  currId = 0;
+
+  currCorrectWord = '';
+
+  correctPos = 0;
+
+  correctWords: Array<GameWord> = [];
+
+  wrongWords: Array<GameWord> = [];
+
   async render() {
     return html;
   }
@@ -30,8 +49,46 @@ export class AudioCall implements content {
   }
 
   startGame() {
-    this.generateContentUI();
+    const { audioIcon, btnsWrap } = this.generateContentUI();
+
+    const correctSound = new Audio('../../../assets/sounds/correct.mp3');
+    correctSound.volume = 0.5;
+    const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
+
+    Array.from(btnsWrap.children).forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!btn.classList.contains('disabled')) {
+          Array.from(btnsWrap.children).forEach((item) => {
+            if (item.id === this.correctPos.toString()) {
+              item.classList.add('correct', 'disabled');
+            } else {
+              item.classList.add('wrong', 'disabled');
+            }
+          });
+          if (btn.innerHTML === this.currCorrectWord) {
+            this.nextWord(btnsWrap);
+            this.correctWords.push(this.words[this.currId]);
+            if (localStorage.getItem('sound') === 'true') {
+              correctSound.play();
+            }
+          } else {
+            this.nextWord(btnsWrap);
+            this.wrongWords.push(this.words[this.currId]);
+            if (localStorage.getItem('sound') === 'true') {
+              wrongSound.play();
+            }
+          }
+        }
+      });
+    });
+    audioIcon.addEventListener('click', () => {
+      this.wordSound.play();
+    });
     /* const heartWrap = */ this.generateHeartsUI();
+  }
+
+  gameOver() {
+    console.log('Game Over!');
   }
 
   generateHeartsUI() {
@@ -66,12 +123,13 @@ export class AudioCall implements content {
     const btnsWrap = document.createElement('div');
     btnsWrap.classList.add('audio-call__content__answer-btns');
 
-    const btn1 = document.createElement('button');
-    const btn2 = document.createElement('button');
-    const btn3 = document.createElement('button');
-    const btn4 = document.createElement('button');
+    for (let i = 0; i < 4; i += 1) {
+      const btn = document.createElement('button');
+      btn.id = i.toString();
+      btnsWrap.appendChild(btn);
+    }
 
-    btnsWrap.append(btn1, btn2, btn3, btn4);
+    this.generateWords();
 
     changeContent(wrap, 3000, 600, 300, 750, 300, 20, [0.05, 0.5, 0.7, 0.9]);
     appearanceContent(audioIcon, 3200);
@@ -80,6 +138,70 @@ export class AudioCall implements content {
     wrap.innerHTML = '';
     wrap.append(audioIcon, btnsWrap);
 
-    return { audioIcon, btns: { btnsWrap, btn1, btn2, btn3, btn4 } };
+    return { audioIcon, btnsWrap };
+  }
+
+  generateWords() {
+    const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
+
+    getWords(group).then((el) => {
+      el.forEach((element: iWord) => {
+        const { word, transcription, wordTranslate, audio, id } = element;
+        this.words.push({ word, transcription, wordTranslate, audio, id });
+        this.fakeWords.push(wordTranslate);
+      });
+      this.renderContent(document.querySelectorAll('.audio-call__content__answer-btns button'), 2800);
+    });
+  }
+
+  renderContent(buttons: NodeListOf<HTMLButtonElement> | Element[], soundDelay: number) {
+    const id = this.chooseWord();
+
+    if (id !== false) {
+      this.currId = id;
+      const { wordTranslate } = this.words[id];
+
+      this.wordSound.src = `https://rs-lang-irina-mokh.herokuapp.com/${this.words[id].audio}`;
+      setTimeout(() => {
+        this.wordSound.play();
+      }, soundDelay);
+
+      const randPos = getRandomNum(0, 3);
+      this.correctPos = randPos;
+
+      const tempFakeWords = [...this.fakeWords];
+      this.fakeWords.splice(id, 1);
+      buttons.forEach((item) => {
+        const fakeId = getRandomNum(0, this.fakeWords.length - 1);
+        item.innerHTML = this.fakeWords[fakeId];
+        this.fakeWords.splice(fakeId, 1);
+      });
+      this.fakeWords = tempFakeWords;
+
+      buttons[randPos].innerHTML = wordTranslate;
+      this.currCorrectWord = wordTranslate;
+    } else {
+      this.gameOver();
+    }
+  }
+
+  chooseWord() {
+    if (this.ids.length === 0) {
+      return false;
+    }
+    const randNum = getRandomNum(0, this.ids.length - 1);
+    const id = this.ids[randNum];
+    this.ids.splice(randNum, 1);
+    return id;
+  }
+
+  nextWord(btnsWrap: HTMLElement) {
+    setTimeout(() => {
+      const arr = Array.from(btnsWrap.children);
+      this.renderContent(arr, 300);
+      arr.forEach((item) => {
+        item.classList.remove('wrong', 'correct', 'disabled');
+      });
+    }, 2000);
   }
 }
