@@ -1,5 +1,4 @@
 @use "../../../scss/vars.scss";
-@import '../game';
 
 .sprint {
 	background-image: linear-gradient(-45deg, #f73e3e, #ee7752 , #236ad5, #9708aa);
@@ -41,14 +40,5 @@
       height: 2px;
       margin: 10px auto auto auto; 
     }
-  }
-
-  .btns-wrap {
-    overflow: hidden;
-    width: 500px;
-    margin: 0 auto;
-    margin-top: 50px;
-    display: flex;
-    justify-content: space-evenly;
   }
 }
