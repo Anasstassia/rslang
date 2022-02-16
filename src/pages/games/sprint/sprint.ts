@@ -248,7 +248,7 @@ export class SprintGame implements content {
         });
       } else {
         client.put(`/users/${state?.currentUser?.id}/statistics`, {
-          learnedWords: 10,
+          learnedWords: 0,
           optional: {
             date: todayDate,
             sprintGame: {

@@ -2,7 +2,7 @@ import { isToday } from 'date-fns';
 import { client } from '../../core/client';
 import { state, StatResponse } from '../../core/client/users';
 import { content, iUserWord } from '../../core/components/types';
-import { sprintStatistics } from '../games/statistics';
+// import { sprintStatistics } from '../games/statistics';
 import html from './stats.html';
 import './stats.scss';
 
@@ -65,26 +65,32 @@ export class Stats implements content {
 
   async setStatistics() {
     this.setGameStatistics('sprint');
-    // this.setGameStatistics('audio'); TODO
+    this.setGameStatistics('audio');
     this.setGeneralStatistics();
   }
 
   setGameStatistics = async (game: 'audio' | 'sprint') => {
-    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${this.id}/statistics`);
     const gameCard = document.querySelector(`.card_${game}`);
     const newWords = gameCard?.querySelector('.words_number');
     const percentCorrect = gameCard?.querySelector('.words_perc');
     const mostInRow = gameCard?.querySelector('.words_max');
 
-    const countNewWords = stat.data.optional.sprintGame?.newWords;
+    const mainPath = game === 'audio' ? stat.data.optional.audioGame : stat.data.optional.sprintGame;
+
+    const countNewWords = `${stat.data.optional.sprintGame?.newWords}`;
     const countTotalCorrect = stat.data.optional.sprintGame?.totalCorrectWords;
     const gamesCount = stat.data.optional.sprintGame?.gamesPlayed;
+    // const mostInRowCount = stat.data.optional.sprintGame?.mostWordsInRow;
+    if (!mainPath) return;
+    const mostInRowCount = `${mainPath.mostWordsInRow}`;
+
+    // console.log(`1${percentCorrect}, 2${mostInRow}, 3${newWords}, 4${countTotalCorrect}, 5${gamesCount}`);
 
     if (!percentCorrect || !mostInRow || !newWords || !countTotalCorrect || !gamesCount) return;
-
     newWords.innerHTML = `${countNewWords}`;
     percentCorrect.innerHTML = `${Math.round((countTotalCorrect * 100) / (20 * gamesCount))}%`;
-    mostInRow.innerHTML = `${sprintStatistics.mostWordsInRow}`;
+    mostInRow.innerHTML = `${mostInRowCount}`;
   };
 
   setGeneralStatistics = async () => {
@@ -101,6 +107,7 @@ export class Stats implements content {
     if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
 
     totalLearnedWords.innerHTML = `${countTotalLearned}`;
+    // console.log(`${countTotalLearned}`);
     totalPercentCorrect.innerHTML = `${countTotalPercent}%`;
     totalNewWords.innerHTML = `${countTotalNew}`;
   };
@@ -114,9 +121,13 @@ export class Stats implements content {
   };
 
   send = async () => {
+    const {
+      data: { optional },
+    } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
     const arg = {
       learnedWords: this.learnedWords,
       optional: {
+        ...optional,
         learnedPages: this.learnedPages,
       },
     };

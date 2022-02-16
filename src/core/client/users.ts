@@ -35,6 +35,12 @@ export type StatResponse = {
       mostWordsInRow: number;
       newWords: number;
     };
+    audioGame?: {
+      gamesPlayed: number;
+      totalCorrectWords: number;
+      mostWordsInRow: number;
+      newWords: number;
+    };
   };
 };
 
@@ -94,7 +100,8 @@ export const changeUserWord = async ({ userId, wordId, userWord }: iUserWordCrea
 export const refreshToken = async () => {
   localStorage.removeItem('token');
   const oldRefreshToken = localStorage.getItem('refreshToken');
-
+  // const id = state.currentUser?.id || localStorage.getItem('currentUserId');
+  // if (!id) return null;
   const { token, refreshToken: rtoken } = await client.get<unknown, { token: string; refreshToken: string }>(
     `/users/${state.currentUser?.id}/tokens`,
     {
