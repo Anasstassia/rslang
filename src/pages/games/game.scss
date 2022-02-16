@@ -1,3 +1,5 @@
+@use "../../scss/vars.scss";
+
 .sprint, .audio-call {
   color: #fff;
   height: 100% !important;
@@ -159,8 +161,17 @@
       &__audio {
         filter: invert(90%) sepia(4%) saturate(263%) hue-rotate(303deg) brightness(106%) contrast(105%);
         height: 25px;
+        cursor: pointer;
       }
     }
+  }
+  .btns-wrap {
+    overflow: hidden;
+    width: 500px;
+    margin: 0 auto;
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-evenly;
   }
 }
 

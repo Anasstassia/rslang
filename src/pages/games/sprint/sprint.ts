@@ -4,8 +4,17 @@ import { state, StatResponse, countAnswersForUserWord } from '../../../core/clie
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
-import { checkLocalStarage, createWord, getRandomNum, getWords, toggleHeaderBtns } from '../utils';
+import {
+  checkLocalStarage,
+  createEndBtns,
+  createWord,
+  generateStatisticsUI,
+  getRandomNum,
+  getWords,
+  toggleHeaderBtns,
+} from '../utils';
 import html from './sprint.html';
+import '../game.scss';
 import './sprint.scss';
 
 export type GameWord = {
@@ -220,7 +229,19 @@ export class SprintGame implements content {
     const todayDate = new Date();
     sprintStatistics.currentDay = todayDate.getDate();
     localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
-    const { progress, correctNums, wrongWords, correctWords } = this.generateStatisticsUI();
+
+    const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('sprint', 600);
+    setTimeout(() => {
+      document.querySelector<HTMLElement>('.sprint__content')!.style.overflowY = 'scroll';
+      const { restart, btnsWrap } = createEndBtns('sprint');
+      restart.addEventListener('click', () => {
+        this.restart();
+        hide(btnsWrap, 1500, 500, 45, 0);
+        setTimeout(() => {
+          btnsWrap.remove();
+        }, 1550);
+      });
+    }, 3000);
 
     progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
     correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
@@ -264,7 +285,6 @@ export class SprintGame implements content {
   }
 
   restart() {
-    document.querySelector('.timer')?.remove();
     const wrap = document.querySelector('.sprint__content') as HTMLElement;
     wrap.style.overflow = 'clip';
     wrap.innerHTML = '';
@@ -360,79 +380,6 @@ export class SprintGame implements content {
     wrap.appendChild(timerWrap);
 
     return { time, line };
-  }
-
-  generateStatisticsUI() {
-    const wrap = document.createElement('div');
-    wrap.classList.add('statistics');
-
-    const progress = document.createElement('p');
-    progress.classList.add('statistics__progress');
-
-    const correctNums = document.createElement('p');
-    correctNums.classList.add('statistics__correct-num');
-
-    const wrongWords = document.createElement('div');
-    wrongWords.classList.add('statistics__mistakes');
-    wrongWords.innerHTML = '<p>Не угадано:</p>';
-
-    const correctWords = document.createElement('div');
-    correctWords.classList.add('statistics__correctly');
-    correctWords.innerHTML = '<p>Угадано:</p>';
-
-    wrap.append(progress, correctNums, wrongWords, correctWords);
-
-    const sprintContent = document.querySelector('.sprint__content') as HTMLElement;
-
-    changeContent(sprintContent, 3000, 600, 300, 500, 300, 20, [0.05, 0.5, 0.7, 0.9]);
-    appearanceContent(wrap, 3200);
-
-    const timer = document.querySelector('.timer') as HTMLElement;
-    hide(timer, 1500, 600, 64, 0);
-
-    setTimeout(() => {
-      timer.style.margin = '0';
-    }, 1450);
-
-    sprintContent.innerHTML = '';
-    sprintContent.appendChild(wrap);
-
-    setTimeout(() => {
-      sprintContent.style.overflowY = 'scroll';
-      this.createEndBtns();
-    }, 3000);
-
-    return { progress, correctNums, wrongWords, correctWords };
-  }
-
-  createEndBtns() {
-    const btnsWrap = document.createElement('div');
-    btnsWrap.classList.add('btns-wrap');
-
-    const restart = document.createElement('button');
-    restart.classList.add('restart');
-    restart.innerHTML = 'Играть заново';
-
-    restart.addEventListener('click', () => {
-      this.restart();
-      hide(btnsWrap, 1500, 500, 45, 0);
-      setTimeout(() => {
-        btnsWrap.remove();
-      }, 1550);
-    });
-
-    const mainPage = document.createElement('button');
-    mainPage.classList.add('main-page-btn');
-    mainPage.innerHTML = 'Главная страница';
-
-    mainPage.addEventListener('click', () => {
-      window.location.href = '../';
-    });
-
-    btnsWrap.append(restart, mainPage);
-
-    const wrap = document.querySelector('.sprint .container');
-    wrap?.append(btnsWrap);
   }
 
   nextWord(mark: HTMLElement, btn: HTMLButtonElement, word: HTMLElement, translatedWord: HTMLElement) {
