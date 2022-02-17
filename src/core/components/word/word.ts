@@ -224,6 +224,9 @@ export class Word {
     this.difficult = true;
     this.card.classList.add('word_difficult');
     this.config.userWord.difficulty = 'hard';
+    if (this.learnt) {
+      (this.card.querySelector('.btn_done') as HTMLElement).click();
+    }
     this.updateUserWord();
   }
 

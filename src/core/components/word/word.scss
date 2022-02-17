@@ -18,7 +18,7 @@
   border: 2px solid vars.$jet;
   border-radius: 10px;
   font-size: 14px;
-
+  background-color: vars.$snow;
   & > * {
     padding: 0;
     margin: 0;
@@ -108,8 +108,6 @@
     }
   }
 
-  
-
   .btn_done {
     grid-area: done;
     background-image: url("../../../assets/icons/check.svg");
@@ -143,13 +141,18 @@
     border-color: vars.$red;
   }
 
-  &_done {
-    color: #b8b3b3;
+  &_done.word {
+    border-color: #838282;
     background-color: #eeeeee;
     .word__img {
       filter: grayscale(1);
     }
+
+    .word__result {
+      border-color: #838282;
+    }
   }
+  
   &_difficult {
     box-shadow: 0px 0px 10px 8px rgba(44, 44, 44, 0.4);
   }

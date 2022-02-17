@@ -81,8 +81,12 @@ export class Vocab implements content {
   }
 
   async run() {
-    // await Utils.resetData();
     // для удаления userwords И очистки изученных в статистике
+    /*
+    if (state.currentUser) {
+      await Utils.resetData();
+    }
+    */
 
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
@@ -141,8 +145,7 @@ export class Vocab implements content {
       document.querySelector('.pagination')?.classList.add('hide');
     });
 
-    this.renderGroup();
-
+    await this.renderGroup();
     return undefined;
   }
 
@@ -150,7 +153,7 @@ export class Vocab implements content {
     let response = null;
     let data = null;
     if (request === 'basic') {
-      if (state.currentUser?.id) {
+      if (state.currentUser) {
         response = await client.get(
           `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${this.page}},{"group":${this.group}}]}`
         );
@@ -177,7 +180,9 @@ export class Vocab implements content {
       const word = await new Word(item, this.group).render();
       this.vocabList?.append(word);
     });
-    if (document.querySelectorAll('.word_done').length === items.length) {
+    if (items.length === 0) {
+      this.vocabList.innerHTML = 'Сложные слова пока не добавлены';
+    } else if (items.length > 0 && document.querySelectorAll('.word_done').length === items.length) {
       this.makePageLearnt();
     } else {
       this.unlearnPage();
@@ -197,7 +202,7 @@ export class Vocab implements content {
       this.vocab.classList.add(`vocab_difficult`);
     }
     this.levelHeader.innerHTML = this.levels[this.group];
-    this.renderWords();
+    await this.renderWords();
   };
 
   resetRequest = async (page?: number, group?: number, requestType?: string) => {
@@ -225,14 +230,26 @@ export class Vocab implements content {
   makePageLearnt = async () => {
     stats.learnedPages[this.group].push(this.page);
     await stats.update();
-    this.vocab.classList.add('vocab_learnt');
-
+    this.vocab.classList.add('vocab_learnt', 'slideIn');
     const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
     currentPage.innerHTML = `${this.page + 1} &#10003;`;
   };
 
   unlearnPage = async () => {
-    this.vocab.classList.remove('vocab_learnt');
+    if (this.vocab.classList.contains('slideIn')) {
+      this.vocab.classList.remove('slideIn');
+      this.vocab.classList.add('slideOut');
+    }
+    this.vocab.addEventListener(
+      'animationend',
+      () => {
+        if (this.vocab.classList.contains('vocab_learnt') && this.vocab.classList.contains('slideOut')) {
+          this.vocab.classList.remove('vocab_learnt', 'slideOut');
+        }
+      },
+      { once: true }
+    );
+
     const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
     currentPage.innerHTML = `${this.page + 1}`;
     const newPages = stats.learnedPages[this.group].filter((i) => i !== this.page);
