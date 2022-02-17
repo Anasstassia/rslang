@@ -141,7 +141,7 @@ export class SprintGame implements content {
 
     const checkBtn = (ev: KeyboardEvent) => {
       if (this.isGameOver) {
-        document.removeEventListener('keydown', checkBtn);
+        document.removeEventListener('keyup', checkBtn);
         return;
       }
       if (ev.code === 'ArrowLeft') {
@@ -150,7 +150,7 @@ export class SprintGame implements content {
         correctBtnPressed();
       }
     };
-    document.addEventListener('keydown', checkBtn);
+    document.addEventListener('keyup', checkBtn);
 
     this.generateWords();
 
