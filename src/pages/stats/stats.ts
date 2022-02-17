@@ -106,7 +106,7 @@ export class Stats implements content {
   };
 
   get = async () => {
-    const response = await client.get(`/users/${this.id}/statistics`);
+    const response = await client.get(`/users/${state.currentUser?.id}/statistics`);
     const stat = response.data;
     this.learnedWords = stat.learnedWords;
     this.learnedPages = stat.optional.learnedPages;

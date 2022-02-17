@@ -1,6 +1,6 @@
 // import { isToday } from 'date-fns';
 import { client } from '.';
-import { renderAuthElements } from '../..';
+import { renderAuthElements, stats } from '../..';
 import { iUserWordCreator } from '../components/types';
 
 export const state = {} as State;
@@ -40,6 +40,8 @@ export type StatResponse = {
 
 export const createUser = async (user: UserRequest) => {
   const response = await client.post<unknown, UserResponse>('/users', user);
+  stats.id = state.currentUser?.id;
+  stats.send();
   return response;
 };
 
@@ -53,6 +55,9 @@ export const loginUser = async (user: UserRequest) => {
     userEmail.innerHTML = state.currentUser.email;
   }
   renderAuthElements();
+  await stats.get();
+  stats.id = state.currentUser?.id;
+  await stats.send();
   return response.data;
 };
 

@@ -37,9 +37,8 @@ const routes: Record<string, content> = {
 };
 
 export const router = async () => {
+  // врменный способ создания статистики - удалить позже
   await loginUser({ email: 'test-user@google.com', password: '12345678' });
-  stats.id = state.currentUser?.id;
-  stats.update();
 
   const headerElem = document.querySelector('.header') as HTMLElement;
   const mainElem = document.querySelector('.content') as HTMLElement;
@@ -77,7 +76,7 @@ export const router = async () => {
 };
 export async function renderAuthElements() {
   // console.log(state);
-
+  
   const authOnlyElems = document.querySelectorAll('.auth') as NodeListOf<HTMLElement>;
   authOnlyElems.forEach((elem: HTMLElement) => {
     elem.style.display = '';
