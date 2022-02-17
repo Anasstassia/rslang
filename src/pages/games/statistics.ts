@@ -3,6 +3,7 @@ interface statistics {
   gamesPlayed: number;
   totalCorrectWords: number;
   mostWordsInRow: number;
+  newWords: number;
   currentDay?: number;
 }
 
@@ -10,6 +11,14 @@ export const sprintStatistics: statistics = {
   gamesPlayed: 0,
   totalCorrectWords: 0,
   mostWordsInRow: 0,
+  newWords: 0,
+};
+
+export const audioStatistics: statistics = {
+  gamesPlayed: 0,
+  totalCorrectWords: 0,
+  mostWordsInRow: 0,
+  newWords: 0,
 };
 
 const storageSprintItem = localStorage.getItem('sprintStatistics');
@@ -26,6 +35,7 @@ export const audioCallStatistics: statistics = {
   gamesPlayed: 0,
   totalCorrectWords: 0,
   mostWordsInRow: 0,
+  newWords: 0,
 };
 const storageAudioCallItem = localStorage.getItem('audioCallStatistics');
 if (storageAudioCallItem) {

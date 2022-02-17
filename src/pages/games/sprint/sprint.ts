@@ -252,6 +252,7 @@ export class SprintGame implements content {
     this.correctWords.forEach((el) => {
       correctWords.appendChild(createWord(el));
     });
+
     client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`).then((stat) => {
       const isActualStat = isToday(new Date(stat.data.optional.date));
       if (isActualStat) {

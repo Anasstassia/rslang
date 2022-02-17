@@ -2,7 +2,6 @@ import { isToday } from 'date-fns';
 import { client } from '../../core/client';
 import { state, StatResponse } from '../../core/client/users';
 import { content, iUserWord } from '../../core/components/types';
-// import { sprintStatistics } from '../games/statistics';
 import html from './stats.html';
 import './stats.scss';
 
@@ -78,14 +77,12 @@ export class Stats implements content {
 
     const mainPath = game === 'audio' ? stat.data.optional.audioGame : stat.data.optional.sprintGame;
 
-    const countNewWords = `${stat.data.optional.sprintGame?.newWords}`;
-    const countTotalCorrect = stat.data.optional.sprintGame?.totalCorrectWords;
-    const gamesCount = stat.data.optional.sprintGame?.gamesPlayed;
-    // const mostInRowCount = stat.data.optional.sprintGame?.mostWordsInRow;
-    if (!mainPath) return;
-    const mostInRowCount = `${mainPath.mostWordsInRow}`;
+    const countNewWords = `${mainPath?.newWords}`;
+    const countTotalCorrect = mainPath?.totalCorrectWords;
+    const gamesCount = mainPath?.gamesPlayed;
+    const mostInRowCount = mainPath?.mostWordsInRow;
 
-    // console.log(`1${percentCorrect}, 2${mostInRow}, 3${newWords}, 4${countTotalCorrect}, 5${gamesCount}`);
+    console.log(`countTotalCorrect ${countTotalCorrect}, gamesCount ${gamesCount}, mostInRowCount ${mostInRowCount}`);
 
     if (!percentCorrect || !mostInRow || !newWords || !countTotalCorrect || !gamesCount) return;
     newWords.innerHTML = `${countNewWords}`;
@@ -94,20 +91,36 @@ export class Stats implements content {
   };
 
   setGeneralStatistics = async () => {
-    // const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
 
     const totalLearnedWords = document.querySelector('.words_new');
     const totalPercentCorrect = document.querySelector('.total-percent');
     const totalNewWords = document.querySelector('.total_new');
 
-    const countTotalLearned = await this.getLearnedWordsPerDay();
-    const countTotalPercent = 0; // TODO
-    const countTotalNew = 0; // TODO
+    const countAudioNew = stat.data.optional.audioGame?.newWords;
+    const countSprintNew = stat.data.optional.sprintGame?.newWords;
+
+    const countTotalLearned = this.getLearnedWordsPerDay();
+    const rightAnswAudio = stat.data.optional.audioGame?.totalCorrectWords;
+    const rightAnswSprint = stat.data.optional.sprintGame?.totalCorrectWords;
+    const gamesPlayedAudio = stat.data.optional.audioGame?.gamesPlayed;
+    const gamesPlayedSprint = stat.data.optional.sprintGame?.gamesPlayed;
+
+    if (
+      !rightAnswAudio ||
+      !rightAnswSprint ||
+      !countAudioNew ||
+      !countSprintNew ||
+      !gamesPlayedAudio ||
+      !gamesPlayedSprint
+    )
+      return;
+    const countTotalPercent = ((rightAnswAudio + rightAnswSprint) / 20) * (gamesPlayedAudio + gamesPlayedSprint);
+    const countTotalNew = countAudioNew + countSprintNew;
 
     if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
 
     totalLearnedWords.innerHTML = `${countTotalLearned}`;
-    // console.log(`${countTotalLearned}`);
     totalPercentCorrect.innerHTML = `${countTotalPercent}%`;
     totalNewWords.innerHTML = `${countTotalNew}`;
   };

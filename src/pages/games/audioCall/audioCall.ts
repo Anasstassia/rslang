@@ -1,3 +1,4 @@
+import { isToday } from 'date-fns';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
@@ -13,7 +14,9 @@ import html from './audioCall.html';
 import '../game.scss';
 import './audioCall.scss';
 import { GameWord } from '../sprint/sprint';
-import { audioCallStatistics } from '../statistics';
+import { audioCallStatistics, audioStatistics } from '../statistics';
+import { state, StatResponse } from '../../../core/client/users';
+import { client } from '../../../core/client';
 
 export class AudioCall implements content {
   words: Array<GameWord> = [];
@@ -145,6 +148,37 @@ export class AudioCall implements content {
     });
     this.correctWords.forEach((el) => {
       correctWords.appendChild(createWord(el));
+    });
+
+    client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`).then((stat) => {
+      const isActualStat = isToday(new Date(stat.data.optional.date));
+      if (isActualStat) {
+        client.put(`/users/${state?.currentUser?.id}/statistics`, {
+          learnedWords: stat.data.learnedWords,
+          optional: {
+            date: todayDate,
+            audioGame: {
+              gamesPlayed: audioStatistics.gamesPlayed,
+              totalCorrectWords: audioStatistics.totalCorrectWords,
+              mostWordsInRow: audioStatistics.mostWordsInRow,
+              newWords: 0,
+            },
+          },
+        });
+      } else {
+        client.put(`/users/${state?.currentUser?.id}/statistics`, {
+          learnedWords: 0,
+          optional: {
+            date: todayDate,
+            audioGame: {
+              gamesPlayed: audioStatistics.gamesPlayed,
+              totalCorrectWords: audioStatistics.totalCorrectWords,
+              mostWordsInRow: audioStatistics.mostWordsInRow,
+              newWords: 0,
+            },
+          },
+        });
+      }
     });
   }
 
