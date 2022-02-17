@@ -69,7 +69,7 @@ export class SprintGame implements content {
 
   startGame() {
     const { time, line } = this.generateTimerUI();
-    const { word, translatedWord, wrongBtn, correctBtn, mark } = this.generateContentUI();
+    const { word, translatedWord, wrongBtn, correctBtn, correctMark, wrongMark } = this.generateContentUI();
 
     const correctSound = new Audio('../../../assets/sounds/correct.mp3');
     correctSound.volume = 0.5;
@@ -83,13 +83,12 @@ export class SprintGame implements content {
 
         this.correctWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/tick.svg';
-        mark.classList.remove('hidden');
+        correctMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
-        this.nextWord(mark, correctBtn, word, translatedWord);
+        this.nextWord(correctMark, correctBtn, word, translatedWord);
       } else if (!correctBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
 
@@ -97,13 +96,12 @@ export class SprintGame implements content {
 
         this.wrongWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/cross.svg';
-        mark.classList.remove('hidden');
+        wrongMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
-        this.nextWord(mark, correctBtn, word, translatedWord);
+        this.nextWord(wrongMark, correctBtn, word, translatedWord);
       }
       countAnswersForUserWord(this.words[this.currId].id, true);
     };
@@ -117,13 +115,12 @@ export class SprintGame implements content {
 
         this.correctWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/tick.svg';
-        mark.classList.remove('hidden');
+        correctMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
-        this.nextWord(mark, wrongBtn, word, translatedWord);
+        this.nextWord(correctMark, wrongBtn, word, translatedWord);
       } else if (!wrongBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
 
@@ -131,13 +128,12 @@ export class SprintGame implements content {
 
         this.wrongWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/cross.svg';
-        mark.classList.remove('hidden');
+        wrongMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
-        this.nextWord(mark, wrongBtn, word, translatedWord);
+        this.nextWord(wrongMark, wrongBtn, word, translatedWord);
       }
       countAnswersForUserWord(this.words[this.currId].id, false);
     };
@@ -341,12 +337,22 @@ export class SprintGame implements content {
     correctBtn.classList.add('answer-btns__correct');
     correctBtn.innerHTML = 'Верно';
 
-    const mark = document.createElement('img');
-    mark.classList.add('answer-btns__mark', 'hidden');
-    mark.src = '../../../assets/icons/tick.svg';
-    mark.alt = 'mark';
+    const marksWrap = document.createElement('div');
+    marksWrap.classList.add('answer-btns__marks');
 
-    btnsWrap.append(wrongBtn, mark, correctBtn);
+    const correctMark = document.createElement('img');
+    correctMark.classList.add('mark', 'hidden');
+    correctMark.src = '../../../assets/icons/tick.svg';
+    correctMark.alt = 'mark';
+
+    const wrongMark = document.createElement('img');
+    wrongMark.classList.add('mark', 'hidden');
+    wrongMark.src = '../../../assets/icons/cross.svg';
+    wrongMark.alt = 'mark';
+
+    marksWrap.append(correctMark, wrongMark);
+
+    btnsWrap.append(wrongBtn, marksWrap, correctBtn);
 
     const wrap = document.querySelector('.sprint__content') as HTMLElement;
 
@@ -358,7 +364,7 @@ export class SprintGame implements content {
     wrap.innerHTML = '';
     wrap.append(word, translatedWord, btnsWrap);
 
-    return { word, translatedWord, wrongBtn, correctBtn, mark };
+    return { word, translatedWord, wrongBtn, correctBtn, correctMark, wrongMark };
   }
 
   generateTimerUI() {

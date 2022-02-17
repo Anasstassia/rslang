@@ -83,6 +83,7 @@ export function checkLocalStarage() {
     soundBtn.src = '../../../assets/icons/soundOff.svg';
   } else {
     soundBtn.src = '../../../assets/icons/soundOn.svg';
+    localStorage.setItem('sound', 'true');
   }
 }
 
