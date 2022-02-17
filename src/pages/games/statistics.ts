@@ -4,7 +4,7 @@ interface statistics {
   totalCorrectWords: number;
   mostWordsInRow: number;
   newWords: number;
-  currentDay?: number;
+  currentDay: Date;
 }
 
 export const sprintStatistics: statistics = {
@@ -12,6 +12,7 @@ export const sprintStatistics: statistics = {
   totalCorrectWords: 0,
   mostWordsInRow: 0,
   newWords: 0,
+  currentDay: new Date(),
 };
 
 export const audioStatistics: statistics = {
@@ -19,6 +20,7 @@ export const audioStatistics: statistics = {
   totalCorrectWords: 0,
   mostWordsInRow: 0,
   newWords: 0,
+  currentDay: new Date(),
 };
 
 const storageSprintItem = localStorage.getItem('sprintStatistics');
@@ -36,6 +38,7 @@ export const audioCallStatistics: statistics = {
   totalCorrectWords: 0,
   mostWordsInRow: 0,
   newWords: 0,
+  currentDay: new Date(),
 };
 const storageAudioCallItem = localStorage.getItem('audioCallStatistics');
 if (storageAudioCallItem) {

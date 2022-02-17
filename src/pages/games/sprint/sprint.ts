@@ -1,6 +1,6 @@
-import { isToday } from 'date-fns';
-import { client } from '../../../core/client';
-import { state, StatResponse, countAnswersForUserWord } from '../../../core/client/users';
+// import { isToday } from 'date-fns';
+// import { client } from '../../../core/client';
+import { countAnswersForUserWord } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
@@ -16,6 +16,7 @@ import {
 import html from './sprint.html';
 import '../game.scss';
 import './sprint.scss';
+import { updateSprintGameStatistics } from '../../../core/client/stat';
 
 export type GameWord = {
   word: string;
@@ -226,8 +227,7 @@ export class SprintGame implements content {
       return;
     }
     sprintStatistics.gamesPlayed += 1;
-    const todayDate = new Date();
-    sprintStatistics.currentDay = todayDate.getDate();
+    sprintStatistics.currentDay = new Date();
     localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('sprint', 600);
@@ -253,35 +253,11 @@ export class SprintGame implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`).then((stat) => {
-      const isActualStat = isToday(new Date(stat.data.optional.date));
-      if (isActualStat) {
-        client.put(`/users/${state?.currentUser?.id}/statistics`, {
-          learnedWords: stat.data.learnedWords,
-          optional: {
-            date: todayDate,
-            sprintGame: {
-              gamesPlayed: sprintStatistics.gamesPlayed,
-              totalCorrectWords: sprintStatistics.totalCorrectWords,
-              mostWordsInRow: sprintStatistics.mostWordsInRow,
-              newWords: 0,
-            },
-          },
-        });
-      } else {
-        client.put(`/users/${state?.currentUser?.id}/statistics`, {
-          learnedWords: 0,
-          optional: {
-            date: todayDate,
-            sprintGame: {
-              gamesPlayed: sprintStatistics.gamesPlayed,
-              totalCorrectWords: sprintStatistics.totalCorrectWords,
-              mostWordsInRow: sprintStatistics.mostWordsInRow,
-              newWords: 0,
-            },
-          },
-        });
-      }
+    updateSprintGameStatistics({
+      gamesPlayed: sprintStatistics.gamesPlayed,
+      totalCorrectWords: sprintStatistics.totalCorrectWords,
+      mostWordsInRow: sprintStatistics.mostWordsInRow,
+      newWords: 0,
     });
   }
 

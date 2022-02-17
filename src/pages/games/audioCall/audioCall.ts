@@ -1,4 +1,4 @@
-import { isToday } from 'date-fns';
+// import { isToday } from 'date-fns';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
@@ -14,9 +14,8 @@ import html from './audioCall.html';
 import '../game.scss';
 import './audioCall.scss';
 import { GameWord } from '../sprint/sprint';
-import { audioCallStatistics, audioStatistics } from '../statistics';
-import { state, StatResponse } from '../../../core/client/users';
-import { client } from '../../../core/client';
+import { audioCallStatistics } from '../statistics';
+import { updateAudioCallGameStatistics } from '../../../core/client/stat';
 
 export class AudioCall implements content {
   words: Array<GameWord> = [];
@@ -123,8 +122,7 @@ export class AudioCall implements content {
 
   gameOver() {
     audioCallStatistics.gamesPlayed += 1;
-    const todayDate = new Date();
-    audioCallStatistics.currentDay = todayDate.getDate();
+    audioCallStatistics.currentDay = new Date();
     localStorage.setItem('audioCallStatistics', JSON.stringify(audioCallStatistics));
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('audio-call', 750);
@@ -150,35 +148,11 @@ export class AudioCall implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`).then((stat) => {
-      const isActualStat = isToday(new Date(stat.data.optional.date));
-      if (isActualStat) {
-        client.put(`/users/${state?.currentUser?.id}/statistics`, {
-          learnedWords: stat.data.learnedWords,
-          optional: {
-            date: todayDate,
-            audioGame: {
-              gamesPlayed: audioStatistics.gamesPlayed,
-              totalCorrectWords: audioStatistics.totalCorrectWords,
-              mostWordsInRow: audioStatistics.mostWordsInRow,
-              newWords: 0,
-            },
-          },
-        });
-      } else {
-        client.put(`/users/${state?.currentUser?.id}/statistics`, {
-          learnedWords: 0,
-          optional: {
-            date: todayDate,
-            audioGame: {
-              gamesPlayed: audioStatistics.gamesPlayed,
-              totalCorrectWords: audioStatistics.totalCorrectWords,
-              mostWordsInRow: audioStatistics.mostWordsInRow,
-              newWords: 0,
-            },
-          },
-        });
-      }
+    updateAudioCallGameStatistics({
+      gamesPlayed: audioCallStatistics.gamesPlayed,
+      totalCorrectWords: audioCallStatistics.totalCorrectWords,
+      mostWordsInRow: audioCallStatistics.mostWordsInRow,
+      newWords: 0,
     });
   }
 

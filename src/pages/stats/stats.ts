@@ -1,5 +1,6 @@
 import { isToday } from 'date-fns';
 import { client } from '../../core/client';
+// import { updateLearnedPagesStatistics } from '../../core/client/stat';
 import { state, StatResponse } from '../../core/client/users';
 import { content, iUserWord } from '../../core/components/types';
 import html from './stats.html';
@@ -82,7 +83,7 @@ export class Stats implements content {
     const gamesCount = mainPath?.gamesPlayed;
     const mostInRowCount = mainPath?.mostWordsInRow;
 
-    console.log(`countTotalCorrect ${countTotalCorrect}, gamesCount ${gamesCount}, mostInRowCount ${mostInRowCount}`);
+    // console.log(`countTotalCorrect ${countTotalCorrect}, gamesCount ${gamesCount}, mostInRowCount ${mostInRowCount}`);
 
     if (!percentCorrect || !mostInRow || !newWords || !countTotalCorrect || !gamesCount) return;
     newWords.innerHTML = `${countNewWords}`;
@@ -97,31 +98,36 @@ export class Stats implements content {
     const totalPercentCorrect = document.querySelector('.total-percent');
     const totalNewWords = document.querySelector('.total_new');
 
-    const countAudioNew = stat.data.optional.audioGame?.newWords;
-    const countSprintNew = stat.data.optional.sprintGame?.newWords;
+    const countAudioNew = Number(stat.data.optional.audioGame?.newWords);
+    const countSprintNew = Number(stat.data.optional.sprintGame?.newWords);
 
-    const countTotalLearned = this.getLearnedWordsPerDay();
-    const rightAnswAudio = stat.data.optional.audioGame?.totalCorrectWords;
-    const rightAnswSprint = stat.data.optional.sprintGame?.totalCorrectWords;
-    const gamesPlayedAudio = stat.data.optional.audioGame?.gamesPlayed;
-    const gamesPlayedSprint = stat.data.optional.sprintGame?.gamesPlayed;
+    const countTotalLearned = await this.getLearnedWordsPerDay();
 
-    if (
-      !rightAnswAudio ||
-      !rightAnswSprint ||
-      !countAudioNew ||
-      !countSprintNew ||
-      !gamesPlayedAudio ||
-      !gamesPlayedSprint
-    )
-      return;
-    const countTotalPercent = ((rightAnswAudio + rightAnswSprint) / 20) * (gamesPlayedAudio + gamesPlayedSprint);
+    const rightAnswAudio = Number(stat.data.optional.audioGame?.totalCorrectWords);
+    const rightAnswSprint = Number(stat.data.optional.sprintGame?.totalCorrectWords);
+    const gamesPlayedAudio = Number(stat.data.optional.audioGame?.gamesPlayed);
+    const gamesPlayedSprint = Number(stat.data.optional.sprintGame?.gamesPlayed);
+    console.log({
+      countTotalLearned,
+      rightAnswAudio,
+      rightAnswSprint,
+      gamesPlayedAudio,
+      gamesPlayedSprint,
+      countAudioNew,
+    });
+
+    const countTotalPercent = Math.round(
+      ((rightAnswAudio + rightAnswSprint) * 100) / (gamesPlayedAudio * 20 + gamesPlayedSprint * 20)
+    );
+
     const countTotalNew = countAudioNew + countSprintNew;
-
-    if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
-
+    if (!totalLearnedWords) return;
     totalLearnedWords.innerHTML = `${countTotalLearned}`;
+
+    if (!totalPercentCorrect) return;
     totalPercentCorrect.innerHTML = `${countTotalPercent}%`;
+
+    if (!totalNewWords) return;
     totalNewWords.innerHTML = `${countTotalNew}`;
   };
 
@@ -134,17 +140,18 @@ export class Stats implements content {
   };
 
   send = async () => {
-    const {
-      data: { optional },
-    } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
-    const arg = {
-      learnedWords: this.learnedWords,
-      optional: {
-        ...optional,
-        learnedPages: this.learnedPages,
-      },
-    };
-    await client.put(`/users/${this.id}/statistics`, arg);
+    // const {
+    //   data: { optional },
+    // } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    // const arg = {
+    //   learnedWords: this.learnedWords,
+    //   optional: {
+    //     ...optional,
+    //     learnedPages: this.learnedPages,
+    //   },
+    // };
+    // await client.put(`/users/${this.id}/statistics`, arg);
+    // updateLearnedPagesStatistics(this.learnedPages);
   };
 
   update = async () => {
@@ -152,8 +159,6 @@ export class Stats implements content {
     await this.get();
   };
 
-  // предлагаю принять learnedWords - изученные за ВСЕ время(может понадобиться в долгосрочной)
-  // а для получения в статисике на сегодня фильтровать юзерские слова
   getLearnedWordsPerDay = async () => {
     const response = await client.get(
       `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=200&filter={"userWord.optional.done":true}`
