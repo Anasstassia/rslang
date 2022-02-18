@@ -15,7 +15,7 @@ import { Menu } from './core/components/menu';
 import { Utils } from './core/utils/utils';
 // import Types
 import { content } from './core/components/types';
-import { loginUser, getCurrentUser, state } from './core/client/users';
+import { getCurrentUser, loginUser, state } from './core/client/users';
 
 export const header = new Header();
 export const footer = new Footer();
@@ -54,7 +54,10 @@ export const router = async () => {
   await footer.run();
   await popup.run();
   await getCurrentUser();
-
+  if (state.currentUser?.id) {
+    stats.id = state.currentUser?.id;
+    await stats.update();
+  }
   const request = Utils.parseRequestURL();
   const parsedURL =
     (request.main ? `/${request.main}` : '/') +

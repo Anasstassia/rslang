@@ -1,8 +1,8 @@
 import { isToday } from 'date-fns';
 import { client } from '../../core/client';
+import { updateLearnedPagesStatistics } from '../../core/client/stat';
 import { state, StatResponse } from '../../core/client/users';
 import { content, iUserWord } from '../../core/components/types';
-import { sprintStatistics } from '../games/statistics';
 import html from './stats.html';
 import './stats.scss';
 
@@ -65,43 +65,69 @@ export class Stats implements content {
 
   async setStatistics() {
     this.setGameStatistics('sprint');
-    // this.setGameStatistics('audio'); TODO
+    this.setGameStatistics('audio');
     this.setGeneralStatistics();
   }
 
   setGameStatistics = async (game: 'audio' | 'sprint') => {
-    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${this.id}/statistics`);
     const gameCard = document.querySelector(`.card_${game}`);
     const newWords = gameCard?.querySelector('.words_number');
     const percentCorrect = gameCard?.querySelector('.words_perc');
     const mostInRow = gameCard?.querySelector('.words_max');
 
-    const countNewWords = stat.data.optional.sprintGame?.newWords;
-    const countTotalCorrect = stat.data.optional.sprintGame?.totalCorrectWords;
-    const gamesCount = stat.data.optional.sprintGame?.gamesPlayed;
+    const mainPath = game === 'audio' ? stat.data.optional.audioGame : stat.data.optional.sprintGame;
+
+    const countNewWords = `${mainPath?.newWords}`;
+    const countTotalCorrect = mainPath?.totalCorrectWords;
+    const gamesCount = mainPath?.gamesPlayed;
+    const mostInRowCount = mainPath?.mostWordsInRow;
+
+    // console.log(`countTotalCorrect ${countTotalCorrect}, gamesCount ${gamesCount}, mostInRowCount ${mostInRowCount}`);
 
     if (!percentCorrect || !mostInRow || !newWords || !countTotalCorrect || !gamesCount) return;
-
     newWords.innerHTML = `${countNewWords}`;
     percentCorrect.innerHTML = `${Math.round((countTotalCorrect * 100) / (20 * gamesCount))}%`;
-    mostInRow.innerHTML = `${sprintStatistics.mostWordsInRow}`;
+    mostInRow.innerHTML = `${mostInRowCount}`;
   };
 
   setGeneralStatistics = async () => {
-    // const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const stat = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
 
     const totalLearnedWords = document.querySelector('.words_new');
     const totalPercentCorrect = document.querySelector('.total-percent');
     const totalNewWords = document.querySelector('.total_new');
 
+    const countAudioNew = Number(stat.data.optional.audioGame?.newWords);
+    const countSprintNew = Number(stat.data.optional.sprintGame?.newWords);
+
     const countTotalLearned = await this.getLearnedWordsPerDay();
-    const countTotalPercent = 0; // TODO
-    const countTotalNew = 0; // TODO
 
-    if (!totalLearnedWords || !totalPercentCorrect || !totalNewWords) return;
+    const rightAnswAudio = Number(stat.data.optional.audioGame?.totalCorrectWords);
+    const rightAnswSprint = Number(stat.data.optional.sprintGame?.totalCorrectWords);
+    const gamesPlayedAudio = Number(stat.data.optional.audioGame?.gamesPlayed);
+    const gamesPlayedSprint = Number(stat.data.optional.sprintGame?.gamesPlayed);
+    console.log({
+      countTotalLearned,
+      rightAnswAudio,
+      rightAnswSprint,
+      gamesPlayedAudio,
+      gamesPlayedSprint,
+      countAudioNew,
+    });
 
+    const countTotalPercent = Math.round(
+      ((rightAnswAudio + rightAnswSprint) * 100) / (gamesPlayedAudio * 20 + gamesPlayedSprint * 20)
+    );
+
+    const countTotalNew = countAudioNew + countSprintNew;
+    if (!totalLearnedWords) return;
     totalLearnedWords.innerHTML = `${countTotalLearned}`;
+
+    if (!totalPercentCorrect) return;
     totalPercentCorrect.innerHTML = `${countTotalPercent}%`;
+
+    if (!totalNewWords) return;
     totalNewWords.innerHTML = `${countTotalNew}`;
   };
 
@@ -114,13 +140,18 @@ export class Stats implements content {
   };
 
   send = async () => {
+    const {
+      data: { optional },
+    } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
     const arg = {
       learnedWords: this.learnedWords,
       optional: {
+        ...optional,
         learnedPages: this.learnedPages,
       },
     };
     await client.put(`/users/${this.id}/statistics`, arg);
+    updateLearnedPagesStatistics(this.learnedPages);
   };
 
   update = async () => {
@@ -128,8 +159,6 @@ export class Stats implements content {
     await this.get();
   };
 
-  // предлагаю принять learnedWords - изученные за ВСЕ время(может понадобиться в долгосрочной)
-  // а для получения в статисике на сегодня фильтровать юзерские слова
   getLearnedWordsPerDay = async () => {
     const response = await client.get(
       `/users/${state.currentUser?.id}/aggregatedWords?wordsPerPage=200&filter={"userWord.optional.done":true}`
