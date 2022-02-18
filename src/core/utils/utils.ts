@@ -35,6 +35,7 @@ export const Utils = {
   },
 
   resetData: async () => {
+    console.log('clear user data');
     statistics.learnedPages = {
       0: [],
       1: [],

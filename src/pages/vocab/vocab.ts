@@ -6,7 +6,6 @@ import { client } from '../../core/client';
 import { state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
 import { stats } from '../../index';
-// import { Utils } from '../../core/utils/utils';
 
 const PAGES = 30;
 
@@ -81,13 +80,6 @@ export class Vocab implements content {
   }
 
   async run() {
-    // для удаления userwords И очистки изученных в статистике
-    /*
-    if (state.currentUser) {
-      await Utils.resetData();
-    }
-    */
-
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
     this.vocabList = document.querySelector('.vocab__page') as HTMLElement;

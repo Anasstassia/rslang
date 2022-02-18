@@ -4,6 +4,7 @@ import { renderAuthElements, stats } from '../..';
 import { iUserWordCreator } from '../components/types';
 
 export const state = {} as State;
+const numberOfCorrectAnswersToGetLearnt = 3;
 
 type State = { currentUser: { email: string; id: string } | null };
 
@@ -41,7 +42,7 @@ export type StatResponse = {
 export const createUser = async (user: UserRequest) => {
   const response = await client.post<unknown, UserResponse>('/users', user);
   stats.id = state.currentUser?.id;
-  stats.send();
+  stats.update();
   return response;
 };
 
@@ -63,26 +64,6 @@ export const loginUser = async (user: UserRequest) => {
 
 export const createUserWord = async ({ userId, wordId, userWord }: iUserWordCreator) => {
   const response = await client.post(`/users/${userId}/words/${wordId}`, userWord);
-  /*
-  const stat = await client.get<unknown, { data: StatResponse }>(`/users/${userId}/statistics`);
-  
-  const isActualStat = isToday(new Date(stat.data.optional.date));
-  if (isActualStat) {
-    await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
-      learnedWords: stat.data.learnedWords + 1,
-      optional: {
-        date: new Date(),
-      },
-    });
-  } else {
-    await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
-      learnedWords: 1,
-      optional: {
-        date: new Date(),
-      },
-    });
-  }
-  */
   return response;
 };
 
@@ -149,24 +130,34 @@ export const countAnswersForUserWord = async (wordId: string, isTrue: boolean) =
         date: new Date(),
         rightAnswers: 0,
         wrongAnswers: 0,
+        seriesOfRight: '0',
       },
     },
   };
-  async function changeCount() {
+  async function changeConfig() {
     if (isTrue) {
       config.userWord.optional.rightAnswers += 1;
+      config.userWord.optional.seriesOfRight += '1';
     } else {
       config.userWord.optional.wrongAnswers += 1;
+      config.userWord.optional.seriesOfRight += '0';
+    }
+
+    const series = config.userWord.optional.seriesOfRight.slice(-numberOfCorrectAnswersToGetLearnt);
+    if (series === '111') {
+      console.log('make word learnt');
+      config.userWord.optional.done = true;
     }
   }
   if (await isUserWord(wordId)) {
+    console.log('is user word');
     const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${wordId}`);
     config.userWord = response.data[0].userWord;
-    await changeCount();
-    changeUserWord(config);
+    await changeConfig();
+    await changeUserWord(config);
   } else {
-    await changeCount();
-    createUserWord(config);
+    await changeConfig();
+    await createUserWord(config);
   }
 };
 

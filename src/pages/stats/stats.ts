@@ -108,6 +108,7 @@ export class Stats implements content {
   get = async () => {
     const response = await client.get(`/users/${state.currentUser?.id}/statistics`);
     const stat = response.data;
+    console.log(stat);
     this.learnedWords = stat.learnedWords;
     this.learnedPages = stat.optional.learnedPages;
     return response.data;
@@ -120,7 +121,7 @@ export class Stats implements content {
         learnedPages: this.learnedPages,
       },
     };
-    await client.put(`/users/${this.id}/statistics`, arg);
+    await client.put(`/users/${state.currentUser?.id}/statistics`, arg);
   };
 
   update = async () => {

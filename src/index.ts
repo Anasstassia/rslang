@@ -38,7 +38,11 @@ const routes: Record<string, content> = {
 
 export const router = async () => {
   // врменный способ создания статистики - удалить позже
-  await loginUser({ email: 'test-user@google.com', password: '12345678' });
+  // await loginUser({ email: 'test-user@google.com', password: '12345678' });
+  // для удаления userwords И очистки изученных в статистике
+  // if (state.currentUser) {
+  //   await Utils.resetData();
+  // }
 
   const headerElem = document.querySelector('.header') as HTMLElement;
   const mainElem = document.querySelector('.content') as HTMLElement;
