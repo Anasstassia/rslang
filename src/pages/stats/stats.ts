@@ -1,6 +1,6 @@
 import { isToday } from 'date-fns';
 import { client } from '../../core/client';
-// import { updateLearnedPagesStatistics } from '../../core/client/stat';
+import { updateLearnedPagesStatistics } from '../../core/client/stat';
 import { state, StatResponse } from '../../core/client/users';
 import { content, iUserWord } from '../../core/components/types';
 import html from './stats.html';
@@ -140,18 +140,18 @@ export class Stats implements content {
   };
 
   send = async () => {
-    // const {
-    //   data: { optional },
-    // } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
-    // const arg = {
-    //   learnedWords: this.learnedWords,
-    //   optional: {
-    //     ...optional,
-    //     learnedPages: this.learnedPages,
-    //   },
-    // };
-    // await client.put(`/users/${this.id}/statistics`, arg);
-    // updateLearnedPagesStatistics(this.learnedPages);
+    const {
+      data: { optional },
+    } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
+    const arg = {
+      learnedWords: this.learnedWords,
+      optional: {
+        ...optional,
+        learnedPages: this.learnedPages,
+      },
+    };
+    await client.put(`/users/${this.id}/statistics`, arg);
+    updateLearnedPagesStatistics(this.learnedPages);
   };
 
   update = async () => {
