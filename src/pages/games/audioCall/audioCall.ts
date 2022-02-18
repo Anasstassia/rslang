@@ -38,6 +38,8 @@ export class AudioCall implements content {
 
   lives = 5;
 
+  isGameOver = false;
+
   async render() {
     return html;
   }
@@ -55,10 +57,10 @@ export class AudioCall implements content {
     const startGame = (ev: KeyboardEvent) => {
       if (ev.code === 'Enter') {
         this.startGame();
-        document.removeEventListener('keydown', startGame);
+        document.removeEventListener('keyup', startGame);
       }
     };
-    document.addEventListener('keydown', startGame);
+    document.addEventListener('keyup', startGame);
   }
 
   startGame() {
@@ -70,62 +72,92 @@ export class AudioCall implements content {
 
     const { audioIcon, btnsWrap } = this.generateContentUI();
 
-    const correctSound = new Audio('../../../assets/sounds/correct.mp3');
-    correctSound.volume = 0.5;
-    const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
-
     Array.from(btnsWrap.children).forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (!btn.classList.contains('disabled') && this.lives > 0) {
-          Array.from(btnsWrap.children).forEach((item) => {
-            if (item.id === this.correctPos.toString()) {
-              item.classList.add('correct', 'disabled');
-            } else {
-              item.classList.add('wrong', 'disabled');
-            }
-          });
-          if (btn.innerHTML === this.currCorrectWord) {
-            this.nextWord(btnsWrap);
-            this.correctWords.push(this.words[this.currId]);
-            if (localStorage.getItem('sound') === 'true') {
-              correctSound.play();
-            }
-          } else {
-            if (heartWrap) {
-              const heart = heartWrap.children.item(this.lives - 1);
-              heart?.classList.add('transition-hide');
-              setTimeout(() => {
-                heart?.classList.add('hide');
-              }, 950);
-              this.lives -= 1;
-            }
-
-            if (this.lives === 0) {
-              setTimeout(() => {
-                Array.from(btnsWrap.children).forEach((item) => {
-                  item.classList.remove('wrong', 'correct', 'disabled');
-                });
-                setTimeout(() => {
-                  this.gameOver();
-                }, 500);
-              }, 1500);
-            } else {
-              this.nextWord(btnsWrap);
-              this.wrongWords.push(this.words[this.currId]);
-            }
-
-            if (localStorage.getItem('sound') === 'true') {
-              wrongSound.play();
-            }
-          }
-        }
+        this.checkAnswer(heartWrap, btnsWrap, btn);
       });
     });
+
+    const checkKey = (ev: KeyboardEvent) => {
+      if (this.isGameOver) {
+        document.removeEventListener('keyup', checkKey);
+        return;
+      }
+      switch (ev.code) {
+        case 'Digit1':
+          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[0]);
+          break;
+        case 'Digit2':
+          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[1]);
+          break;
+        case 'Digit3':
+          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[2]);
+          break;
+        case 'Digit4':
+          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[3]);
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener('keyup', checkKey);
+
     audioIcon.addEventListener('click', () => {
       if (this.lives > 0) {
         this.wordSound.play();
       }
     });
+  }
+
+  checkAnswer(heartWrap: HTMLDivElement | false, btnsWrap: HTMLDivElement, currBtn: Element) {
+    if (!currBtn.classList.contains('disabled') && this.lives > 0) {
+      const correctSound = new Audio('../../../assets/sounds/correct.mp3');
+      correctSound.volume = 0.5;
+      const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
+
+      Array.from(btnsWrap.children).forEach((item) => {
+        if (item.id === this.correctPos.toString()) {
+          item.classList.add('correct', 'disabled');
+        } else {
+          item.classList.add('wrong', 'disabled');
+        }
+      });
+      if (currBtn.innerHTML === this.currCorrectWord) {
+        this.nextWord(btnsWrap);
+        this.correctWords.push(this.words[this.currId]);
+        if (localStorage.getItem('sound') === 'true') {
+          correctSound.play();
+        }
+      } else {
+        if (heartWrap) {
+          const heart = heartWrap.children.item(this.lives - 1);
+          heart?.classList.add('transition-hide');
+          setTimeout(() => {
+            heart?.classList.add('hide');
+          }, 950);
+          this.lives -= 1;
+        }
+
+        if (this.lives === 0) {
+          setTimeout(() => {
+            Array.from(btnsWrap.children).forEach((item) => {
+              item.classList.remove('wrong', 'correct', 'disabled');
+            });
+            setTimeout(() => {
+              this.gameOver();
+            }, 500);
+          }, 1500);
+        } else {
+          this.nextWord(btnsWrap);
+          this.wrongWords.push(this.words[this.currId]);
+        }
+
+        if (localStorage.getItem('sound') === 'true') {
+          wrongSound.play();
+        }
+      }
+    }
   }
 
   gameOver() {
