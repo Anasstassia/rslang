@@ -35,6 +35,15 @@ export type StatResponse = {
       mostWordsInRow: number;
       newWords: number;
     };
+    audioGame?: {
+      gamesPlayed: number;
+      totalCorrectWords: number;
+      mostWordsInRow: number;
+      newWords: number;
+    };
+    learnedPages?: {
+      [key: number]: Array<number>;
+    };
   };
 };
 
@@ -63,26 +72,6 @@ export const loginUser = async (user: UserRequest) => {
 
 export const createUserWord = async ({ userId, wordId, userWord }: iUserWordCreator) => {
   const response = await client.post(`/users/${userId}/words/${wordId}`, userWord);
-  /*
-  const stat = await client.get<unknown, { data: StatResponse }>(`/users/${userId}/statistics`);
-  
-  const isActualStat = isToday(new Date(stat.data.optional.date));
-  if (isActualStat) {
-    await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
-      learnedWords: stat.data.learnedWords + 1,
-      optional: {
-        date: new Date(),
-      },
-    });
-  } else {
-    await client.put<unknown, { data: StatResponse }>(`/users/${userId}/statistics`, {
-      learnedWords: 1,
-      optional: {
-        date: new Date(),
-      },
-    });
-  }
-  */
   return response;
 };
 
@@ -99,7 +88,8 @@ export const changeUserWord = async ({ userId, wordId, userWord }: iUserWordCrea
 export const refreshToken = async () => {
   localStorage.removeItem('token');
   const oldRefreshToken = localStorage.getItem('refreshToken');
-
+  // const id = state.currentUser?.id || localStorage.getItem('currentUserId');
+  // if (!id) return null;
   const { token, refreshToken: rtoken } = await client.get<unknown, { token: string; refreshToken: string }>(
     `/users/${state.currentUser?.id}/tokens`,
     {
