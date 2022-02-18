@@ -99,11 +99,16 @@
       animation-fill-mode: forwards;
       font-size: 27px;
     }
+
     &__subtitle {
       animation: appearanceContent 2.7s ease-in-out;
       animation-fill-mode: forwards;
       font-size: 23px;
     }
+
+    &__settings {
+			animation: appearanceContent 2.7s ease-in-out;
+		}
 
     &__start-btn {
       animation: appearanceContent 2.7s ease-in-out;

@@ -62,8 +62,13 @@ export class AudioCall implements content {
   }
 
   startGame() {
+    const heartsCheckbox = document.getElementById('heartsCheckbox') as HTMLInputElement;
+    let heartWrap: HTMLDivElement | false;
+    if (heartsCheckbox.checked) {
+      heartWrap = this.generateHeartsUI();
+    } else heartWrap = false;
+
     const { audioIcon, btnsWrap } = this.generateContentUI();
-    const heartWrap = this.generateHeartsUI();
 
     const correctSound = new Audio('../../../assets/sounds/correct.mp3');
     correctSound.volume = 0.5;
@@ -86,12 +91,15 @@ export class AudioCall implements content {
               correctSound.play();
             }
           } else {
-            const heart = heartWrap.children.item(this.lives - 1);
-            heart?.classList.add('transition-hide');
-            setTimeout(() => {
-              heart?.classList.add('hide');
-            }, 950);
-            this.lives -= 1;
+            if (heartWrap) {
+              const heart = heartWrap.children.item(this.lives - 1);
+              heart?.classList.add('transition-hide');
+              setTimeout(() => {
+                heart?.classList.add('hide');
+              }, 950);
+              this.lives -= 1;
+            }
+
             if (this.lives === 0) {
               setTimeout(() => {
                 Array.from(btnsWrap.children).forEach((item) => {
