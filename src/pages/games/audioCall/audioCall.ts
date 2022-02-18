@@ -1,4 +1,3 @@
-// import { isToday } from 'date-fns';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
@@ -36,6 +35,8 @@ export class AudioCall implements content {
 
   wrongWords: Array<GameWord> = [];
 
+  isHeartsOn = false;
+
   lives = 5;
 
   isGameOver = false;
@@ -66,7 +67,8 @@ export class AudioCall implements content {
   startGame() {
     const heartsCheckbox = document.getElementById('heartsCheckbox') as HTMLInputElement;
     let heartWrap: HTMLDivElement | false;
-    if (heartsCheckbox.checked) {
+    if (this.isHeartsOn || heartsCheckbox?.checked) {
+      this.isHeartsOn = true;
       heartWrap = this.generateHeartsUI();
     } else heartWrap = false;
 
@@ -81,23 +83,31 @@ export class AudioCall implements content {
     const checkKey = (ev: KeyboardEvent) => {
       if (this.isGameOver) {
         document.removeEventListener('keyup', checkKey);
-        return;
-      }
-      switch (ev.code) {
-        case 'Digit1':
-          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[0]);
-          break;
-        case 'Digit2':
-          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[1]);
-          break;
-        case 'Digit3':
-          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[2]);
-          break;
-        case 'Digit4':
-          this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[3]);
-          break;
-        default:
-          break;
+      } else {
+        switch (ev.code) {
+          case 'Digit1':
+            if (!btnsWrap.children[0].classList.contains('disabled')) {
+              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[0]);
+            }
+            break;
+          case 'Digit2':
+            if (!btnsWrap.children[1].classList.contains('disabled')) {
+              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[1]);
+            }
+            break;
+          case 'Digit3':
+            if (!btnsWrap.children[2].classList.contains('disabled')) {
+              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[2]);
+            }
+            break;
+          case 'Digit4':
+            if (!btnsWrap.children[3].classList.contains('disabled')) {
+              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[3]);
+            }
+            break;
+          default:
+            break;
+        }
       }
     };
 
@@ -145,6 +155,7 @@ export class AudioCall implements content {
               item.classList.remove('wrong', 'correct', 'disabled');
             });
             setTimeout(() => {
+              this.isGameOver = true;
               this.gameOver();
             }, 500);
           }, 1500);
@@ -203,8 +214,6 @@ export class AudioCall implements content {
     for (let i = 1; i < 6; i += 1) {
       const heart = document.createElement('div');
       heart.classList.add('hearts__item');
-      heart.id = i.toString();
-
       heartWrap.appendChild(heart);
     }
 
@@ -286,6 +295,7 @@ export class AudioCall implements content {
       buttons[randPos].innerHTML = wordTranslate;
       this.currCorrectWord = wordTranslate;
     } else {
+      this.isGameOver = true;
       this.gameOver();
     }
   }
@@ -311,6 +321,21 @@ export class AudioCall implements content {
   }
 
   restart() {
-    console.log('restart');
+    const wrap = document.querySelector('.audio-call__content') as HTMLElement;
+    wrap.style.overflow = 'clip';
+    wrap.innerHTML = '';
+    changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+
+    this.isGameOver = false;
+    this.words = [];
+    this.fakeWords = [];
+    this.correctWords = [];
+    this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    this.wrongWords = [];
+    this.lives = 5;
+    this.currId = 0;
+    this.currCorrectWord = '';
+    this.correctPos = 0;
+    this.startGame();
   }
 }
