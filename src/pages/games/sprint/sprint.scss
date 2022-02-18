@@ -17,12 +17,22 @@
       width: 400px;
       margin: 40px auto auto auto;
 
-      &__mark {
+      &__marks {
+        position: relative;
         height: 30px;
-        &.hidden {
-          opacity: 0;
+        width: 30px;
+        .mark {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 30px;
+          &.hidden {
+            opacity: 0;
+          }
         }
       }
+
+      
     }
   }
 
