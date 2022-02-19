@@ -6,7 +6,7 @@ export function getRandomNum(min: number, max: number) {
 }
 
 export async function getWords(group: string | undefined) {
-  const randPage = getRandomNum(0, 30);
+  const randPage = getRandomNum(0, 29);
 
   const response = await (
     await fetch(`https://rs-lang-irina-mokh.herokuapp.com/words?group=${group}&page=${randPage}`)
@@ -116,15 +116,16 @@ export function generateStatisticsUI(game: 'sprint' | 'audio-call', startWidth: 
     const timer = document.querySelector('.timer') as HTMLElement;
     hide(timer, 1500, 600, 64, 0);
     setTimeout(() => {
-      // timer.style.margin = '0';
       timer.remove();
     }, 1450);
   } else {
     const hearts = document.querySelector('.hearts') as HTMLElement;
-    hide(hearts, 1500, 600, 64, 0);
-    setTimeout(() => {
-      hearts.remove();
-    }, 1450);
+    if (hearts !== null) {
+      hide(hearts, 1500, 600, 64, 0);
+      setTimeout(() => {
+        hearts.remove();
+      }, 1450);
+    }
   }
 
   content.innerHTML = '';
