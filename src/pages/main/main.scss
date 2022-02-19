@@ -10,16 +10,24 @@
 
   &__app {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    @media (max-width: vars.$mediumScreen) {
-      flex-direction: column;
-    }
+    background-image: url('../../assets/bg.jpg');
+    background-size: cover;
   }
 
   &__description {
-    max-width: 600px;
-    margin-right: 1em;
+    padding-left: 2em;
+    width: 70%;
+    background: linear-gradient(90deg, transparent 0%, #ffffff7c 2em, #ffffffce 50%, vars.$snow 100%);
+    @media (max-width: vars.$mediumScreen) {
+      width: 80%;
+    }
+    @media (max-width: vars.$smallScreen) {
+      margin-top: 5em;
+      width: 100%;
+      padding: 0 1em;
+      background: linear-gradient(180deg, transparent 0%, #ffffff7c 2em, #ffffffce 50%, vars.$snow 100%);    }
   }
 
   &__text {
@@ -44,9 +52,13 @@
     background-color: vars.$green;
     color: vars.$snow;
     font-weight: 500;
+    font-size: 1.1em;
     padding: 5px 5px 5px 35px;
     border-radius: 1em;
-    
+    @media (max-width: vars.$mediumScreen) {
+      font-size: 1em;
+      width: 100%;
+    }
     animation: 1s ease-out 0s 1 slideInFromRight;
     @keyframes slideInFromRight {
       0% {

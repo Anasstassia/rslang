@@ -2,7 +2,8 @@ import { countAnswersForUserWord, state } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
-  checkLocalStarage,
+  checkPlaceOfOpening,
+  checkSoundLocalStarage,
   createEndBtns,
   createWord,
   generateStatisticsUI,
@@ -41,12 +42,15 @@ export class SprintGame implements content {
 
   currWordsInRow = 0;
 
+  IsGameOpenFromVocabPage = false;
+
   async render() {
     return html;
   }
 
   async run() {
-    checkLocalStarage();
+    this.IsGameOpenFromVocabPage = checkPlaceOfOpening();
+    checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
   }
@@ -58,91 +62,93 @@ export class SprintGame implements content {
     const startGame = (ev: KeyboardEvent) => {
       if (ev.code === 'Enter') {
         this.startGame();
-        document.removeEventListener('keydown', startGame);
+        document.removeEventListener('keydown', startGame, true);
       }
     };
-    document.addEventListener('keydown', startGame);
+    document.addEventListener('keydown', startGame, true);
   }
 
   startGame() {
     const { time, line } = this.generateTimerUI();
-    const { word, translatedWord, wrongBtn, correctBtn, mark } = this.generateContentUI();
+    const { word, translatedWord, wrongBtn, correctBtn, correctMark, wrongMark } = this.generateContentUI();
 
     const correctSound = new Audio('../../../assets/sounds/correct.mp3');
     correctSound.volume = 0.5;
     const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
 
     const correctBtnPressed = () => {
-      if (this.isCorrect && !correctBtn.classList.contains('disabled')) {
+      if (this.isCorrect && !correctBtn.classList.contains('disabled') && !wrongBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
+        wrongBtn.classList.add('disabled');
 
         this.changeStat();
 
         this.correctWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/tick.svg';
-        mark.classList.remove('hidden');
+        correctMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
-        this.nextWord(mark, correctBtn, word, translatedWord);
-      } else if (!correctBtn.classList.contains('disabled')) {
+        this.nextWord(correctMark, { correctBtn, wrongBtn }, word, translatedWord);
+        countAnswersForUserWord(this.words[this.currId].id, true);
+      } else if (!correctBtn.classList.contains('disabled') && !wrongBtn.classList.contains('disabled')) {
         correctBtn.classList.add('disabled');
+        wrongBtn.classList.add('disabled');
 
         this.currWordsInRow = 0;
 
         this.wrongWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/cross.svg';
-        mark.classList.remove('hidden');
+        wrongMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
-        this.nextWord(mark, correctBtn, word, translatedWord);
+        this.nextWord(wrongMark, { correctBtn, wrongBtn }, word, translatedWord);
+        countAnswersForUserWord(this.words[this.currId].id, false);
       }
-      countAnswersForUserWord(this.words[this.currId].id, true);
     };
     correctBtn.addEventListener('click', correctBtnPressed);
 
     const wrondBtnPressed = () => {
-      if (!this.isCorrect && !wrongBtn.classList.contains('disabled')) {
+      if (!this.isCorrect && !wrongBtn.classList.contains('disabled') && !correctBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
+        correctBtn.classList.add('disabled');
 
         this.changeStat();
 
         this.correctWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/tick.svg';
-        mark.classList.remove('hidden');
+        correctMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
-        this.nextWord(mark, wrongBtn, word, translatedWord);
-      } else if (!wrongBtn.classList.contains('disabled')) {
+        this.nextWord(correctMark, { correctBtn, wrongBtn }, word, translatedWord);
+        countAnswersForUserWord(this.words[this.currId].id, true);
+      } else if (!wrongBtn.classList.contains('disabled') && !correctBtn.classList.contains('disabled')) {
         wrongBtn.classList.add('disabled');
+        correctBtn.classList.add('disabled');
 
         this.currWordsInRow = 0;
 
         this.wrongWords.push(this.words[this.currId]);
 
-        mark.src = '../../../assets/icons/cross.svg';
-        mark.classList.remove('hidden');
+        wrongMark.classList.remove('hidden');
 
         if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
-        this.nextWord(mark, wrongBtn, word, translatedWord);
+        this.nextWord(wrongMark, { correctBtn, wrongBtn }, word, translatedWord);
+        countAnswersForUserWord(this.words[this.currId].id, false);
       }
-      countAnswersForUserWord(this.words[this.currId].id, false);
     };
     wrongBtn.addEventListener('click', wrondBtnPressed);
 
     const checkBtn = (ev: KeyboardEvent) => {
       if (this.isGameOver) {
-        document.removeEventListener('keydown', checkBtn);
+        document.removeEventListener('keyup', checkBtn, true);
         return;
       }
       if (ev.code === 'ArrowLeft') {
@@ -151,7 +157,7 @@ export class SprintGame implements content {
         correctBtnPressed();
       }
     };
-    document.addEventListener('keydown', checkBtn);
+    document.addEventListener('keyup', checkBtn, true);
 
     this.generateWords();
 
@@ -268,7 +274,7 @@ export class SprintGame implements content {
   generateWords() {
     const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
 
-    getWords(group).then((el) => {
+    getWords(group, this.IsGameOpenFromVocabPage, false).then((el) => {
       el.forEach((element: iWord) => {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
@@ -307,12 +313,22 @@ export class SprintGame implements content {
     correctBtn.classList.add('answer-btns__correct');
     correctBtn.innerHTML = 'Верно';
 
-    const mark = document.createElement('img');
-    mark.classList.add('answer-btns__mark', 'hidden');
-    mark.src = '../../../assets/icons/tick.svg';
-    mark.alt = 'mark';
+    const marksWrap = document.createElement('div');
+    marksWrap.classList.add('answer-btns__marks');
 
-    btnsWrap.append(wrongBtn, mark, correctBtn);
+    const correctMark = document.createElement('img');
+    correctMark.classList.add('mark', 'hidden');
+    correctMark.src = '../../../assets/icons/tick.svg';
+    correctMark.alt = 'mark';
+
+    const wrongMark = document.createElement('img');
+    wrongMark.classList.add('mark', 'hidden');
+    wrongMark.src = '../../../assets/icons/cross.svg';
+    wrongMark.alt = 'mark';
+
+    marksWrap.append(correctMark, wrongMark);
+
+    btnsWrap.append(wrongBtn, marksWrap, correctBtn);
 
     const wrap = document.querySelector('.sprint__content') as HTMLElement;
 
@@ -324,7 +340,7 @@ export class SprintGame implements content {
     wrap.innerHTML = '';
     wrap.append(word, translatedWord, btnsWrap);
 
-    return { word, translatedWord, wrongBtn, correctBtn, mark };
+    return { word, translatedWord, wrongBtn, correctBtn, correctMark, wrongMark };
   }
 
   generateTimerUI() {
@@ -348,11 +364,17 @@ export class SprintGame implements content {
     return { time, line };
   }
 
-  nextWord(mark: HTMLElement, btn: HTMLButtonElement, word: HTMLElement, translatedWord: HTMLElement) {
+  nextWord(
+    mark: HTMLElement,
+    btns: { correctBtn: HTMLButtonElement; wrongBtn: HTMLButtonElement },
+    word: HTMLElement,
+    translatedWord: HTMLElement
+  ) {
     setTimeout(() => {
       mark.classList.add('hidden');
       this.renderContent(word, translatedWord);
-      btn.classList.remove('disabled');
+      btns.correctBtn.classList.remove('disabled');
+      btns.wrongBtn.classList.remove('disabled');
     }, 500);
   }
 
