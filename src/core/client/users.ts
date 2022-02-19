@@ -2,10 +2,15 @@
 import { client } from '.';
 import { renderAuthElements, stats } from '../..';
 import { iUserWordCreator } from '../components/types';
+import { getStat } from './stat';
 
 export const state = {} as State;
 
-type State = { currentUser: { email: string; id: string } | null };
+type State = {
+  currentUser: { email: string; id: string } | null;
+  sprintStatistics: StatResponse['optional']['sprintGame'];
+  audioStatistics: StatResponse['optional']['audioGame'];
+};
 
 type UserRequest = {
   email: string;
@@ -48,9 +53,7 @@ export type StatResponse = {
 };
 
 export const createUser = async (user: UserRequest) => {
-  const response = await client.post<unknown, UserResponse>('/users', user);
-  stats.id = state.currentUser?.id;
-  stats.send();
+  const response = await client.post<unknown, { data: UserResponse }>('/users', user);
   return response;
 };
 
@@ -64,9 +67,8 @@ export const loginUser = async (user: UserRequest) => {
     userEmail.innerHTML = state.currentUser.email;
   }
   renderAuthElements();
-  await stats.get();
+  // await stats.get();
   stats.id = state.currentUser?.id;
-  await stats.send();
   return response.data;
 };
 
@@ -88,8 +90,8 @@ export const changeUserWord = async ({ userId, wordId, userWord }: iUserWordCrea
 export const refreshToken = async () => {
   localStorage.removeItem('token');
   const oldRefreshToken = localStorage.getItem('refreshToken');
-  // const id = state.currentUser?.id || localStorage.getItem('currentUserId');
-  // if (!id) return null;
+  const id = state.currentUser?.id || localStorage.getItem('currentUserId');
+  if (!id) return null;
   const { token, refreshToken: rtoken } = await client.get<unknown, { token: string; refreshToken: string }>(
     `/users/${state.currentUser?.id}/tokens`,
     {
@@ -122,6 +124,42 @@ export const getCurrentUser = async () => {
       userEmail.innerHTML = response?.data.email;
     }
     state.currentUser = response.data;
+    let stat;
+    try {
+      stat = await getStat();
+      console.log(stat);
+    } catch (e) {
+      const r = await client.put(`/users/${state.currentUser?.id}/statistics`, {
+        learnedWords: 0,
+        optional: {
+          date: new Date(),
+          sprintGame: {
+            gamesPlayed: 0,
+            totalCorrectWords: 0,
+            mostWordsInRow: 0,
+            newWords: 0,
+          },
+          audioGame: {
+            gamesPlayed: 0,
+            totalCorrectWords: 0,
+            mostWordsInRow: 0,
+            newWords: 0,
+          },
+          learnedPages: {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+          },
+        },
+      });
+      stat = r.data;
+    }
+    state.sprintStatistics = stat.optional.sprintGame;
+
     renderAuthElements();
     return response.data;
   }

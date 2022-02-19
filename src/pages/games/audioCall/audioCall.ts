@@ -122,7 +122,6 @@ export class AudioCall implements content {
 
   gameOver() {
     audioCallStatistics.gamesPlayed += 1;
-    audioCallStatistics.currentDay = new Date();
     localStorage.setItem('audioCallStatistics', JSON.stringify(audioCallStatistics));
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('audio-call', 750);
@@ -148,12 +147,7 @@ export class AudioCall implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    updateAudioCallGameStatistics({
-      gamesPlayed: audioCallStatistics.gamesPlayed,
-      totalCorrectWords: audioCallStatistics.totalCorrectWords,
-      mostWordsInRow: audioCallStatistics.mostWordsInRow,
-      newWords: 0,
-    });
+    updateAudioCallGameStatistics(audioCallStatistics);
   }
 
   generateHeartsUI() {

@@ -1,6 +1,6 @@
 import { isToday } from 'date-fns';
 import { client } from '../../core/client';
-import { updateLearnedPagesStatistics } from '../../core/client/stat';
+// import { updateLearnedPagesStatistics } from '../../core/client/stat';
 import { state, StatResponse } from '../../core/client/users';
 import { content, iUserWord } from '../../core/components/types';
 import html from './stats.html';
@@ -14,6 +14,8 @@ export class Stats implements content {
   learnedPages: {
     [key: number]: Array<number>;
   };
+
+  optional?: StatResponse['optional'];
 
   constructor() {
     this.id = state.currentUser?.id;
@@ -30,6 +32,7 @@ export class Stats implements content {
   }
 
   async render() {
+    console.log(state);
     return html;
   }
 
@@ -131,33 +134,31 @@ export class Stats implements content {
     totalNewWords.innerHTML = `${countTotalNew}`;
   };
 
-  get = async () => {
-    const response = await client.get(`/users/${state.currentUser?.id}/statistics`);
-    const stat = response.data;
-    this.learnedWords = stat.learnedWords;
-    this.learnedPages = stat.optional.learnedPages;
-    return response.data;
-  };
+  // get = async () => {
+  //   const response = await client.get(`/users/${state.currentUser?.id}/statistics`);
+  //   const stat = response.data;
+  //   this.learnedWords = stat.learnedWords;
+  //   this.learnedPages = stat.optional.learnedPages;
+  //   this.optional = stat.optional;
+  //   return response.data;
+  // };
 
-  send = async () => {
-    const {
-      data: { optional },
-    } = await client.get<unknown, { data: StatResponse }>(`/users/${state.currentUser?.id}/statistics`);
-    const arg = {
-      learnedWords: this.learnedWords,
-      optional: {
-        ...optional,
-        learnedPages: this.learnedPages,
-      },
-    };
-    await client.put(`/users/${this.id}/statistics`, arg);
-    updateLearnedPagesStatistics(this.learnedPages);
-  };
+  // send = async () => {
+  //   const arg = {
+  //     learnedWords: this.learnedWords,
+  //     optional: {
+  //       ...this.optional,
+  //       learnedPages: this.learnedPages,
+  //     },
+  //   };
+  //   await client.put(`/users/${this.id}/statistics`, arg);
+  //   // updateLearnedPagesStatistics(this.learnedPages);
+  // };
 
-  update = async () => {
-    await this.send();
-    await this.get();
-  };
+  // update = async () => {
+  //   await this.send();
+  //   await this.get();
+  // };
 
   getLearnedWordsPerDay = async () => {
     const response = await client.get(

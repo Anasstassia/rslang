@@ -92,6 +92,9 @@ export class Popup implements content {
             this.valid(emailInputElement, spanEmail);
             this.valid(passwordInputElement, spanPass);
             handlers[i]({ email: emailInputElement?.value || '', password: emailPasswordElement?.value || '' });
+            if (i === 1) {
+              document.querySelector('.popup')?.classList.remove('active');
+            }
           }
           setTimeout(() => circle.remove(), 500);
         })
