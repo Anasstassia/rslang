@@ -1,8 +1,8 @@
-// import { isToday } from 'date-fns';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
-  checkLocalStarage,
+  checkPlaceOfOpening,
+  checkSoundLocalStarage,
   createEndBtns,
   createWord,
   generateStatisticsUI,
@@ -36,14 +36,21 @@ export class AudioCall implements content {
 
   wrongWords: Array<GameWord> = [];
 
+  isHeartsOn = false;
+
   lives = 5;
+
+  isGameOver = false;
+
+  IsGameOpenFromVocabPage = false;
 
   async render() {
     return html;
   }
 
   async run() {
-    checkLocalStarage();
+    this.IsGameOpenFromVocabPage = checkPlaceOfOpening();
+    checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
   }
@@ -53,71 +60,120 @@ export class AudioCall implements content {
       this.startGame();
     });
     const startGame = (ev: KeyboardEvent) => {
-      if (ev.code === 'Enter') {
+      if (ev.code === 'Enter' && this.words.length === 0) {
         this.startGame();
-        document.removeEventListener('keydown', startGame);
-      }
+        document.removeEventListener('keyup', startGame, true);
+      } else document.removeEventListener('keyup', startGame, true);
     };
-    document.addEventListener('keydown', startGame);
+    document.addEventListener('keyup', startGame, true);
   }
 
   startGame() {
-    const { audioIcon, btnsWrap } = this.generateContentUI();
-    const heartWrap = this.generateHeartsUI();
+    const heartsCheckbox = document.getElementById('heartsCheckbox') as HTMLInputElement;
+    let heartWrap: HTMLDivElement | false;
+    if (this.isHeartsOn || heartsCheckbox?.checked) {
+      this.isHeartsOn = true;
+      heartWrap = this.generateHeartsUI();
+    } else heartWrap = false;
 
-    const correctSound = new Audio('../../../assets/sounds/correct.mp3');
-    correctSound.volume = 0.5;
-    const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
+    const { audioIcon, btnsWrap } = this.generateContentUI();
 
     Array.from(btnsWrap.children).forEach((btn) => {
       btn.addEventListener('click', () => {
-        if (!btn.classList.contains('disabled') && this.lives > 0) {
-          Array.from(btnsWrap.children).forEach((item) => {
-            if (item.id === this.correctPos.toString()) {
-              item.classList.add('correct', 'disabled');
-            } else {
-              item.classList.add('wrong', 'disabled');
-            }
-          });
-          if (btn.innerHTML === this.currCorrectWord) {
-            this.nextWord(btnsWrap);
-            this.correctWords.push(this.words[this.currId]);
-            if (localStorage.getItem('sound') === 'true') {
-              correctSound.play();
-            }
-          } else {
-            const heart = heartWrap.children.item(this.lives - 1);
-            heart?.classList.add('transition-hide');
-            setTimeout(() => {
-              heart?.classList.add('hide');
-            }, 950);
-            this.lives -= 1;
-            if (this.lives === 0) {
-              setTimeout(() => {
-                Array.from(btnsWrap.children).forEach((item) => {
-                  item.classList.remove('wrong', 'correct', 'disabled');
-                });
-                setTimeout(() => {
-                  this.gameOver();
-                }, 500);
-              }, 1500);
-            } else {
-              this.nextWord(btnsWrap);
-              this.wrongWords.push(this.words[this.currId]);
-            }
-
-            if (localStorage.getItem('sound') === 'true') {
-              wrongSound.play();
-            }
-          }
-        }
+        this.checkAnswer(heartWrap, btnsWrap, btn);
       });
     });
+
+    const checkKey = (ev: KeyboardEvent) => {
+      if (this.isGameOver) {
+        document.removeEventListener('keyup', checkKey, true);
+        return;
+      }
+
+      switch (ev.code) {
+        case 'Digit1':
+          if (!btnsWrap.children[0].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[0]);
+          }
+          break;
+        case 'Digit2':
+          if (!btnsWrap.children[1].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[1]);
+          }
+          break;
+        case 'Digit3':
+          if (!btnsWrap.children[2].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[2]);
+          }
+          break;
+        case 'Digit4':
+          if (!btnsWrap.children[3].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[3]);
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener('keyup', checkKey, true);
+
     audioIcon.addEventListener('click', () => {
       if (this.lives > 0) {
         this.wordSound.play();
       }
     });
+  }
+
+  checkAnswer(heartWrap: HTMLDivElement | false, btnsWrap: HTMLDivElement, currBtn: Element) {
+    if (!currBtn.classList.contains('disabled') && this.lives > 0) {
+      const correctSound = new Audio('../../../assets/sounds/correct.mp3');
+      correctSound.volume = 0.5;
+      const wrongSound = new Audio('../../../assets/sounds/wrong.mp3');
+
+      Array.from(btnsWrap.children).forEach((item) => {
+        if (item.id === this.correctPos.toString()) {
+          item.classList.add('correct', 'disabled');
+        } else {
+          item.classList.add('wrong', 'disabled');
+        }
+      });
+      if (currBtn.innerHTML === this.currCorrectWord) {
+        this.nextWord(btnsWrap);
+        this.correctWords.push(this.words[this.currId]);
+        if (localStorage.getItem('sound') === 'true') {
+          correctSound.play();
+        }
+      } else {
+        if (heartWrap) {
+          const heart = heartWrap.children.item(this.lives - 1);
+          heart?.classList.add('transition-hide');
+          setTimeout(() => {
+            heart?.classList.add('hide');
+          }, 950);
+          this.lives -= 1;
+        }
+
+        if (this.lives === 0) {
+          setTimeout(() => {
+            Array.from(btnsWrap.children).forEach((item) => {
+              item.classList.remove('wrong', 'correct', 'disabled');
+            });
+            setTimeout(() => {
+              this.isGameOver = true;
+              this.gameOver();
+            }, 500);
+          }, 1500);
+        } else {
+          this.nextWord(btnsWrap);
+          this.wrongWords.push(this.words[this.currId]);
+        }
+
+        if (localStorage.getItem('sound') === 'true') {
+          wrongSound.play();
+        }
+      }
+    }
   }
 
   gameOver() {
@@ -163,8 +219,6 @@ export class AudioCall implements content {
     for (let i = 1; i < 6; i += 1) {
       const heart = document.createElement('div');
       heart.classList.add('hearts__item');
-      heart.id = i.toString();
-
       heartWrap.appendChild(heart);
     }
 
@@ -209,13 +263,23 @@ export class AudioCall implements content {
   generateWords() {
     const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
 
-    getWords(group).then((el) => {
+    getWords(group, this.IsGameOpenFromVocabPage, false).then((el) => {
       el.forEach((element: iWord) => {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
-        this.fakeWords.push(wordTranslate);
       });
       this.renderContent(document.querySelectorAll('.audio-call__content__answer-btns button'), 2800);
+    });
+
+    getWords(group, this.IsGameOpenFromVocabPage, true).then((el) => {
+      el.forEach((element: iWord) => {
+        this.fakeWords.push(element.wordTranslate);
+      });
+    });
+    getWords(group, this.IsGameOpenFromVocabPage, true).then((el) => {
+      el.forEach((element: iWord) => {
+        this.fakeWords.push(element.wordTranslate);
+      });
     });
   }
 
@@ -235,7 +299,10 @@ export class AudioCall implements content {
       this.correctPos = randPos;
 
       const tempFakeWords = [...this.fakeWords];
-      this.fakeWords.splice(id, 1);
+      const index = this.fakeWords.indexOf(wordTranslate);
+      if (index !== -1) {
+        this.fakeWords.splice(index, 1);
+      }
       buttons.forEach((item) => {
         const fakeId = getRandomNum(0, this.fakeWords.length - 1);
         item.innerHTML = this.fakeWords[fakeId];
@@ -246,6 +313,7 @@ export class AudioCall implements content {
       buttons[randPos].innerHTML = wordTranslate;
       this.currCorrectWord = wordTranslate;
     } else {
+      this.isGameOver = true;
       this.gameOver();
     }
   }
@@ -271,6 +339,21 @@ export class AudioCall implements content {
   }
 
   restart() {
-    console.log('restart');
+    const wrap = document.querySelector('.audio-call__content') as HTMLElement;
+    wrap.style.overflow = 'clip';
+    wrap.innerHTML = '';
+    changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
+
+    this.isGameOver = false;
+    this.words = [];
+    this.fakeWords = [];
+    this.correctWords = [];
+    this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    this.wrongWords = [];
+    this.lives = 5;
+    this.currId = 0;
+    this.currCorrectWord = '';
+    this.correctPos = 0;
+    this.startGame();
   }
 }
