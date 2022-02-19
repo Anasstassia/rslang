@@ -145,6 +145,16 @@ export class Vocab implements content {
       document.querySelector('.pagination')?.classList.add('hide');
     });
 
+    // games
+    const sprintGameLink = document.getElementById('sprintLink') as HTMLLinkElement;
+    sprintGameLink.addEventListener('click', () => {
+      localStorage.setItem('IsGameOpenFromVocabPage', 'true');
+    });
+    const audioCallGameLink = document.getElementById('audioCallLink') as HTMLLinkElement;
+    audioCallGameLink.addEventListener('click', () => {
+      localStorage.setItem('IsGameOpenFromVocabPage', 'true');
+    });
+
     await this.renderGroup();
     return undefined;
   }

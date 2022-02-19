@@ -56,30 +56,45 @@
         height: 30px;
       }
     }
-  
-    .diff {
-      display: block;
-      text-decoration: none;
-      border: 1px solid transparent;
-      border-radius: 30px;
-      outline: none;
-      background: transparent !important;
-      cursor: pointer;
-      color: #fff;
-      font-size: 18px;
-  
-      padding: 10px;
-  
-      transition: border .2s linear;
-  
-      &:hover {
-        border: 1px solid rgb(255, 255, 255);
-      }
-  
-      &__option {
-        background: rgb(199, 152, 152);
+    &__select-wrap {
+      display: flex;
+      align-items: center;
+      .diff {
+        display: block;
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: 30px;
+        outline: none;
+        background: transparent !important;
+        cursor: pointer;
+        color: #fff;
+        font-size: 18px;
+    
+        padding: 10px;
+    
+        transition: border .2s linear;
+    
+        &:hover {
+          border: 1px solid rgb(255, 255, 255);
+        }
+        &:disabled:hover {
+          position: relative;
+          border: 1px solid transparent !important;
+          
+          &+label::after {
+            content: '*Вы открыли игру со страницы учебника';
+            letter-spacing: 1.4px;
+            font-style: italic;
+            margin-left: 10px;
+            opacity: 0.7;
+          }
+        }
+        &__option {
+          background: rgb(199, 152, 152);
+        }
       }
     }
+    
   }
 
   //Content

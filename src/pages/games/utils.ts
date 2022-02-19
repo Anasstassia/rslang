@@ -5,11 +5,23 @@ export function getRandomNum(min: number, max: number) {
   return Math.round(Math.random() * (max - min) + min);
 }
 
-export async function getWords(group: string | undefined) {
-  const randPage = getRandomNum(0, 29);
+export async function getWords(group: string | undefined, IsGameOpenFromVocabPage: boolean, isFakeWords: boolean) {
+  const vocabGroup = localStorage.getItem('group');
+  if (IsGameOpenFromVocabPage && !isFakeWords) {
+    const page = localStorage.getItem('page');
+    const response = await (
+      await fetch(`https://rs-lang-irina-mokh.herokuapp.com/words?group=${vocabGroup}&page=${page}`)
+    ).json();
+    return response;
+  }
 
+  const randPage = getRandomNum(0, 29);
   const response = await (
-    await fetch(`https://rs-lang-irina-mokh.herokuapp.com/words?group=${group}&page=${randPage}`)
+    await fetch(
+      `https://rs-lang-irina-mokh.herokuapp.com/words?group=${
+        IsGameOpenFromVocabPage ? vocabGroup : group
+      }&page=${randPage}`
+    )
   ).json();
   return response;
 }
@@ -76,7 +88,7 @@ export function toggleHeaderBtns(isSoundOn: boolean) {
   });
 }
 
-export function checkLocalStarage() {
+export function checkSoundLocalStarage() {
   const sound = localStorage.getItem('sound');
   const soundBtn = document.getElementById('gameSound') as HTMLImageElement;
   if (sound === 'false') {
@@ -85,6 +97,16 @@ export function checkLocalStarage() {
     soundBtn.src = '../../../assets/icons/soundOn.svg';
     localStorage.setItem('sound', 'true');
   }
+}
+
+export function checkPlaceOfOpening() {
+  const IsGameOpenFromVocabPage = localStorage.getItem('IsGameOpenFromVocabPage') === 'true';
+  if (IsGameOpenFromVocabPage && Number(localStorage.getItem('group')) < 6) {
+    localStorage.setItem('IsGameOpenFromVocabPage', 'false');
+    document.querySelector('.diff')?.setAttribute('disabled', 'disabled');
+    return true;
+  }
+  return false;
 }
 
 export function generateStatisticsUI(game: 'sprint' | 'audio-call', startWidth: number) {

@@ -1,7 +1,8 @@
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
-  checkLocalStarage,
+  checkPlaceOfOpening,
+  checkSoundLocalStarage,
   createEndBtns,
   createWord,
   generateStatisticsUI,
@@ -41,12 +42,15 @@ export class AudioCall implements content {
 
   isGameOver = false;
 
+  IsGameOpenFromVocabPage = false;
+
   async render() {
     return html;
   }
 
   async run() {
-    checkLocalStarage();
+    this.IsGameOpenFromVocabPage = checkPlaceOfOpening();
+    checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
   }
@@ -259,13 +263,23 @@ export class AudioCall implements content {
   generateWords() {
     const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
 
-    getWords(group).then((el) => {
+    getWords(group, this.IsGameOpenFromVocabPage, false).then((el) => {
       el.forEach((element: iWord) => {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
-        this.fakeWords.push(wordTranslate);
       });
       this.renderContent(document.querySelectorAll('.audio-call__content__answer-btns button'), 2800);
+    });
+
+    getWords(group, this.IsGameOpenFromVocabPage, true).then((el) => {
+      el.forEach((element: iWord) => {
+        this.fakeWords.push(element.wordTranslate);
+      });
+    });
+    getWords(group, this.IsGameOpenFromVocabPage, true).then((el) => {
+      el.forEach((element: iWord) => {
+        this.fakeWords.push(element.wordTranslate);
+      });
     });
   }
 
@@ -285,7 +299,10 @@ export class AudioCall implements content {
       this.correctPos = randPos;
 
       const tempFakeWords = [...this.fakeWords];
-      this.fakeWords.splice(id, 1);
+      const index = this.fakeWords.indexOf(wordTranslate);
+      if (index !== -1) {
+        this.fakeWords.splice(index, 1);
+      }
       buttons.forEach((item) => {
         const fakeId = getRandomNum(0, this.fakeWords.length - 1);
         item.innerHTML = this.fakeWords[fakeId];
