@@ -5,7 +5,8 @@ import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import { sprintStatistics } from '../statistics';
 import {
-  checkLocalStarage,
+  checkPlaceOfOpening,
+  checkSoundLocalStarage,
   createEndBtns,
   createWord,
   generateStatisticsUI,
@@ -45,12 +46,15 @@ export class SprintGame implements content {
 
   currWordsInRow = 0;
 
+  IsGameOpenFromVocabPage = false;
+
   async render() {
     return html;
   }
 
   async run() {
-    checkLocalStarage();
+    this.IsGameOpenFromVocabPage = checkPlaceOfOpening();
+    checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
   }
@@ -281,7 +285,7 @@ export class SprintGame implements content {
   generateWords() {
     const group = document.querySelector<HTMLSelectElement>('.diff')?.value;
 
-    getWords(group).then((el) => {
+    getWords(group, this.IsGameOpenFromVocabPage, false).then((el) => {
       el.forEach((element: iWord) => {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
