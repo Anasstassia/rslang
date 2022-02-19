@@ -56,12 +56,12 @@ export class AudioCall implements content {
       this.startGame();
     });
     const startGame = (ev: KeyboardEvent) => {
-      if (ev.code === 'Enter') {
+      if (ev.code === 'Enter' && this.words.length === 0) {
         this.startGame();
-        document.removeEventListener('keyup', startGame);
-      }
+        document.removeEventListener('keyup', startGame, true);
+      } else document.removeEventListener('keyup', startGame, true);
     };
-    document.addEventListener('keyup', startGame);
+    document.addEventListener('keyup', startGame, true);
   }
 
   startGame() {
@@ -82,36 +82,37 @@ export class AudioCall implements content {
 
     const checkKey = (ev: KeyboardEvent) => {
       if (this.isGameOver) {
-        document.removeEventListener('keyup', checkKey);
-      } else {
-        switch (ev.code) {
-          case 'Digit1':
-            if (!btnsWrap.children[0].classList.contains('disabled')) {
-              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[0]);
-            }
-            break;
-          case 'Digit2':
-            if (!btnsWrap.children[1].classList.contains('disabled')) {
-              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[1]);
-            }
-            break;
-          case 'Digit3':
-            if (!btnsWrap.children[2].classList.contains('disabled')) {
-              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[2]);
-            }
-            break;
-          case 'Digit4':
-            if (!btnsWrap.children[3].classList.contains('disabled')) {
-              this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[3]);
-            }
-            break;
-          default:
-            break;
-        }
+        document.removeEventListener('keyup', checkKey, true);
+        return;
+      }
+
+      switch (ev.code) {
+        case 'Digit1':
+          if (!btnsWrap.children[0].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[0]);
+          }
+          break;
+        case 'Digit2':
+          if (!btnsWrap.children[1].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[1]);
+          }
+          break;
+        case 'Digit3':
+          if (!btnsWrap.children[2].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[2]);
+          }
+          break;
+        case 'Digit4':
+          if (!btnsWrap.children[3].classList.contains('disabled')) {
+            this.checkAnswer(heartWrap, btnsWrap, btnsWrap.children[3]);
+          }
+          break;
+        default:
+          break;
       }
     };
 
-    document.addEventListener('keyup', checkKey);
+    document.addEventListener('keyup', checkKey, true);
 
     audioIcon.addEventListener('click', () => {
       if (this.lives > 0) {
