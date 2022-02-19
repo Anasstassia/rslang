@@ -263,9 +263,19 @@ export class AudioCall implements content {
       el.forEach((element: iWord) => {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
-        this.fakeWords.push(wordTranslate);
       });
       this.renderContent(document.querySelectorAll('.audio-call__content__answer-btns button'), 2800);
+    });
+
+    getWords(group).then((el) => {
+      el.forEach((element: iWord) => {
+        this.fakeWords.push(element.wordTranslate);
+      });
+    });
+    getWords(group).then((el) => {
+      el.forEach((element: iWord) => {
+        this.fakeWords.push(element.wordTranslate);
+      });
     });
   }
 
@@ -285,7 +295,10 @@ export class AudioCall implements content {
       this.correctPos = randPos;
 
       const tempFakeWords = [...this.fakeWords];
-      this.fakeWords.splice(id, 1);
+      const index = this.fakeWords.indexOf(wordTranslate);
+      if (index !== -1) {
+        this.fakeWords.splice(index, 1);
+      }
       buttons.forEach((item) => {
         const fakeId = getRandomNum(0, this.fakeWords.length - 1);
         item.innerHTML = this.fakeWords[fakeId];
