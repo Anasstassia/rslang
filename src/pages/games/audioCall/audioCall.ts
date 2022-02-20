@@ -15,7 +15,7 @@ import '../game.scss';
 import './audioCall.scss';
 import { GameWord } from '../sprint/sprint';
 import { updateAudioCallGameStatistics } from '../../../core/client/stat';
-import { state } from '../../../core/client/users';
+import { countAnswersForUserWord, state } from '../../../core/client/users';
 
 export class AudioCall implements content {
   words: Array<GameWord> = [];
@@ -147,6 +147,7 @@ export class AudioCall implements content {
         if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
         }
+        countAnswersForUserWord(this.words[this.currId].id, true);
       } else {
         if (heartWrap) {
           const heart = heartWrap.children.item(this.lives - 1);
@@ -175,6 +176,8 @@ export class AudioCall implements content {
         if (localStorage.getItem('sound') === 'true') {
           wrongSound.play();
         }
+
+        countAnswersForUserWord(this.words[this.currId].id, false);
       }
     }
   }
@@ -182,6 +185,12 @@ export class AudioCall implements content {
   gameOver() {
     if (!state.audioStatistics) return;
     state.audioStatistics.gamesPlayed += 1;
+
+    document.dispatchEvent(
+      new KeyboardEvent('keyup', {
+        key: 'Shift',
+      })
+    );
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('audio-call', 750);
     setTimeout(() => {
