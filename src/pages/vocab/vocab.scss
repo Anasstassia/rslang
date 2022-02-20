@@ -42,19 +42,26 @@
 
 .content {
   position: relative;
-  overflow: hidden;
 }
 .vocab {
-  
   &__header {
     display: flex;
     justify-content: flex-start;
+    @media (max-width: vars.$smallScreen) {
+      flex-wrap: wrap;
+      height: 4em;
+      align-content: space-between;
+    }
   }
 
   &__difficult {
     font-size: 1.1em;
     padding: 3px 10px;
     margin-right: 2em;
+    @media (max-width: vars.$mediumScreen) {
+      font-size: 1em;
+      margin-right: 0.5em;
+    }
   }
 
   &_learnt {
@@ -133,6 +140,10 @@
       width: 30px;
       height: 100%;
     }
+    @media (max-width: vars.$mediumScreen) {
+      font-size: 1.4em;
+      margin-top: 10px;
+    }
   }
 
   &__menu.menu{
@@ -172,6 +183,10 @@
     color: #979696;
     border-color: #979696;
   }
+  @media (max-width: vars.$mediumScreen) {
+    max-width: 200px;
+    margin-right: 0.5em;
+  }
 }
 
 .btn_arrow {
@@ -184,6 +199,9 @@
   flex-grow: 1;
   align-items: center;
   justify-content: flex-start;
+  @media (max-width: vars.$mediumScreen) {
+    justify-content: center;
+  }
   &.hide{
     display: none;
   }

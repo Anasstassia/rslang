@@ -25,6 +25,7 @@
   grid-template-rows: auto 1fr auto;
   font-family: 'PT Sans', sans-serif, Tahoma;
   background-color: vars.$snow;
+  overflow-x: hidden;
 }
 
 .visually-hidden {
