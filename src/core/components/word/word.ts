@@ -173,8 +173,8 @@ export class Word {
     if (this.isUserWord) {
       const right = card.querySelector('.word__right-ans') as HTMLElement;
       const wrong = card.querySelector('.word__wrong-ans') as HTMLElement;
-      right.innerHTML = String(this.userWord?.optional.rightAnswers);
-      wrong.innerHTML = String(this.userWord?.optional.wrongAnswers);
+      right.innerHTML = String(this.userWord?.optional.rightAnswers || 0);
+      wrong.innerHTML = String(this.userWord?.optional.wrongAnswers || 0);
     }
 
     return this.card;
