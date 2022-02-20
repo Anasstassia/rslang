@@ -24,7 +24,7 @@ export class AudioCall implements content {
 
   wordSound = new Audio();
 
-  ids: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  ids: Array<number> = [];
 
   currId = 0;
 
@@ -205,8 +205,8 @@ export class AudioCall implements content {
       });
     }, 3000);
 
-    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
-    correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
+    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / this.words.length) * 100).toFixed(0)}%</b>`;
+    correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / ${this.words.length}</b>`;
 
     this.wrongWords.forEach((el) => {
       wrongWords.appendChild(createWord(el));
@@ -274,17 +274,19 @@ export class AudioCall implements content {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
       });
-      this.renderContent(document.querySelectorAll('.audio-call__content__answer-btns button'), 2800);
-    });
-
-    getWords(group, this.IsGameOpenFromVocabPage, true).then((el) => {
-      el.forEach((element: iWord) => {
-        this.fakeWords.push(element.wordTranslate);
-      });
-    });
-    getWords(group, this.IsGameOpenFromVocabPage, true).then((el) => {
-      el.forEach((element: iWord) => {
-        this.fakeWords.push(element.wordTranslate);
+      for (let i = 0; i < this.words.length; i += 1) {
+        this.ids.push(i);
+      }
+      getWords(group, this.IsGameOpenFromVocabPage, true).then((fakeEl1) => {
+        fakeEl1.forEach((element: iWord) => {
+          this.fakeWords.push(element.wordTranslate);
+        });
+        getWords(group, this.IsGameOpenFromVocabPage, true).then((fakeEl2) => {
+          fakeEl2.forEach((element: iWord) => {
+            this.fakeWords.push(element.wordTranslate);
+          });
+          this.renderContent(document.querySelectorAll('.audio-call__content__answer-btns button'), 2800);
+        });
       });
     });
   }
@@ -364,7 +366,7 @@ export class AudioCall implements content {
     this.words = [];
     this.fakeWords = [];
     this.correctWords = [];
-    this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    this.ids = [];
     this.wrongWords = [];
     this.lives = 5;
     this.currId = 0;
