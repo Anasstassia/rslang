@@ -14,8 +14,8 @@ import html from './audioCall.html';
 import '../game.scss';
 import './audioCall.scss';
 import { GameWord } from '../sprint/sprint';
-import { audioCallStatistics } from '../statistics';
 import { updateAudioCallGameStatistics } from '../../../core/client/stat';
+import { state } from '../../../core/client/users';
 
 export class AudioCall implements content {
   words: Array<GameWord> = [];
@@ -35,6 +35,8 @@ export class AudioCall implements content {
   correctWords: Array<GameWord> = [];
 
   wrongWords: Array<GameWord> = [];
+
+  currWordsInRow = 0;
 
   isHeartsOn = false;
 
@@ -140,6 +142,7 @@ export class AudioCall implements content {
       });
       if (currBtn.innerHTML === this.currCorrectWord) {
         this.nextWord(btnsWrap);
+        this.changeStat();
         this.correctWords.push(this.words[this.currId]);
         if (localStorage.getItem('sound') === 'true') {
           correctSound.play();
@@ -177,9 +180,8 @@ export class AudioCall implements content {
   }
 
   gameOver() {
-    audioCallStatistics.gamesPlayed += 1;
-    audioCallStatistics.currentDay = new Date();
-    localStorage.setItem('audioCallStatistics', JSON.stringify(audioCallStatistics));
+    if (!state.audioStatistics) return;
+    state.audioStatistics.gamesPlayed += 1;
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('audio-call', 750);
     setTimeout(() => {
@@ -203,13 +205,8 @@ export class AudioCall implements content {
     this.correctWords.forEach((el) => {
       correctWords.appendChild(createWord(el));
     });
-
-    updateAudioCallGameStatistics({
-      gamesPlayed: audioCallStatistics.gamesPlayed,
-      totalCorrectWords: audioCallStatistics.totalCorrectWords,
-      mostWordsInRow: audioCallStatistics.mostWordsInRow,
-      newWords: 0,
-    });
+    // state.audioStatistics.totalCorrectWords = this.correctWords.length;
+    updateAudioCallGameStatistics(state.audioStatistics);
   }
 
   generateHeartsUI() {
@@ -336,6 +333,16 @@ export class AudioCall implements content {
         item.classList.remove('wrong', 'correct', 'disabled');
       });
     }, 2000);
+  }
+
+  changeStat() {
+    if (!state.audioStatistics) return;
+    state.audioStatistics.totalCorrectWords += 1;
+    this.currWordsInRow += 1;
+    state.audioStatistics.mostWordsInRow =
+      this.currWordsInRow > state.audioStatistics.mostWordsInRow
+        ? this.currWordsInRow
+        : state.audioStatistics.mostWordsInRow;
   }
 
   restart() {

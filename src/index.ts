@@ -15,7 +15,7 @@ import { Menu } from './core/components/menu';
 import { Utils } from './core/utils/utils';
 // import Types
 import { content } from './core/components/types';
-import { getCurrentUser, loginUser, state } from './core/client/users';
+import { getCurrentUser, state } from './core/client/users';
 
 export const header = new Header();
 export const footer = new Footer();
@@ -38,7 +38,7 @@ const routes: Record<string, content> = {
 
 export const router = async () => {
   // врменный способ создания статистики - удалить позже
-  await loginUser({ email: 'test-user@google.com', password: '12345678' });
+  // await loginUser({ email: 'test-user@google.com', password: '12345678' });
 
   const headerElem = document.querySelector('.header') as HTMLElement;
   const mainElem = document.querySelector('.content') as HTMLElement;
@@ -56,7 +56,7 @@ export const router = async () => {
   await getCurrentUser();
   if (state.currentUser?.id) {
     stats.id = state.currentUser?.id;
-    await stats.update();
+    // await stats.update();
   }
   const request = Utils.parseRequestURL();
   const parsedURL =
@@ -78,8 +78,6 @@ export const router = async () => {
    */
 };
 export async function renderAuthElements() {
-  // console.log(state);
-
   const authOnlyElems = document.querySelectorAll('.auth') as NodeListOf<HTMLElement>;
   authOnlyElems.forEach((elem: HTMLElement) => {
     elem.style.display = '';

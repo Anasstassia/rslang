@@ -1,9 +1,6 @@
-// import { isToday } from 'date-fns';
-// import { client } from '../../../core/client';
-import { countAnswersForUserWord } from '../../../core/client/users';
+import { countAnswersForUserWord, state } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
-import { sprintStatistics } from '../statistics';
 import {
   checkPlaceOfOpening,
   checkSoundLocalStarage,
@@ -26,7 +23,6 @@ export type GameWord = {
   audio: string;
   id: string;
 };
-
 export class SprintGame implements content {
   timeLeft = 60;
 
@@ -229,12 +225,10 @@ export class SprintGame implements content {
   }
 
   gameOver() {
-    if (this.isGameOver) {
+    if (this.isGameOver || !state.sprintStatistics) {
       return;
     }
-    sprintStatistics.gamesPlayed += 1;
-    sprintStatistics.currentDay = new Date();
-    localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+    state.sprintStatistics.gamesPlayed += 1;
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('sprint', 600);
     setTimeout(() => {
@@ -259,12 +253,7 @@ export class SprintGame implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    updateSprintGameStatistics({
-      gamesPlayed: sprintStatistics.gamesPlayed,
-      totalCorrectWords: sprintStatistics.totalCorrectWords,
-      mostWordsInRow: sprintStatistics.mostWordsInRow,
-      newWords: 0,
-    });
+    updateSprintGameStatistics(state.sprintStatistics);
   }
 
   restart() {
@@ -390,11 +379,12 @@ export class SprintGame implements content {
   }
 
   changeStat() {
-    sprintStatistics.totalCorrectWords += 1;
+    if (!state.sprintStatistics) return;
+    state.sprintStatistics.totalCorrectWords += 1;
     this.currWordsInRow += 1;
-    sprintStatistics.mostWordsInRow =
-      this.currWordsInRow > sprintStatistics.mostWordsInRow ? this.currWordsInRow : sprintStatistics.mostWordsInRow;
-
-    localStorage.setItem('sprintStatistics', JSON.stringify(sprintStatistics));
+    state.sprintStatistics.mostWordsInRow =
+      this.currWordsInRow > state.sprintStatistics.mostWordsInRow
+        ? this.currWordsInRow
+        : state.sprintStatistics.mostWordsInRow;
   }
 }
