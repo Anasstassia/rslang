@@ -32,11 +32,13 @@ export class SprintGame implements content {
 
   words: Array<GameWord> = [];
 
+  fakeWords: Array<string> = [];
+
   wrongWords: Array<GameWord> = [];
 
   correctWords: Array<GameWord> = [];
 
-  ids: Array<number> = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+  ids: Array<number> = [];
 
   currId = 0;
 
@@ -159,8 +161,6 @@ export class SprintGame implements content {
     };
     document.addEventListener('keyup', checkBtn, true);
 
-    this.generateWords();
-
     this.startTimer(time, line);
   }
 
@@ -185,14 +185,11 @@ export class SprintGame implements content {
           time.style.color = '#bd0404';
           line.style.backgroundColor = '#bd0404';
         }
-
-        if (this.timeLeft === 0 || this.isGameOver) {
-          this.gameOver();
+        if (this.isGameOver) {
           clearInterval(interval);
-
-          this.timeLeft = 60;
-          time.style.color = '';
-          line.style.backgroundColor = '';
+        }
+        if (this.timeLeft === 0) {
+          this.gameOver();
         }
       }, 1000);
     }, 3000);
@@ -205,7 +202,14 @@ export class SprintGame implements content {
       if (wordWrap !== null && translatedWordWrap !== null) {
         wordWrap.innerHTML = this.words[id].word;
 
-        translatedWordWrap.innerHTML = this.words[this.isCorrectTranslate() ? id : getRandomNum(0, 19)].wordTranslate;
+        if (this.isCorrectTranslate()) {
+          translatedWordWrap.innerHTML = this.words[id].wordTranslate;
+        } else {
+          const tempFaleWords = [...this.fakeWords];
+          this.fakeWords.splice(id, 1);
+          translatedWordWrap.innerHTML = this.fakeWords[getRandomNum(0, this.fakeWords.length - 1)];
+          this.fakeWords = tempFaleWords;
+        }
       }
     } else {
       this.gameOver();
@@ -246,8 +250,8 @@ export class SprintGame implements content {
       });
     }, 3000);
 
-    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / 20) * 100).toFixed(0)}%</b>`;
-    correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / 20</b>`;
+    progress.innerHTML = `Успешность: <b> ${((this.correctWords.length / this.words.length) * 100).toFixed(0)}%</b>`;
+    correctNums.innerHTML = `Правильных ответов: <b>${this.correctWords.length} / ${this.words.length}</b>`;
 
     this.wrongWords.forEach((el) => {
       wrongWords.appendChild(createWord(el));
@@ -267,9 +271,10 @@ export class SprintGame implements content {
 
     this.isGameOver = false;
     this.words = [];
+    this.fakeWords = [];
     this.correctWords = [];
     this.wrongWords = [];
-    this.ids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    this.ids = [];
 
     this.startGame();
   }
@@ -282,10 +287,19 @@ export class SprintGame implements content {
         const { word, transcription, wordTranslate, audio, id } = element;
         this.words.push({ word, transcription, wordTranslate, audio, id });
       });
-      this.renderContent(
-        document.querySelector<HTMLElement>('.sprint__content__word'),
-        document.querySelector<HTMLElement>('.sprint__content__translate')
-      );
+      for (let i = 0; i < this.words.length; i += 1) {
+        this.ids.push(i);
+      }
+
+      getWords(group, this.IsGameOpenFromVocabPage, true).then((fakeEl) => {
+        fakeEl.forEach((element: iWord) => {
+          this.fakeWords.push(element.wordTranslate);
+        });
+        this.renderContent(
+          document.querySelector<HTMLElement>('.sprint__content__word'),
+          document.querySelector<HTMLElement>('.sprint__content__translate')
+        );
+      });
     });
   }
 
@@ -334,6 +348,8 @@ export class SprintGame implements content {
     btnsWrap.append(wrongBtn, marksWrap, correctBtn);
 
     const wrap = document.querySelector('.sprint__content') as HTMLElement;
+
+    this.generateWords();
 
     changeContent(wrap, 3000, 600, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
     appearanceContent(word, 3200);
