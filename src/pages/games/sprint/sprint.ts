@@ -190,7 +190,6 @@ export class SprintGame implements content {
           this.gameOver();
           clearInterval(interval);
 
-          this.isGameOver = true;
           this.timeLeft = 60;
           time.style.color = '';
           line.style.backgroundColor = '';
@@ -210,7 +209,6 @@ export class SprintGame implements content {
       }
     } else {
       this.gameOver();
-      this.isGameOver = true;
     }
   }
 
@@ -225,10 +223,15 @@ export class SprintGame implements content {
   }
 
   gameOver() {
-    if (this.isGameOver || !state.sprintStatistics) {
-      return;
-    }
+    if (this.isGameOver || !state.sprintStatistics) return;
     state.sprintStatistics.gamesPlayed += 1;
+
+    this.isGameOver = true;
+    document.dispatchEvent(
+      new KeyboardEvent('keyup', {
+        key: 'Shift',
+      })
+    );
 
     const { progress, correctNums, wrongWords, correctWords } = generateStatisticsUI('sprint', 600);
     setTimeout(() => {
