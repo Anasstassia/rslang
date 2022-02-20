@@ -194,14 +194,12 @@ export const countAnswersForUserWord = async (wordId: string, isTrue: boolean) =
     }
     const series = config.userWord.optional.seriesOfRight.slice(-numberOfCorrectAnswersToGetLearnt);
     if (series === '111') {
-      console.log('make word learnt');
       config.userWord.optional.done = true;
     } else {
       config.userWord.optional.done = false;
     }
   }
   if (await isUserWord(wordId)) {
-    console.log('is user word');
     const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${wordId}`);
     config.userWord = response.data[0].userWord;
     await changeConfig();
