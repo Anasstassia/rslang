@@ -113,6 +113,7 @@ export const logOut = () => {
   if (userEmail) {
     userEmail.innerHTML = '';
   }
+  document.location.reload();
   renderAuthElements();
 };
 
