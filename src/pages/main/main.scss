@@ -12,8 +12,10 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    background-image: url('../../assets/bg.jpg');
-    background-size: cover;
+    background-image: url('../../assets/bg.png');
+    background-size: contain;
+    background-position: 0 0;
+    background-repeat: no-repeat;
   }
 
   &__description {
@@ -21,13 +23,13 @@
     width: 70%;
     background: linear-gradient(90deg, transparent 0%, #ffffff7c 2em, #ffffffce 50%, vars.$snow 100%);
     @media (max-width: vars.$mediumScreen) {
-      width: 80%;
+      // width: 80%;
     }
     @media (max-width: vars.$smallScreen) {
-      margin-top: 5em;
+      margin-top: 8em;
       width: 100%;
       padding: 0 1em;
-      background: linear-gradient(180deg, transparent 0%, #ffffff7c 2em, #ffffffce 50%, vars.$snow 100%);    }
+      background: linear-gradient(180deg, transparent 0%, #ffffff7c 1em, #ffffffce 20%, vars.$snow 100%);    }
   }
 
   &__text {
