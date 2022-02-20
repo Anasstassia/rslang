@@ -152,11 +152,12 @@ export const countAnswersForUserWord = async (wordId: string, isTrue: boolean) =
       config.userWord.optional.wrongAnswers += 1;
       config.userWord.optional.seriesOfRight += '0';
     }
-
     const series = config.userWord.optional.seriesOfRight.slice(-numberOfCorrectAnswersToGetLearnt);
     if (series === '111') {
       console.log('make word learnt');
       config.userWord.optional.done = true;
+    } else {
+      config.userWord.optional.done = false;
     }
   }
   if (await isUserWord(wordId)) {
