@@ -78,8 +78,6 @@ export const router = async () => {
    */
 };
 export async function renderAuthElements() {
-  // console.log(state);
-
   const authOnlyElems = document.querySelectorAll('.auth') as NodeListOf<HTMLElement>;
   authOnlyElems.forEach((elem: HTMLElement) => {
     elem.style.display = '';

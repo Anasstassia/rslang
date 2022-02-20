@@ -6,7 +6,7 @@ import { client } from '../../core/client';
 import { state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
 import { stats } from '../../index';
-// import { Utils } from '../../core/utils/utils';
+import { updateLearnedPagesStatistics } from '../../core/client/stat';
 
 const PAGES = 30;
 
@@ -239,7 +239,7 @@ export class Vocab implements content {
 
   makePageLearnt = async () => {
     stats.learnedPages[this.group].push(this.page);
-    // await stats.update();
+    updateLearnedPagesStatistics(state.learnedPagesStatistics);
     this.vocab.classList.add('vocab_learnt', 'slideIn');
     const currentPage = document.querySelector(`.page__option[value="${this.page}"]`) as HTMLElement;
     currentPage.innerHTML = `${this.page + 1} &#10003;`;
@@ -264,7 +264,7 @@ export class Vocab implements content {
     currentPage.innerHTML = `${this.page + 1}`;
     const newPages = stats.learnedPages[this.group].filter((i) => i !== this.page);
     stats.learnedPages[this.group] = newPages;
-    // await stats.update();
+    updateLearnedPagesStatistics(state.learnedPagesStatistics);
   };
 
   markLearnedPages = async () => {

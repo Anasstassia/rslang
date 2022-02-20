@@ -1,4 +1,3 @@
-// import { isToday } from 'date-fns';
 import { client } from '.';
 import { renderAuthElements, stats } from '../..';
 import { iUserWordCreator } from '../components/types';
@@ -10,6 +9,7 @@ type State = {
   currentUser: { email: string; id: string } | null;
   sprintStatistics: StatResponse['optional']['sprintGame'];
   audioStatistics: StatResponse['optional']['audioGame'];
+  learnedPagesStatistics: StatResponse['optional']['learnedPages'];
 };
 
 type UserRequest = {
@@ -129,7 +129,7 @@ export const getCurrentUser = async () => {
       stat = await getStat();
       console.log(stat);
     } catch (e) {
-      const r = await client.put(`/users/${state.currentUser?.id}/statistics`, {
+      const res = await client.put(`/users/${state.currentUser?.id}/statistics`, {
         learnedWords: 0,
         optional: {
           date: new Date(),
@@ -156,9 +156,11 @@ export const getCurrentUser = async () => {
           },
         },
       });
-      stat = r.data;
+      stat = res.data;
     }
     state.sprintStatistics = stat.optional.sprintGame;
+    state.audioStatistics = stat.optional.audioGame;
+    state.learnedPagesStatistics = stat.optional.learnedPages;
 
     renderAuthElements();
     return response.data;
