@@ -81,13 +81,6 @@ export class Vocab implements content {
   }
 
   async run() {
-    // для удаления userwords И очистки изученных в статистике
-    /*
-    if (state.currentUser) {
-      await Utils.resetData();
-    }
-    */
-
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
     this.vocabList = document.querySelector('.vocab__page') as HTMLElement;
@@ -264,12 +257,13 @@ export class Vocab implements content {
     currentPage.innerHTML = `${this.page + 1}`;
     const newPages = stats.learnedPages[this.group].filter((i) => i !== this.page);
     stats.learnedPages[this.group] = newPages;
-    updateLearnedPagesStatistics(state.learnedPagesStatistics);
+    if (state.currentUser) {
+      updateLearnedPagesStatistics(state.learnedPagesStatistics);
+    }
   };
 
   markLearnedPages = async () => {
     const pages = document.querySelectorAll('.page__option') as NodeListOf<HTMLInputElement>;
-    // await stats.update();
     const learnedPages = stats.learnedPages[this.group];
     pages.forEach((item) => {
       if (learnedPages.includes(Number(item.value))) {

@@ -4,6 +4,7 @@ import { iUserWordCreator } from '../components/types';
 import { getStat } from './stat';
 
 export const state = {} as State;
+const numberOfCorrectAnswersToGetLearnt = 3;
 
 type State = {
   currentUser: { email: string; id: string } | null;
@@ -112,6 +113,7 @@ export const logOut = () => {
   if (userEmail) {
     userEmail.innerHTML = '';
   }
+  document.location.reload();
   renderAuthElements();
 };
 
@@ -179,24 +181,33 @@ export const countAnswersForUserWord = async (wordId: string, isTrue: boolean) =
         date: new Date(),
         rightAnswers: 0,
         wrongAnswers: 0,
+        seriesOfRight: '0',
       },
     },
   };
-  async function changeCount() {
+  async function changeConfig() {
     if (isTrue) {
       config.userWord.optional.rightAnswers += 1;
+      config.userWord.optional.seriesOfRight += '1';
     } else {
       config.userWord.optional.wrongAnswers += 1;
+      config.userWord.optional.seriesOfRight += '0';
+    }
+    const series = config.userWord.optional.seriesOfRight.slice(-numberOfCorrectAnswersToGetLearnt);
+    if (series === '111') {
+      config.userWord.optional.done = true;
+    } else {
+      config.userWord.optional.done = false;
     }
   }
   if (await isUserWord(wordId)) {
     const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${wordId}`);
     config.userWord = response.data[0].userWord;
-    await changeCount();
-    changeUserWord(config);
+    await changeConfig();
+    await changeUserWord(config);
   } else {
-    await changeCount();
-    createUserWord(config);
+    await changeConfig();
+    await createUserWord(config);
   }
 };
 
