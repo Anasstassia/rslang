@@ -200,14 +200,16 @@ export const countAnswersForUserWord = async (wordId: string, isTrue: boolean) =
       config.userWord.optional.done = false;
     }
   }
-  if (await isUserWord(wordId)) {
-    const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${wordId}`);
-    config.userWord = response.data[0].userWord;
-    await changeConfig();
-    await changeUserWord(config);
-  } else {
-    await changeConfig();
-    await createUserWord(config);
+  if (state.currentUser) {
+    if (await isUserWord(wordId)) {
+      const response = await client.get(`/users/${state.currentUser?.id}/aggregatedWords/${wordId}`);
+      config.userWord = response.data[0].userWord;
+      await changeConfig();
+      await changeUserWord(config);
+    } else {
+      await changeConfig();
+      await createUserWord(config);
+    }
   }
 };
 
