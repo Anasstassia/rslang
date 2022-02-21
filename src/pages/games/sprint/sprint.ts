@@ -55,6 +55,7 @@ export class SprintGame implements content {
     checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
+    this.resetData();
   }
 
   addListeners() {
@@ -71,6 +72,8 @@ export class SprintGame implements content {
   }
 
   startGame() {
+    this.resetData();
+
     const { time, line } = this.generateTimerUI();
     const { word, translatedWord, wrongBtn, correctBtn, correctMark, wrongMark } = this.generateContentUI();
 
@@ -227,8 +230,8 @@ export class SprintGame implements content {
   }
 
   gameOver() {
-    if (this.isGameOver || !state.sprintStatistics) return;
-    state.sprintStatistics.gamesPlayed += 1;
+    if (this.isGameOver) return;
+    if (state.sprintStatistics && state.currentUser) state.sprintStatistics.gamesPlayed += 1;
 
     this.isGameOver = true;
     document.dispatchEvent(
@@ -260,13 +263,15 @@ export class SprintGame implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    const allWordsId = this.words.map((el) => el.id);
-    checkScore(allWordsId).then((score) => {
-      if (state?.sprintStatistics) {
-        state.sprintStatistics.newWords += score;
-        updateSprintGameStatistics(state.sprintStatistics);
-      }
-    });
+    if (state.currentUser) {
+      const allWordsId = this.words.map((el) => el.id);
+      checkScore(allWordsId).then((score) => {
+        if (state?.sprintStatistics) {
+          state.sprintStatistics.newWords += score;
+          updateSprintGameStatistics(state.sprintStatistics);
+        }
+      });
+    }
   }
 
   restart() {
@@ -274,13 +279,6 @@ export class SprintGame implements content {
     wrap.style.overflow = 'clip';
     wrap.innerHTML = '';
     changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
-
-    this.isGameOver = false;
-    this.words = [];
-    this.fakeWords = [];
-    this.correctWords = [];
-    this.wrongWords = [];
-    this.ids = [];
 
     this.startGame();
   }
@@ -411,5 +409,16 @@ export class SprintGame implements content {
       this.currWordsInRow > state.sprintStatistics.mostWordsInRow
         ? this.currWordsInRow
         : state.sprintStatistics.mostWordsInRow;
+  }
+
+  resetData() {
+    this.isGameOver = false;
+    this.words = [];
+    this.fakeWords = [];
+    this.correctWords = [];
+    this.wrongWords = [];
+    this.ids = [];
+    this.currId = 0;
+    this.timeLeft = 60;
   }
 }

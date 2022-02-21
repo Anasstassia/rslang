@@ -55,6 +55,7 @@ export class AudioCall implements content {
     checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
+    this.resetData(true);
   }
 
   addListeners() {
@@ -71,6 +72,7 @@ export class AudioCall implements content {
   }
 
   startGame() {
+    this.resetData(false);
     const heartsCheckbox = document.getElementById('heartsCheckbox') as HTMLInputElement;
     let heartWrap: HTMLDivElement | false;
     if (this.isHeartsOn || heartsCheckbox?.checked) {
@@ -183,8 +185,7 @@ export class AudioCall implements content {
   }
 
   gameOver() {
-    if (!state.audioStatistics) return;
-    state.audioStatistics.gamesPlayed += 1;
+    if (state.audioStatistics && state.currentUser) state.audioStatistics.gamesPlayed += 1;
 
     document.dispatchEvent(
       new KeyboardEvent('keyup', {
@@ -215,13 +216,15 @@ export class AudioCall implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    const allWordsId = this.words.map((el) => el.id);
-    checkScore(allWordsId).then((score) => {
-      if (state?.audioStatistics) {
-        state.audioStatistics.newWords += score;
-        updateAudioCallGameStatistics(state.audioStatistics);
-      }
-    });
+    if (state.currentUser) {
+      const allWordsId = this.words.map((el) => el.id);
+      checkScore(allWordsId).then((score) => {
+        if (state?.audioStatistics) {
+          state.audioStatistics.newWords += score;
+          updateAudioCallGameStatistics(state.audioStatistics);
+        }
+      });
+    }
   }
 
   generateHeartsUI() {
@@ -368,6 +371,10 @@ export class AudioCall implements content {
     wrap.innerHTML = '';
     changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
 
+    this.startGame();
+  }
+
+  resetData(full: boolean) {
     this.isGameOver = false;
     this.words = [];
     this.fakeWords = [];
@@ -378,6 +385,9 @@ export class AudioCall implements content {
     this.currId = 0;
     this.currCorrectWord = '';
     this.correctPos = 0;
-    this.startGame();
+
+    if (full) {
+      this.isHeartsOn = false;
+    }
   }
 }

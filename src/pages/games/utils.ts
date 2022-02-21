@@ -17,7 +17,7 @@ const filterLearnedWords = (allWords: iWord[], learnedWords: iWord[], filteredWo
         isLearned = true;
       }
     });
-    if (!isLearned) {
+    if (!isLearned && filtered.length < 20) {
       filtered.push(element);
     }
   });
