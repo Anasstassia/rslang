@@ -183,8 +183,7 @@ export class AudioCall implements content {
   }
 
   gameOver() {
-    if (!state.audioStatistics) return;
-    state.audioStatistics.gamesPlayed += 1;
+    if (state.audioStatistics && state.currentUser) state.audioStatistics.gamesPlayed += 1;
 
     document.dispatchEvent(
       new KeyboardEvent('keyup', {
@@ -215,13 +214,15 @@ export class AudioCall implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    const allWordsId = this.words.map((el) => el.id);
-    checkScore(allWordsId).then((score) => {
-      if (state?.audioStatistics) {
-        state.audioStatistics.newWords += score;
-        updateAudioCallGameStatistics(state.audioStatistics);
-      }
-    });
+    if (state.currentUser) {
+      const allWordsId = this.words.map((el) => el.id);
+      checkScore(allWordsId).then((score) => {
+        if (state?.audioStatistics) {
+          state.audioStatistics.newWords += score;
+          updateAudioCallGameStatistics(state.audioStatistics);
+        }
+      });
+    }
   }
 
   generateHeartsUI() {

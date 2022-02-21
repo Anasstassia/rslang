@@ -227,8 +227,8 @@ export class SprintGame implements content {
   }
 
   gameOver() {
-    if (this.isGameOver || !state.sprintStatistics) return;
-    state.sprintStatistics.gamesPlayed += 1;
+    if (this.isGameOver) return;
+    if (state.sprintStatistics && state.currentUser) state.sprintStatistics.gamesPlayed += 1;
 
     this.isGameOver = true;
     document.dispatchEvent(
@@ -260,13 +260,15 @@ export class SprintGame implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    const allWordsId = this.words.map((el) => el.id);
-    checkScore(allWordsId).then((score) => {
-      if (state?.sprintStatistics) {
-        state.sprintStatistics.newWords += score;
-        updateSprintGameStatistics(state.sprintStatistics);
-      }
-    });
+    if (state.currentUser) {
+      const allWordsId = this.words.map((el) => el.id);
+      checkScore(allWordsId).then((score) => {
+        if (state?.sprintStatistics) {
+          state.sprintStatistics.newWords += score;
+          updateSprintGameStatistics(state.sprintStatistics);
+        }
+      });
+    }
   }
 
   restart() {
