@@ -191,6 +191,7 @@ export class Vocab implements content {
     } else {
       this.unlearnPage();
     }
+    renderAuthElements();
   };
 
   renderGroup = async () => {
