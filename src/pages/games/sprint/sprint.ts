@@ -55,6 +55,7 @@ export class SprintGame implements content {
     checkSoundLocalStarage();
     toggleHeaderBtns(localStorage.getItem('sound') !== 'false');
     this.addListeners();
+    this.resetData();
   }
 
   addListeners() {
@@ -71,6 +72,8 @@ export class SprintGame implements content {
   }
 
   startGame() {
+    this.resetData();
+
     const { time, line } = this.generateTimerUI();
     const { word, translatedWord, wrongBtn, correctBtn, correctMark, wrongMark } = this.generateContentUI();
 
@@ -277,13 +280,6 @@ export class SprintGame implements content {
     wrap.innerHTML = '';
     changeContent(wrap, 3000, 500, 300, 600, 300, 20, [0.05, 0.5, 0.7, 0.9]);
 
-    this.isGameOver = false;
-    this.words = [];
-    this.fakeWords = [];
-    this.correctWords = [];
-    this.wrongWords = [];
-    this.ids = [];
-
     this.startGame();
   }
 
@@ -413,5 +409,16 @@ export class SprintGame implements content {
       this.currWordsInRow > state.sprintStatistics.mostWordsInRow
         ? this.currWordsInRow
         : state.sprintStatistics.mostWordsInRow;
+  }
+
+  resetData() {
+    this.isGameOver = false;
+    this.words = [];
+    this.fakeWords = [];
+    this.correctWords = [];
+    this.wrongWords = [];
+    this.ids = [];
+    this.currId = 0;
+    this.timeLeft = 60;
   }
 }
