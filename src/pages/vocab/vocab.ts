@@ -32,7 +32,7 @@ export class Vocab implements content {
   constructor() {
     this._page = Number(localStorage.page) || 0;
     this._group = Number(localStorage.group) || 0;
-    this._requestType = localStorage.request;
+    this._requestType = localStorage.request || 'basic';
     this.levels = {
       '0': 'A1 Beginner',
       '1': 'A2 Elementary',
