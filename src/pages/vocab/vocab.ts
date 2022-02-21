@@ -5,7 +5,7 @@ import './vocab.scss';
 import { client } from '../../core/client';
 import { state } from '../../core/client/users';
 import { Word } from '../../core/components/word';
-import { stats } from '../../index';
+import { renderAuthElements, stats } from '../../index';
 import { updateLearnedPagesStatistics } from '../../core/client/stat';
 
 const PAGES = 30;
@@ -81,6 +81,7 @@ export class Vocab implements content {
   }
 
   async run() {
+    renderAuthElements();
     this.levelSelect = document.querySelector('.level') as HTMLSelectElement;
     this.vocab = document.querySelector('.vocab') as HTMLElement;
     this.vocabList = document.querySelector('.vocab__page') as HTMLElement;
