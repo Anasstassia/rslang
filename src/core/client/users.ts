@@ -94,7 +94,7 @@ export const refreshToken = async () => {
   const id = state.currentUser?.id || localStorage.getItem('currentUserId');
   if (!id) return null;
   const { token, refreshToken: rtoken } = await client.get<unknown, { token: string; refreshToken: string }>(
-    `/users/${state.currentUser?.id}/tokens`,
+    `/users/${id}/tokens`,
     {
       headers: {
         Authorization: `Bearer ${oldRefreshToken}`,
@@ -113,7 +113,7 @@ export const logOut = () => {
   if (userEmail) {
     userEmail.innerHTML = '';
   }
-  document.location.reload();
+  window.location.hash = '';
   renderAuthElements();
 };
 
