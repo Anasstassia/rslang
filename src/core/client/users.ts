@@ -1,6 +1,6 @@
 import { client } from '.';
 import { renderAuthElements, stats } from '../..';
-import { iUserWordCreator } from '../components/types';
+import { iUserWordCreator, iUserWordResponse } from '../components/types';
 import { getStat } from './stat';
 
 export const state = {} as State;
@@ -129,7 +129,6 @@ export const getCurrentUser = async () => {
     let stat;
     try {
       stat = await getStat();
-      console.log(stat);
     } catch (e) {
       const res = await client.put(`/users/${state.currentUser?.id}/statistics`, {
         learnedWords: 0,
@@ -224,4 +223,14 @@ const isUserWord = async (id: string) => {
     console.log(err);
   }
   return result;
+};
+
+export const checkScore = async (wordsList: string[]) => {
+  const requests = wordsList.map((el) =>
+    client.get<unknown, { data: iUserWordResponse }>(`/users/${state.currentUser?.id}/words/${el}`)
+  );
+  const results = await Promise.all(requests);
+  return results
+    .map((result) => result.data.optional.rightAnswers + result.data.optional.wrongAnswers)
+    .filter((el) => el === 1).length;
 };

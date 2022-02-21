@@ -1,4 +1,4 @@
-import { countAnswersForUserWord, state } from '../../../core/client/users';
+import { checkScore, countAnswersForUserWord, state } from '../../../core/client/users';
 import { content, iWord } from '../../../core/components/types';
 import { appearanceContent, changeContent, hide, show } from '../animation';
 import {
@@ -260,7 +260,13 @@ export class SprintGame implements content {
       correctWords.appendChild(createWord(el));
     });
 
-    updateSprintGameStatistics(state.sprintStatistics);
+    const allWordsId = this.words.map((el) => el.id);
+    checkScore(allWordsId).then((score) => {
+      if (state?.sprintStatistics) {
+        state.sprintStatistics.newWords += score;
+        updateSprintGameStatistics(state.sprintStatistics);
+      }
+    });
   }
 
   restart() {

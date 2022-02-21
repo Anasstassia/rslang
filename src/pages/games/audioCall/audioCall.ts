@@ -15,7 +15,7 @@ import '../game.scss';
 import './audioCall.scss';
 import { GameWord } from '../sprint/sprint';
 import { updateAudioCallGameStatistics } from '../../../core/client/stat';
-import { countAnswersForUserWord, state } from '../../../core/client/users';
+import { checkScore, countAnswersForUserWord, state } from '../../../core/client/users';
 
 export class AudioCall implements content {
   words: Array<GameWord> = [];
@@ -214,8 +214,14 @@ export class AudioCall implements content {
     this.correctWords.forEach((el) => {
       correctWords.appendChild(createWord(el));
     });
-    // state.audioStatistics.totalCorrectWords = this.correctWords.length;
-    updateAudioCallGameStatistics(state.audioStatistics);
+
+    const allWordsId = this.words.map((el) => el.id);
+    checkScore(allWordsId).then((score) => {
+      if (state?.audioStatistics) {
+        state.audioStatistics.newWords += score;
+        updateAudioCallGameStatistics(state.audioStatistics);
+      }
+    });
   }
 
   generateHeartsUI() {
