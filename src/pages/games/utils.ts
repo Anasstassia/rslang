@@ -1,3 +1,6 @@
+import { client } from '../../core/client';
+import { state } from '../../core/client/users';
+import { iWord } from '../../core/components/types';
 import { changeContent, appearanceContent, hide } from './animation';
 import { GameWord } from './sprint/sprint';
 
@@ -5,14 +8,41 @@ export function getRandomNum(min: number, max: number) {
   return Math.round(Math.random() * (max - min) + min);
 }
 
+const filterLearnedWords = (allWords: iWord[], learnedWords: iWord[], filteredWords: iWord[] = []) => {
+  const filtered: iWord[] = filteredWords;
+  allWords.forEach((element: iWord) => {
+    let isLearned = false;
+    learnedWords.forEach((item: iWord) => {
+      if (element.id === item._id) {
+        isLearned = true;
+      }
+    });
+    if (!isLearned) {
+      filtered.push(element);
+    }
+  });
+  return filtered;
+};
+
 export async function getWords(group: string | undefined, IsGameOpenFromVocabPage: boolean, isFakeWords: boolean) {
   const vocabGroup = localStorage.getItem('group');
-  if (IsGameOpenFromVocabPage && !isFakeWords) {
+  if (IsGameOpenFromVocabPage && !isFakeWords && state.currentUser?.id) {
     const page = localStorage.getItem('page');
-    const response = await (
-      await fetch(`https://rs-lang-irina-mokh.herokuapp.com/words?group=${vocabGroup}&page=${page}`)
-    ).json();
-    return response;
+    const words = await client.get(`/words?group=${vocabGroup}&page=${page}`);
+    const learnedWords = await client.get(
+      `/users/${state.currentUser.id}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${page}},{"group":${vocabGroup}}, {"userWord.optional.done":true}]}`
+    );
+    let filtered = filterLearnedWords(words.data, learnedWords.data[0].paginatedResults);
+    if (filtered.length < 20) {
+      const prevPage = Number(page) === 0 ? 29 : Number(page) - 1;
+      const prevPageWords = await client.get(`/words?group=${vocabGroup}&page=${prevPage}`);
+
+      const prevPageLearnedWords = await client.get(
+        `/users/${state.currentUser.id}/aggregatedWords?wordsPerPage=20&filter={"$and": [{"page":${prevPage}},{"group":${vocabGroup}}, {"userWord.optional.done":true}]}`
+      );
+      filtered = filterLearnedWords(prevPageWords.data, prevPageLearnedWords.data[0].paginatedResults, filtered);
+    }
+    return filtered;
   }
 
   const randPage = getRandomNum(0, 29);
