@@ -30,8 +30,8 @@ export class Vocab implements content {
   pagesEl: HTMLSelectElement;
 
   constructor() {
-    this._page = Number(localStorage.page);
-    this._group = Number(localStorage.group);
+    this._page = Number(localStorage.page) || 0;
+    this._group = Number(localStorage.group) || 0;
     this._requestType = localStorage.request;
     this.levels = {
       '0': 'A1 Beginner',
