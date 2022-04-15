@@ -1,0 +1,201 @@
+@use '../../scss/vars.scss';
+
+.start {
+  color: vars.$jet;
+  width: 100%;
+}
+
+.about {
+  margin-top: 1em;
+
+  &__app {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-image: url('../../assets/bg.png');
+    background-size: contain;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+  }
+
+  &__description {
+    padding-left: 2em;
+    width: 70%;
+    background: linear-gradient(90deg, transparent 0%, #ffffff7c 2em, #ffffffce 50%, vars.$snow 100%);
+    @media (max-width: vars.$mediumScreen) {
+      // width: 80%;
+    }
+    @media (max-width: vars.$smallScreen) {
+      margin-top: 8em;
+      width: 100%;
+      padding: 0 1em;
+      background: linear-gradient(180deg, transparent 0%, #ffffff7c 1em, #ffffffce 20%, vars.$snow 100%);    }
+  }
+
+  &__text {
+    font-size: 1.2em;
+  }
+
+  &__advantages {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__feature {
+    position: relative;
+    list-style-type: none;
+    display: block;
+    width: 45%;
+    margin-bottom: 1em;
+    border: 2px solid vars.$green;
+    background-color: vars.$green;
+    color: vars.$snow;
+    font-weight: 500;
+    font-size: 1.1em;
+    padding: 5px 5px 5px 35px;
+    border-radius: 1em;
+    @media (max-width: vars.$mediumScreen) {
+      font-size: 1em;
+      width: 100%;
+    }
+    animation: 1s ease-out 0s 1 slideInFromRight;
+    @keyframes slideInFromRight {
+      0% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    &::before {
+      content: url('../../assets/icons/lightbulb_outline.svg');
+      filter: vars.$filter-orange;
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      margin-top: -12px;
+      vertical-align: widdle;
+      width: 2em;
+      object-fit: cover;
+    }
+
+    &:nth-child(1)::before {
+      content: url('../../assets/icons/book.svg');
+    }
+
+    &:nth-child(2)::before {
+      content: url('../../assets/icons/user.svg');
+    }
+
+    &:nth-child(3)::before {
+      content: url('../../assets/icons/sprint.svg');
+    }
+
+    &:nth-child(4)::before {
+      content: url('../../assets/icons/volume.svg');
+    }
+
+    &:nth-child(5)::before {
+      content: url('../../assets/icons/devices.svg');
+    }
+
+    &:nth-child(6)::before {
+      content: url('../../assets/icons/wallet.svg');
+    }
+
+    @media (max-width: vars.$smallScreen) {
+      width: 100%;
+    }
+  }
+
+  &__video {
+    margin: 2em 0 0 0;
+  }
+
+  &__title {
+    font-size: 2em;
+    padding: 0 0 5px 0;
+    margin: 0;
+    border-bottom: 3px solid vars.$green;
+  }
+
+  .team {
+    &__list {
+      display: flex;
+      margin: 1em 0 1em 0;
+      padding: 0;
+      justify-content: space-between;
+      @media (max-width: vars.$smallScreen) {
+        flex-direction: column;
+      }
+    }
+
+    .member {
+      position: relative;
+      list-style: none;
+      display: flex;
+      border: 2px solid vars.$green;
+      border-radius: 1em;
+      width: 31%;
+      padding: 7px;
+      @media (max-width: vars.$mediumScreen) {
+        flex-direction: column;
+        font-size: 14px;
+        align-items: center;
+      }
+      @media (max-width: vars.$smallScreen) {
+        flex-direction: row;
+        width: 100%;
+        margin-bottom: 1em;
+      }
+
+      &__photo {
+        display: block;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 15px 0 0;
+        @media (max-width: vars.$mediumScreen) {
+          width: 100px;
+          height: 100px;
+        }
+      }
+
+      &__name {
+        font-size: 1.2em;
+        padding: 0 0 7px 0;
+        margin: 0;
+      }
+
+      &__role {
+        font-style: italic;
+        margin: 0 7px 0 0;
+      }
+
+      &__duties {
+        padding: 0 0 0 10px;
+        margin: 0;
+      }
+
+      .github {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        &__icon {
+          filter: vars.$filter-green;
+        }
+        &:hover .github__icon {
+          filter: vars.$filter-orange;
+        }
+        &:active .github__icon {
+          opacity: 0.7;
+        }
+      }
+    }
+  }
+}

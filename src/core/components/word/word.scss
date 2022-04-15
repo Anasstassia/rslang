@@ -1,0 +1,160 @@
+@use '../../../scss/vars.scss';
+
+.word {
+  max-width: 500px;
+  display: grid;
+  grid-template-columns: 7fr 7fr 1fr;
+  row-gap: 5px;
+  column-gap: 15px;
+  grid-template-areas:
+        "img wordEn audio"
+        "img transcript done"
+        "img wordRu difficult"
+        "meaning meaning ."
+        "meaningRu meaningRu ."
+        "example example right"
+        "exampleRu exampleRu wrong";
+        padding: 7px;
+  border: 2px solid vars.$jet;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: vars.$snow;
+  & > * {
+    padding: 0;
+    margin: 0;
+  }
+
+  &__img {
+    grid-area: img;
+    position: relative;
+    img {
+      width: 100%;    
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: block;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(0.25turn, transparent, vars.$snow);
+    }
+  }
+
+  &__en {
+    grid-area: wordEn;
+    font-size: 2em;
+  }
+
+  &__ru {
+    grid-area: wordRu;
+    font-size: 1.5em;
+  }
+
+  &__transcript {
+    grid-area: transcript;
+    font-size: 1.4em;
+  }
+
+  &__meaning,
+  &__meaning_ru {
+
+  }
+
+  &__example,
+  &__example_ru {
+    font-style: italic;
+  }
+  &__meaning {
+    grid-area: meaning;
+  }
+
+  &__meaning_ru {
+    grid-area: meaningRu;
+  }
+
+  &__example {
+    grid-area: example;
+  }
+
+  &__example_ru {
+    grid-area: exampleRu;
+  }
+
+  .checkbox {
+    display: none;
+    &:checked + * {
+      filter: vars.$filter-orange;
+    }
+  }
+
+  &__btn {
+    filter: vars.$filter-jet;
+    background-size: 90%;
+    &:hover {
+      filter: vars.$filter-green;
+    }
+    &:active {
+      filter: vars.$filter-blue-green;
+    }
+  }
+
+  .btn_audio {
+    grid-area: audio;
+    background-image: url("../../../assets/icons/volume.svg");
+    &.btn_pause {
+      background-image: url("../../../assets/icons/pause.svg");
+    }
+  }
+
+  .btn_done {
+    grid-area: done;
+    background-image: url("../../../assets/icons/check.svg");
+  }
+
+  .btn_difficult {
+    grid-area: difficult;
+    background-image: url("../../../assets/icons/lightbulb_outline.svg"); 
+  }
+
+  &__result {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    justify-self: center;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    color: vars.$jet;
+  }
+
+  &__right-ans {
+    grid-area: right;
+    border-color: vars.$green;
+  }
+
+  &__wrong-ans {
+    grid-area: wrong;
+    border-color: vars.$red;
+  }
+
+  &_done.word {
+    border-color: #838282;
+    background-color: #eeeeee;
+    .word__img {
+      filter: grayscale(1);
+    }
+
+    .word__result {
+      border-color: #838282;
+    }
+  }
+  
+  &_difficult {
+    box-shadow: 0px 0px 10px 8px rgba(44, 44, 44, 0.4);
+  }
+
+}

@@ -1,0 +1,61 @@
+@use '../../../scss/vars.scss';
+
+.menu {
+  width: 70px;
+  height: 100%;
+  background-color: vars.$green;
+
+  &__list {
+    padding: 20px 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+  }
+  &__item {
+    list-style: none;
+    margin: 0.5em;
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.3);
+      opacity: 0.7;
+    }
+
+  }
+  &__link {
+    display: block;
+    margin: 7px;
+    width: 40px;
+    height: 40px;
+    background-size: contain;
+    filter: vars.$filter-snow;
+    cursor: pointer;
+
+    .menu__item:hover & {
+      filter: vars.$filter-orange;
+    }
+
+    &_vocabulary {
+      background-image: url('../../../assets/icons/book.svg');
+    }
+
+    &_audio {
+      background-image: url('../../../assets/icons/volume.svg');
+    }
+
+    &_sprint {
+      background-image: url('../../../assets/icons/sprint.svg');
+    }
+
+    &_stats {
+      background-image: url('../../../assets/icons/stat.svg');
+    }
+
+    &_logout {
+      background-image: url('../../../assets/icons/logout.svg');
+    }
+  }
+}

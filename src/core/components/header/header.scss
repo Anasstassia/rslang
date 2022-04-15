@@ -1,0 +1,51 @@
+/* HEADER */
+@use '../../../scss/vars.scss';
+
+.header {
+  background-color: vars.$jet;
+  font-size: 20px;
+
+  @media (max-width: vars.$smallScreen) {
+    font-size: 16px;
+  }
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    &_btn {
+      display: flex;
+      align-items: center;
+      color: vars.$green;
+    }
+  }
+
+  .logo {
+    display: block;
+    cursor: pointer;
+    padding: 0 0 0 3.5em;
+    margin: 7px 0;
+    text-decoration: none;
+    text-align: right;
+    color: #000000;
+    font-weight: 600;
+    background-image: url('../../../assets/logo.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: vars.$filter-snow;
+
+    &:hover {
+      filter: vars.$filter-green;
+    }
+
+    &__top,
+    &__bottom {
+      display: block;
+    }
+
+    &__top {
+      font-size: 1.8em;
+      line-height: 1em;
+    }
+  }
+}

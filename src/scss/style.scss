@@ -1,0 +1,205 @@
+@use './vars.scss';
+/* GLOBAL */
+* {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'PT Sans';
+  src: url('../assets/fonts/ptsans.woff2'), url('../assets/fonts/ptsans.woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PT Sans';
+  src: url('../assets/fonts/ptsansbold.woff2'), url('../assets/fonts/ptsansbold.woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+.page {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  font-family: 'PT Sans', sans-serif, Tahoma;
+  background-color: vars.$snow;
+  overflow-x: hidden;
+}
+
+.visually-hidden {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+}
+
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 15px;
+  height: 100%;
+}
+
+.section {
+  height: 100%;
+
+  &__title {
+    font-weight: bold;
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0.5em 0;
+  }
+}
+
+.btn {
+  display: block;
+  text-decoration: none;
+  border: 2px solid transparent;
+  background: transparent center no-repeat;
+  cursor: pointer;
+  border-radius: 1em;
+
+  &_icon {
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    border-color: black;
+    color: black;
+    filter: vars.$filter-snow;
+    &:hover {
+      filter: vars.$filter-green;
+    }
+    &:active {
+      filter: vars.$filter-blue-green;
+    }
+  }
+
+  &_text {
+    color: vars.$jet;
+    border-color: vars.$jet;
+    &:hover {
+      background-color: vars.$green;
+      border-color: transparent;
+      color: vars.$snow;
+    }
+    &:active {
+      border-color: vars.$blue-green;
+    }
+  }
+
+  &_auth {
+    border: none;
+    background-size: cover;
+    background-image: url('../assets/icons/user-login.svg');
+    margin-left: 20px;
+  }
+  &_user {
+    background-image: url('../assets/icons/user.svg');
+  }
+
+  &_close {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    background-image: url('../assets/icons/close_big.svg');
+
+    &:hover {
+      filter: vars.$filter-blue-green;
+    }
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}
+
+.popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal {
+  max-width: 300px;
+  width: 80%;
+  position: relative;
+  top: 10%;
+  text-align: center;
+  padding: 0.8em;
+  margin: 0 auto;
+  border-radius: 15px;
+  background-color: vars.$jet;
+  @media (max-width: vars.$smallScreen) {
+    font-size: 16px;
+    top: 10px;
+  }
+}
+
+/* MAIN*/
+.main {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+.hide {
+  display: none;
+}
+
+.auth {
+  display: block;
+}
+
+.github {
+  display: flex;
+  text-decoration: none;
+  transition: all 0.3s;
+  align-items: center;
+  &__icon {
+    display: inline-block;
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: transparent url('../assets/icons/gh.svg') center no-repeat;
+    background-size: contain;
+    filter: vars.$filter-snow;
+  }
+
+  &__text {
+    margin: 0 0 0 10px;
+    font-family: inherit;
+    font-size: 16px;
+    color: vars.$snow;
+  }
+
+  &:hover {
+    .github__text {
+      color: vars.$green;
+    }
+    .github__icon {
+      filter: vars.$filter-green;
+    }
+  }
+
+  &:active {
+    .github__text {
+      color: vars.$blue-green;
+    }
+    .github__icon {
+      filter: vars.$filter-blue-green;
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "include": ["./src/"],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "sourceMap": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "allowJs": true,
+    "lib": ["es2015", "DOM", "ESNext"]
+  }
+}
